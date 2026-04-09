@@ -1,4 +1,3 @@
-# config/settings.yaml
 worldbank:
   countries:
     # G20
@@ -237,7 +236,8 @@ worldbank:
     end: 2024
 
   fetch:
-    chunk_size: 30
+    chunk_size: 10
+    country_chunk: 30
     sleep_seconds: 1
     retry_delay: 5
     output_format: parquet
