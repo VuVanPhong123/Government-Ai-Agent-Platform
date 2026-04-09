@@ -2,6 +2,7 @@ venv/
 .env
 env/
 .venv/
+config/keys.env
 
 __pycache__/
 *.pyc
