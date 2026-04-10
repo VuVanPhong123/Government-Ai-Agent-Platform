@@ -1,0 +1,47 @@
+PROFILE FOR: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_Elements.csv
+Generated on: 2026-04-10 21:28:04
+
+BASIC STATISTICS:
+Total Rows: 6
+Total Columns: 2
+
+SCHEMA:
+Element Code                             : int
+Element                                  : string
+
+Data Type Distribution:
+------------------------------------------------------------
+int            :   1 columns
+string         :   1 columns
+
+SAMPLE DATA:
++------------+-----------------------------------------+
+|Element Code|                                  Element|
++------------+-----------------------------------------+
+|         495|  Export Quantity Index (2014-2016 = 100)|
+|         494|Export Unit/Value Index (2014-2016 = 100)|
+|         492|     Export Value Index (2014-2016 = 100)|
+|         465|  Import Quantity Index (2014-2016 = 100)|
+|         464|Import Unit/Value Index (2014-2016 = 100)|
++------------+-----------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_Elements.csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Element Code                                      0        0.00%
+Element                                           0        0.00%
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+
+|summary|      Element Code|
++-------+------------------+
+|  count|                 6|
+|   mean| 478.6666666666667|
+| stddev|16.488379746556873|
+|    min|               462|
+|    max|               495|
++-------+------------------+
+

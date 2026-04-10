@@ -1,0 +1,45 @@
+PROFILE FOR: Prices_E_All_Data_(Normalized)\Prices_E_Elements.csv
+Generated on: 2026-04-10 21:10:58
+
+BASIC STATISTICS:
+Total Rows: 4
+Total Columns: 2
+
+SCHEMA:
+Element Code                             : int
+Element                                  : string
+
+Data Type Distribution:
+------------------------------------------------------------
+int            :   1 columns
+string         :   1 columns
+
+SAMPLE DATA:
++------------+--------------------------------------+
+|Element Code|                               Element|
++------------+--------------------------------------+
+|        5530|            Producer Price (LCU/tonne)|
+|        5531|            Producer Price (SLC/tonne)|
+|        5532|            Producer Price (USD/tonne)|
+|        5539|Producer Price Index (2014-2016 = 100)|
++------------+--------------------------------------+
+
+
+NULL MISSING VALUE ANALYSIS: Prices_E_All_Data_(Normalized)\Prices_E_Elements.csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Element Code                                      0        0.00%
+Element                                           0        0.00%
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+----------------+
+|summary|    Element Code|
++-------+----------------+
+|  count|               4|
+|   mean|          5533.0|
+| stddev|4.08248290463863|
+|    min|            5530|
+|    max|            5539|
++-------+----------------+
+

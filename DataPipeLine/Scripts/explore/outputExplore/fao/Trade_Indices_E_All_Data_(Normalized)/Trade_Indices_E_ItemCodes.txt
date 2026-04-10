@@ -1,0 +1,38 @@
+PROFILE FOR: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_ItemCodes.csv
+Generated on: 2026-04-10 21:28:06
+
+BASIC STATISTICS:
+Total Rows: 194
+Total Columns: 3
+
+SCHEMA:
+Item Code                                : string
+CPC Code                                 : string
+Item                                     : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   3 columns
+
+SAMPLE DATA:
++---------+---------+-----------------------------------+
+|Item Code| CPC Code|                               Item|
++---------+---------+-----------------------------------+
+|     2080|     NULL|              Additional aggregates|
+|      800|'01929.06|          Agave fibres; raw; n.e.c.|
+|     1907|   'F1907|                Alcoholic Beverages|
+|     1975|   'F1975|Animal Fats and Oils (excl. Butter)|
+|      515|   '01341|                             Apples|
++---------+---------+-----------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_ItemCodes.csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+CPC Code                                          2        1.03%
+Item Code                                         0        0.00%
+Item                                              0        0.00%
+
+No numeric columns found in this dataset

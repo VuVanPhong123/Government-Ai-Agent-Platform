@@ -1,0 +1,72 @@
+PROFILE FOR: Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_All_Data_(Normalized).csv
+Generated on: 2026-04-10 21:09:46
+
+BASIC STATISTICS:
+Total Rows: 145,389
+Total Columns: 14
+
+SCHEMA:
+Area Code                                : int
+Area Code (M49)                          : string
+Area                                     : string
+Element Code                             : string
+Element                                  : string
+ISO Currency Code                        : string
+Currency                                 : string
+Year Code                                : int
+Year                                     : int
+Months Code                              : int
+Months                                   : string
+Unit                                     : string
+Value                                    : double
+Flag                                     : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   9 columns
+int            :   4 columns
+double         :   1 columns
+
+SAMPLE DATA:
++---------+---------------+-----------+------------+----------------------------+-----------------+--------+---------+----+-----------+------------+----+-----------+----+
+|Area Code|Area Code (M49)|       Area|Element Code|                     Element|ISO Currency Code|Currency|Year Code|Year|Months Code|      Months|Unit|      Value|Flag|
++---------+---------------+-----------+------------+----------------------------+-----------------+--------+---------+----+-----------+------------+----+-----------+----+
+|        2|           '004|Afghanistan|         LCU|Local currency units per USD|              AFA| Afghani|     1970|1970|       7021|Annual value|NULL|44.99842708|   X|
+|        2|           '004|Afghanistan|         LCU|Local currency units per USD|              AFA| Afghani|     1970|1970|       7001|     January|NULL|38.69226155|   X|
+|        2|           '004|Afghanistan|         LCU|Local currency units per USD|              AFA| Afghani|     1970|1970|       7002|    February|NULL|38.69226155|   X|
+|        2|           '004|Afghanistan|         LCU|Local currency units per USD|              AFA| Afghani|     1970|1970|       7003|       March|NULL|38.69226155|   X|
+|        2|           '004|Afghanistan|         LCU|Local currency units per USD|              AFA| Afghani|     1970|1970|       7004|       April|NULL|38.69226155|   X|
++---------+---------------+-----------+------------+----------------------------+-----------------+--------+---------+----+-----------+------------+----+-----------+----+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_All_Data_(Normalized).csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Unit                                        145,389      100.00%
+Value                                            15        0.01%
+Area Code                                         0        0.00%
+Area Code (M49)                                   0        0.00%
+Area                                              0        0.00%
+Element Code                                      0        0.00%
+Element                                           0        0.00%
+ISO Currency Code                                 0        0.00%
+Currency                                          0        0.00%
+Year Code                                         0        0.00%
+Year                                              0        0.00%
+Months Code                                       0        0.00%
+Months                                            0        0.00%
+Flag                                              0        0.00%
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+-----------------+------------------+------------------+------------------+--------------------+
+|summary|        Area Code|         Year Code|              Year|       Months Code|               Value|
++-------+-----------------+------------------+------------------+------------------+--------------------+
+|  count|           145389|            145389|            145389|            145389|              145374|
+|   mean|129.8300765532468|1998.9397753612723|1998.9397753612723| 7008.904662663613|   669657.1875625423|
+| stddev|75.93808163964748|16.186537429436406|16.186537429436406|6.2572628333262506|1.8605741436981156E8|
+|    min|                1|              1970|              1970|              7001|             4.3E-14|
+|    max|              299|              2026|              2026|              7021|     6.9078379717E10|
++-------+-----------------+------------------+------------------+------------------+--------------------+
+

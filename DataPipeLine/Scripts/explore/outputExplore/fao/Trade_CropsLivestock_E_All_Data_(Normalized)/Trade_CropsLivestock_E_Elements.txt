@@ -1,0 +1,47 @@
+PROFILE FOR: Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_Elements.csv
+Generated on: 2026-04-10 21:22:30
+
+BASIC STATISTICS:
+Total Rows: 10
+Total Columns: 2
+
+SCHEMA:
+Element Code                             : int
+Element                                  : string
+
+Data Type Distribution:
+------------------------------------------------------------
+int            :   1 columns
+string         :   1 columns
+
+SAMPLE DATA:
++------------+---------------+
+|Element Code|        Element|
++------------+---------------+
+|        5907|Export quantity|
+|        5908|Export quantity|
+|        5909|Export quantity|
+|        5910|Export quantity|
+|        5922|   Export value|
++------------+---------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_Elements.csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Element Code                                      0        0.00%
+Element                                           0        0.00%
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+
+|summary|      Element Code|
++-------+------------------+
+|  count|                10|
+|   mean|            5761.2|
+| stddev|158.21981895802787|
+|    min|              5607|
+|    max|              5922|
++-------+------------------+
+

@@ -1,0 +1,1065 @@
+REPORT GENERATED ON: 2026-04-10 20:58:36
+
+Source directory: C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/unuwider(tax)/
+Total sheets across all files: 15
+
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_Central::LCU
+================================================================================
+BASIC STATISTICS:
+Total Rows: 7,299
+Total Columns: 66
+
+SCHEMA:
+Database source                          : string
+Govern-ment                              : string
+datastatuscode                           : string
+identifier                               : string
+country                                  : string
+iso                                      : string
+downloadyr                               : double
+Data status                              : string
+Fiscal year                              : string
+year                                     : double
+Reg                                      : string
+Inc                                      : string
+x                                        : string
+currency                                 : string
+GDP lcu mn                               : string
+Common GDP Series                        : double
+Flag 1 if substitute GDP, 0 if leave alone : double
+Revenue Data Scalar                      : double
+Total Revenue                            : string
+Unnamed: 19                              : string
+Unnamed: 20                              : string
+Unnamed: 21                              : string
+Total Resource Revenue                   : double
+Total Non-Resource Revenue (inc SC)      : double
+Taxes                                    : string
+Unnamed: 25                              : string
+Resource Taxes                           : double
+Non-Resource Tax                         : string
+Unnamed: 28                              : string
+Direct Taxes                             : string
+Unnamed: 30                              : string
+Unnamed: 31                              : string
+Unnamed: 32                              : string
+Taxes on Income, Profits & Capital Gains : string
+Unnamed: 34                              : string
+Unnamed: 35                              : string
+Unnamed: 36                              : string
+Unnamed: 37                              : string
+Unnamed: 38                              : string
+Unnamed: 39                              : string
+Taxes on Payroll & Workforce             : double
+Property Taxes                           : double
+Indirect Taxes                           : string
+Unnamed: 43                              : string
+Unnamed: 44                              : string
+Taxes on Goods and Services              : string
+Unnamed: 46                              : string
+Unnamed: 47                              : string
+Unnamed: 48                              : string
+Taxes on International Trade             : string
+Unnamed: 50                              : string
+Unnamed: 51                              : string
+Other Taxes                              : double
+Non-Tax Revenue                          : string
+Unnamed: 54                              : string
+Unnamed: 55                              : string
+Social Contributions                     : double
+Grants                                   : double
+General Notes                            : string
+Caution1 Accuracy, Quality or Comparability of data is questionable. : string
+Caution 1  Notes                         : string
+Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes : string
+Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible : double
+Resource Revenue Notes                   : string
+Caution 4 Inconsistencies with Social Contributions : string
+Social contributions notes               : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  52 columns
+double         :  14 columns
+
+SAMPLE DATA:
++------------------+-----------+--------------+----------+-------+----+----------+-----------+-----------+------+-------------------------+-----------+----+-------------+----------+-----------------+------------------------------------------+-------------------+----------------+-----------+----------------+-----------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+
+|   Database source|Govern-ment|datastatuscode|identifier|country| iso|downloadyr|Data status|Fiscal year|  year|                      Reg|        Inc|   x|     currency|GDP lcu mn|Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|Revenue Data Scalar|   Total Revenue|Unnamed: 19|     Unnamed: 20|Unnamed: 21|Total Resource Revenue|Total Non-Resource Revenue (inc SC)|       Taxes| Unnamed: 25|Resource Taxes|Non-Resource Tax| Unnamed: 28|Direct Taxes|Unnamed: 30| Unnamed: 31|Unnamed: 32|Taxes on Income, Profits & Capital Gains|       Unnamed: 34|           Unnamed: 35|Unnamed: 36|Unnamed: 37|       Unnamed: 38|            Unnamed: 39|Taxes on Payroll & Workforce|Property Taxes|Indirect Taxes|       Unnamed: 43|           Unnamed: 44|Taxes on Goods and Services|                             Unnamed: 46|Unnamed: 47|Unnamed: 48|Taxes on International Trade|Unnamed: 50|Unnamed: 51|Other Taxes|Non-Tax Revenue|       Unnamed: 54|           Unnamed: 55|Social Contributions|Grants|                                     General Notes|Caution1 Accuracy, Quality or Comparability of data is questionable.|Caution 1  Notes|Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes|Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible|Resource Revenue Notes|Caution 4 Inconsistencies with Social Contributions|                        Social contributions notes|
++------------------+-----------+--------------+----------+-------+----+----------+-----------+-----------+------+-------------------------+-----------+----+-------------+----------+-----------------+------------------------------------------+-------------------+----------------+-----------+----------------+-----------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+
+|              NULL|       NULL|          NULL|      NULL|   NULL|NULL|      NULL|       NULL|       NULL|  NULL|                     NULL|       NULL|NULL|         NULL|      NULL|             NULL|                                      NULL|               NULL|Including Grants|       NULL|Excluding Grants|       NULL|                  NULL|                               NULL|Including SC|Excluding SC|          NULL|    Including SC|Excluding SC|Including SC|       NULL|Excluding SC|       NULL|                                   Total|Resource Component|Non-Resource Component|    o/w PIT|    o/w CIT|              NULL|                   NULL|                        NULL|          NULL|         Total|Resource Component|Non-Resource Component|                      Total|o/w General (Sales, VAT, Turnover, TFCT)|        VAT|o/w Excises|                       Total| o/w Import| o/w Export|       NULL|          Total|Resource Component|Non-Resource Component|                NULL|  NULL|                                              NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                                              NULL|
+|              NULL|       NULL|          NULL|      NULL|   NULL|NULL|      NULL|       NULL|       NULL|  NULL|                     NULL|       NULL|NULL|         NULL|      NULL|             NULL|                                      NULL|               NULL|          Inc SC|      Ex SC|          Inc SC|      Ex SC|                  NULL|                               NULL|        NULL|        NULL|          NULL|            NULL|        NULL|Inc Resource|Ex Resource|Inc Resource|Ex Resource|                                    NULL|              NULL|                  NULL|       NULL|      Total|Resource component|Non- Resource component|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|  NULL|                                              NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                                              NULL|
+|IMF Country Report|  Budgetary|          NULL|   ABW1986|  Aruba| ABW|      NULL|     Actual|       1986|1986.0|Latin America & Caribbean|High income|NULL|Aruban florin|      1204|            726.0|                                       0.0|                1.0|            NULL|      321.4|            NULL|     313.36|                   0.0|                             313.36|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|  8.04|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|
+|IMF Country Report|  Budgetary|          NULL|   ABW1987|  Aruba| ABW|      NULL|     Actual|       1987|1987.0|Latin America & Caribbean|High income|NULL|Aruban florin|   1268.18|            873.0|                                       0.0|                1.0|            NULL|      394.4|            NULL|      384.1|                   0.0|                              384.1|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|  10.3|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|
+|IMF Country Report|  Budgetary|          NULL|   ABW1988|  Aruba| ABW|      NULL|     Actual|       1988|1988.0|Latin America & Caribbean|High income|NULL|Aruban florin|   1335.79|           1068.0|                                       0.0|                1.0|            NULL|      301.9|            NULL|      294.1|                   0.0|                              294.1|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|   7.8|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|
++------------------+-----------+--------------+----------+-------+----+----------+-----------+-----------+------+-------------------------+-----------+----+-------------+----------+-----------------+------------------------------------------+-------------------+----------------+-----------+----------------+-----------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_Central::LCU
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+------------------+-------------------+------------------------------------------+-------------------+
+|summary|        downloadyr|              year|  Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|Revenue Data Scalar|
++-------+------------------+------------------+-------------------+------------------------------------------+-------------------+
+|  count|              2022|              7297|               7201|                                      7274|               7274|
+|   mean|2019.3422354104846| 2002.916678086885|7.596552971087348E7|                        0.9384107781138301|  828.4624869397855|
+| stddev| 74.95791058174429|12.190990504864482|7.745080015240916E8|                       0.24042449185596915| 28710.368033082974|
+|    min|              10.0|            1980.0|                0.0|                                       0.0|               0.01|
+|    max|            2025.0|            2024.0|           2.089E10|                                       1.0|          1000000.0|
++-------+------------------+------------------+-------------------+------------------------------------------+-------------------+
+
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_Central::PCTGDP
+================================================================================
+BASIC STATISTICS:
+Total Rows: 7,299
+Total Columns: 66
+
+SCHEMA:
+Database source                          : string
+Govern-ment                              : string
+datastatuscode                           : string
+identifier                               : string
+country                                  : string
+iso                                      : string
+downloadyr                               : double
+Data status                              : string
+Fiscal year                              : string
+year                                     : double
+Reg                                      : string
+Inc                                      : string
+Unnamed: 12                              : string
+currency                                 : string
+GDP lcu mn                               : string
+Common GDP Series                        : double
+Flag 1 if substitute GDP, 0 if leave alone : double
+Revenue Data Scalar                      : double
+Total Revenue                            : string
+Unnamed: 19                              : string
+Unnamed: 20                              : string
+Unnamed: 21                              : string
+Total Resource Revenue                   : double
+Total Non-Resource Revenue (inc SC)      : double
+Taxes                                    : string
+Unnamed: 25                              : string
+Resource Taxes                           : double
+Non-Resource Tax                         : string
+Unnamed: 28                              : string
+Direct Taxes                             : string
+Unnamed: 30                              : string
+Unnamed: 31                              : string
+Unnamed: 32                              : string
+Taxes on Income, Profits & Capital Gains : string
+Unnamed: 34                              : string
+Unnamed: 35                              : string
+Unnamed: 36                              : string
+Unnamed: 37                              : string
+Unnamed: 38                              : string
+Unnamed: 39                              : string
+Taxes on Payroll & Workforce             : double
+Property Taxes                           : double
+Indirect Taxes                           : string
+Unnamed: 43                              : string
+Unnamed: 44                              : string
+Taxes on Goods and Services              : string
+Unnamed: 46                              : string
+Unnamed: 47                              : string
+Unnamed: 48                              : string
+Taxes on International Trade             : string
+Unnamed: 50                              : string
+Unnamed: 51                              : string
+Other Taxes                              : double
+Non-Tax Revenue                          : string
+Unnamed: 54                              : string
+Unnamed: 55                              : string
+Social Contributions                     : double
+Grants                                   : double
+General Notes                            : string
+Caution1 Accuracy, Quality or Comparability of data is questionable. : string
+Caution 1  Notes                         : string
+Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes : string
+Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible : double
+Resource Revenue Notes                   : string
+Caution 4 Inconsistencies with Social Contributions : string
+Social contributions notes               : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  52 columns
+double         :  14 columns
+
+SAMPLE DATA:
++------------------+-----------+--------------+----------+-------+----+----------+-----------+-----------+------+-------------------------+-----------+-----------+-------------+----------+-----------------+------------------------------------------+-------------------+----------------+-------------------+----------------+------------------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+--------------------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+
+|   Database source|Govern-ment|datastatuscode|identifier|country| iso|downloadyr|Data status|Fiscal year|  year|                      Reg|        Inc|Unnamed: 12|     currency|GDP lcu mn|Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|Revenue Data Scalar|   Total Revenue|        Unnamed: 19|     Unnamed: 20|       Unnamed: 21|Total Resource Revenue|Total Non-Resource Revenue (inc SC)|       Taxes| Unnamed: 25|Resource Taxes|Non-Resource Tax| Unnamed: 28|Direct Taxes|Unnamed: 30| Unnamed: 31|Unnamed: 32|Taxes on Income, Profits & Capital Gains|       Unnamed: 34|           Unnamed: 35|Unnamed: 36|Unnamed: 37|       Unnamed: 38|            Unnamed: 39|Taxes on Payroll & Workforce|Property Taxes|Indirect Taxes|       Unnamed: 43|           Unnamed: 44|Taxes on Goods and Services|                             Unnamed: 46|Unnamed: 47|Unnamed: 48|Taxes on International Trade|Unnamed: 50|Unnamed: 51|Other Taxes|Non-Tax Revenue|       Unnamed: 54|           Unnamed: 55|Social Contributions|              Grants|                                     General Notes|Caution1 Accuracy, Quality or Comparability of data is questionable.|Caution 1  Notes|Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes|Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible|Resource Revenue Notes|Caution 4 Inconsistencies with Social Contributions|                        Social contributions notes|
++------------------+-----------+--------------+----------+-------+----+----------+-----------+-----------+------+-------------------------+-----------+-----------+-------------+----------+-----------------+------------------------------------------+-------------------+----------------+-------------------+----------------+------------------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+--------------------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+
+|              NULL|       NULL|          NULL|      NULL|   NULL|NULL|      NULL|       NULL|       NULL|  NULL|                     NULL|       NULL|       NULL|         NULL|      NULL|             NULL|                                      NULL|               NULL|Including Grants|               NULL|Excluding Grants|              NULL|                  NULL|                               NULL|Including SC|Excluding SC|          NULL|    Including SC|Excluding SC|Including SC|       NULL|Excluding SC|       NULL|                                   Total|Resource Component|Non-Resource Component|    o/w PIT|    o/w CIT|              NULL|                   NULL|                        NULL|          NULL|         Total|Resource Component|Non-Resource Component|                      Total|o/w General (Sales, VAT, Turnover, TFCT)|        VAT|o/w Excises|                       Total| o/w Import| o/w Export|       NULL|          Total|Resource Component|Non-Resource Component|                NULL|                NULL|                                              NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                                              NULL|
+|              NULL|       NULL|          NULL|      NULL|   NULL|NULL|      NULL|       NULL|       NULL|  NULL|                     NULL|       NULL|       NULL|         NULL|      NULL|             NULL|                                      NULL|               NULL|          Inc SC|              Ex SC|          Inc SC|             Ex SC|                  NULL|                               NULL|        NULL|        NULL|          NULL|            NULL|        NULL|Inc Resource|Ex Resource|Inc Resource|Ex Resource|                                    NULL|              NULL|                  NULL|       NULL|      Total|Resource component|Non- Resource component|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|                NULL|                                              NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                                              NULL|
+|IMF Country Report|  Budgetary|          NULL|   ABW1986|  Aruba| ABW|      NULL|     Actual|       1986|1986.0|Latin America & Caribbean|High income|       NULL|Aruban florin|      1204|            726.0|                                       0.0|                1.0|            NULL| 0.2669435215946844|            NULL| 0.260265780730897|                  NULL|                  0.260265780730897|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|0.006677740863787375|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|
+|IMF Country Report|  Budgetary|          NULL|   ABW1987|  Aruba| ABW|      NULL|     Actual|       1987|1987.0|Latin America & Caribbean|High income|       NULL|Aruban florin|   1268.18|            873.0|                                       0.0|                1.0|            NULL|0.31099686164424606|            NULL|0.3028749862006971|                  NULL|                 0.3028749862006971|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|0.008121875443549023|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|
+|IMF Country Report|  Budgetary|          NULL|   ABW1988|  Aruba| ABW|      NULL|     Actual|       1988|1988.0|Latin America & Caribbean|High income|       NULL|Aruban florin|   1335.79|           1068.0|                                       0.0|                1.0|            NULL|0.22600857919283718|            NULL|0.2201693379947447|                  NULL|                 0.2201693379947447|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|0.005839241198092515|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|
++------------------+-----------+--------------+----------+-------+----+----------+-----------+-----------+------+-------------------------+-----------+-----------+-------------+----------+-----------------+------------------------------------------+-------------------+----------------+-------------------+----------------+------------------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+--------------------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_Central::PCTGDP
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+-----------------+------------------+-------------------+------------------------------------------+-------------------+
+|summary|       downloadyr|              year|  Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|Revenue Data Scalar|
++-------+-----------------+------------------+-------------------+------------------------------------------+-------------------+
+|  count|             2017|              7297|               7212|                                      7297|               7297|
+|   mean|2019.328210213188| 2002.916678086885|7.585019137576261E7|                        0.9392901192270796|  825.8543415102097|
+| stddev| 75.0502765507013|12.190990504864482| 7.73922667693952E8|                       0.23881374953115866| 28665.116384553286|
+|    min|             10.0|            1980.0|                0.0|                                       0.0|               0.01|
+|    max|           2025.0|            2024.0|           2.089E10|                                       1.0|          1000000.0|
++-------+-----------------+------------------+-------------------+------------------------------------------+-------------------+
+
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_Central::GDP
+================================================================================
+BASIC STATISTICS:
+Total Rows: 9,800
+Total Columns: 5
+
+SCHEMA:
+identifier                               : string
+iso                                      : string
+year                                     : int
+GDP, lcu mn. IMF WEO                     : double
+Unnamed: 4                               : double
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   2 columns
+double         :   2 columns
+int            :   1 columns
+
+SAMPLE DATA:
++----------+---+----+--------------------+----------+
+|identifier|iso|year|GDP, lcu mn. IMF WEO|Unnamed: 4|
++----------+---+----+--------------------+----------+
+|   AFG1980|AFG|1980|                NULL|      NULL|
+|   AFG1981|AFG|1981|                NULL|      NULL|
+|   AFG1982|AFG|1982|                NULL|      NULL|
+|   AFG1983|AFG|1983|                NULL|      NULL|
+|   AFG1984|AFG|1984|                NULL|      NULL|
++----------+---+----+--------------------+----------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_Central::GDP
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_Central::Reg_Inc
+================================================================================
+BASIC STATISTICS:
+Total Rows: 218
+Total Columns: 6
+
+SCHEMA:
+country                                  : string
+iso                                      : string
+reg                                      : string
+inc                                      : string
+Unnamed: 4                               : string
+Source: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups Accessed September 2025 : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   6 columns
+
+SAMPLE DATA:
++--------------+---+--------------------------+-------------------+----------+--------------------------------------------------------------------------------------------------------------------------------------+
+|       country|iso|                       reg|                inc|Unnamed: 4|Source: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups Accessed September 2025|
++--------------+---+--------------------------+-------------------+----------+--------------------------------------------------------------------------------------------------------------------------------------+
+|   Afghanistan|AFG|                South Asia|         Low income|      NULL|                                                                                    NB. The World Bank has recently reclassified Af...|
+|       Albania|ALB|     Europe & Central Asia|Upper middle income|      NULL|                                                                                                                                  NULL|
+|       Algeria|DZA|Middle East & North Africa|Upper middle income|      NULL|                                                                                                                                  NULL|
+|American Samoa|ASM|       East Asia & Pacific|        High income|      NULL|                                                                                                                                  NULL|
+|       Andorra|AND|     Europe & Central Asia|        High income|      NULL|                                                                                                                                  NULL|
++--------------+---+--------------------------+-------------------+----------+--------------------------------------------------------------------------------------------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_Central::Reg_Inc
+------------------------------------------------------------
+
+No numeric columns found in this dataset
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_General::LCU
+================================================================================
+BASIC STATISTICS:
+Total Rows: 5,121
+Total Columns: 74
+
+SCHEMA:
+Database source                          : string
+Govern-ment                              : string
+datastatuscode                           : string
+identifier                               : string
+country                                  : string
+iso                                      : string
+downloadyr                               : double
+Data status                              : string
+Fiscal year                              : string
+year                                     : double
+Reg                                      : string
+Inc                                      : string
+GDP used                                 : double
+currency                                 : string
+GDP lcu mn                               : string
+Common GDP Series                        : double
+Flag 1 if substitute GDP, 0 if leave alone : double
+Revenue Data Scalar                      : double
+Total Revenue                            : string
+Unnamed: 19                              : string
+Unnamed: 20                              : string
+Unnamed: 21                              : string
+Total Resource Revenue                   : double
+Total Non-Resource Revenue (inc SC)      : double
+Taxes                                    : string
+Unnamed: 25                              : string
+Resource Taxes                           : string
+Non-Resource Tax                         : string
+Unnamed: 28                              : string
+Direct Taxes                             : string
+Unnamed: 30                              : string
+Unnamed: 31                              : string
+Unnamed: 32                              : string
+Taxes on Income, Profits & Capital Gains : string
+Unnamed: 34                              : string
+Unnamed: 35                              : string
+Unnamed: 36                              : string
+Unnamed: 37                              : string
+Unnamed: 38                              : string
+Unnamed: 39                              : string
+Taxes on Payroll & Workforce             : double
+Property Taxes                           : double
+Indirect Taxes                           : string
+Unnamed: 43                              : string
+Unnamed: 44                              : string
+Taxes on Goods and Services              : string
+Unnamed: 46                              : string
+Unnamed: 47                              : string
+Unnamed: 48                              : string
+Taxes on International Trade             : string
+Unnamed: 50                              : string
+Unnamed: 51                              : string
+Other Taxes                              : double
+Non-Tax Revenue                          : string
+Unnamed: 54                              : string
+Unnamed: 55                              : string
+Social Contributions                     : double
+Grants                                   : double
+General Notes                            : string
+Caution1 Accuracy, Quality or Comparability of data is questionable. : string
+Caution 1  Notes                         : string
+Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes : string
+Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible : string
+Resource Revenue Notes                   : string
+Caution 4 Inconsistencies with Social Contributions : string
+Social contributions notes               : string
+Unnamed: 66                              : string
+Unnamed: 67                              : string
+Unnamed: 68                              : string
+Unnamed: 69                              : string
+Unnamed: 70                              : string
+Unnamed: 71                              : string
+Unnamed: 72                              : string
+Unnamed: 73                              : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  61 columns
+double         :  13 columns
+
+SAMPLE DATA:
++---------------+-----------+--------------+----------+-----------+----+----------+-----------+-----------+------+----------+----------+--------+--------------+----------+-----------------+------------------------------------------+-------------------+----------------+----------------+------------------+------------------+----------------------+-----------------------------------+------------------+------------------+--------------+----------------+------------+-----------------+-----------+------------------+-----------+----------------------------------------+------------------+----------------------+------------------+----------------+------------------+-----------------------+----------------------------+--------------+------------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+----------------+-----------+---------------+------------------+------------------+----------------------+--------------------+----------------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|Database source|Govern-ment|datastatuscode|identifier|    country| iso|downloadyr|Data status|Fiscal year|  year|       Reg|       Inc|GDP used|      currency|GDP lcu mn|Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|Revenue Data Scalar|   Total Revenue|     Unnamed: 19|       Unnamed: 20|       Unnamed: 21|Total Resource Revenue|Total Non-Resource Revenue (inc SC)|             Taxes|       Unnamed: 25|Resource Taxes|Non-Resource Tax| Unnamed: 28|     Direct Taxes|Unnamed: 30|       Unnamed: 31|Unnamed: 32|Taxes on Income, Profits & Capital Gains|       Unnamed: 34|           Unnamed: 35|       Unnamed: 36|     Unnamed: 37|       Unnamed: 38|            Unnamed: 39|Taxes on Payroll & Workforce|Property Taxes|    Indirect Taxes|       Unnamed: 43|           Unnamed: 44|Taxes on Goods and Services|                             Unnamed: 46|Unnamed: 47|Unnamed: 48|Taxes on International Trade|     Unnamed: 50|Unnamed: 51|    Other Taxes|   Non-Tax Revenue|       Unnamed: 54|           Unnamed: 55|Social Contributions|          Grants|General Notes|Caution1 Accuracy, Quality or Comparability of data is questionable.|Caution 1  Notes|Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes|Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible|Resource Revenue Notes|Caution 4 Inconsistencies with Social Contributions|Social contributions notes|Unnamed: 66|Unnamed: 67|Unnamed: 68|Unnamed: 69|Unnamed: 70|Unnamed: 71|Unnamed: 72|Unnamed: 73|
++---------------+-----------+--------------+----------+-----------+----+----------+-----------+-----------+------+----------+----------+--------+--------------+----------+-----------------+------------------------------------------+-------------------+----------------+----------------+------------------+------------------+----------------------+-----------------------------------+------------------+------------------+--------------+----------------+------------+-----------------+-----------+------------------+-----------+----------------------------------------+------------------+----------------------+------------------+----------------+------------------+-----------------------+----------------------------+--------------+------------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+----------------+-----------+---------------+------------------+------------------+----------------------+--------------------+----------------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|           NULL|       NULL|          NULL|      NULL|       NULL|NULL|      NULL|       NULL|       NULL|  NULL|      NULL|      NULL|    NULL|          NULL|      NULL|             NULL|                                      NULL|               NULL|Including Grants|            NULL|  Excluding Grants|              NULL|                  NULL|                               NULL|      Including SC|      Excluding SC|          NULL|    Including SC|Excluding SC|     Including SC|       NULL|      Excluding SC|       NULL|                                   Total|Resource Component|Non-Resource Component|           o/w PIT|         o/w CIT|              NULL|                   NULL|                        NULL|          NULL|             Total|Resource Component|Non-Resource Component|                      Total|o/w General (Sales, VAT, Turnover, TFCT)|        VAT|o/w Excises|                       Total|      o/w Import| o/w Export|           NULL|             Total|Resource Component|Non-Resource Component|                NULL|            NULL|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|           NULL|       NULL|          NULL|      NULL|       NULL|NULL|      NULL|       NULL|       NULL|  NULL|      NULL|      NULL|    NULL|          NULL|      NULL|             NULL|                                      NULL|               NULL|          Inc SC|           Ex SC|            Inc SC|             Ex SC|                  NULL|                               NULL|              NULL|              NULL|          NULL|            NULL|        NULL|     Inc Resource|Ex Resource|      Inc Resource|Ex Resource|                                    NULL|              NULL|                  NULL|              NULL|           Total|Resource component|Non- Resource component|                        NULL|          NULL|              NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|            NULL|       NULL|           NULL|              NULL|              NULL|                  NULL|                NULL|            NULL|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|        IMF GFS|    General|          NULL|   AFG2006|Afghanistan| AFG|      NULL|     Actual|       2006|2006.0|South Asia|Low income|345817.0|Afghan afghani|      NULL|         345817.0|                                       1.0|                1.0|104517.716789663|104160.364682663|  32354.5323061605|31997.180199160503|                  NULL|                               NULL|24997.582462979997|    24640.23035598|          NULL|            NULL|        NULL|    4744.59914155|       NULL|4387.2470345500005|       NULL|                           4379.72979655|              NULL|                  NULL|1690.6886561600002|   2171.69705079|              NULL|                   NULL|                         0.0|      7.517238|    20252.98332143|                 0|        20252.98332143|              6198.00404998|                           5601.04996598|       NULL|       NULL|                11640.067019|      11615.6384|  24.428619|  2414.91225245|     7356.94984318|              NULL|                  NULL|          357.352107|72163.1844835025|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|        IMF GFS|    General|          NULL|   AFG2007|Afghanistan| AFG|      NULL|     Actual|       2007|2007.0|South Asia|Low income|427495.0|Afghan afghani|      NULL|         427495.0|                                       1.0|                1.0|156634.504463911|156236.038162911|35264.609977632994|34866.143676632986|                  NULL|                               NULL|26412.472627390598|26014.006326390598|          NULL|            NULL|        NULL|6320.700416667991|       NULL|  5922.23411566799|       NULL|                        5892.64641766799|              NULL|                  NULL|     2032.75422525|3138.90130546799|              NULL|                   NULL|                         0.0|     29.587698| 20091.77221072257|                 0|     20091.77221072257|            6702.1712945766|                         5945.4580385766|       NULL|       NULL|            13225.1090791408|13221.6044511408|   3.504628|164.49183700517|   8852.1373502419|              NULL|                  NULL|          398.466301|121369.894486278|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|        IMF GFS|    General|          NULL|   AFG2008|Afghanistan| AFG|      NULL|     Actual|       2008|2008.0|South Asia|Low income|517509.0|Afghan afghani|      NULL|         517509.0|                                       1.0|                1.0| 454974.36912585| 454222.38873585|    43190.09925713| 42438.11886713002|                  NULL|                               NULL|  32328.4855267044|  31576.5051367044|          NULL|            NULL|        NULL|    9703.78822325|       NULL| 8951.807833249999|       NULL|                           8700.94036325|              NULL|                  NULL|     2266.03439836|   4610.36726559|              NULL|                   NULL|                         0.0|     250.86747|22624.697303454403|                 0|    22624.697303454403|            8070.6948884844|                           6865.16058982|       NULL|       NULL|                14329.746472|     14323.66037|   6.086102|   224.25594297|10861.613730425399|              NULL|                  NULL|           751.98039| 411784.26986872|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
++---------------+-----------+--------------+----------+-----------+----+----------+-----------+-----------+------+----------+----------+--------+--------------+----------+-----------------+------------------------------------------+-------------------+----------------+----------------+------------------+------------------+----------------------+-----------------------------------+------------------+------------------+--------------+----------------+------------+-----------------+-----------+------------------+-----------+----------------------------------------+------------------+----------------------+------------------+----------------+------------------+-----------------------+----------------------------+--------------+------------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+----------------+-----------+---------------+------------------+------------------+----------------------+--------------------+----------------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_General::LCU
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+------------------+-------------------+-------------------+------------------------------------------+
+|summary|        downloadyr|              year|           GDP used|  Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|
++-------+------------------+------------------+-------------------+-------------------+------------------------------------------+
+|  count|              2705|              5119|               5119|               5030|                                      5119|
+|   mean|2023.1194085027726|2005.0554795858566|9.777120107310708E7|9.863637839148432E7|                        0.9546786481734714|
+| stddev| 1.288953845901995|11.374321701839943|8.795699289617319E8|8.867123221909853E8|                       0.20802831741677366|
+|    min|            2020.0|            1980.0|                0.0|                0.0|                                       0.0|
+|    max|            2025.0|            2023.0|           2.089E10|           2.089E10|                                       1.0|
++-------+------------------+------------------+-------------------+-------------------+------------------------------------------+
+
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_General::PCTGDP
+================================================================================
+BASIC STATISTICS:
+Total Rows: 5,121
+Total Columns: 74
+
+SCHEMA:
+Database source                          : string
+Govern-ment                              : string
+datastatuscode                           : string
+identifier                               : string
+country                                  : string
+iso                                      : string
+downloadyr                               : double
+Data status                              : string
+Fiscal year                              : string
+year                                     : double
+Reg                                      : string
+Inc                                      : string
+Unnamed: 12                              : string
+currency                                 : string
+GDP lcu mn                               : string
+Common GDP Series                        : double
+Flag 1 if substitute GDP, 0 if leave alone : double
+Revenue Data Scalar                      : double
+Total Revenue                            : string
+Unnamed: 19                              : string
+Unnamed: 20                              : string
+Unnamed: 21                              : string
+Total Resource Revenue                   : double
+Total Non-Resource Revenue (inc SC)      : double
+Taxes                                    : string
+Unnamed: 25                              : string
+Resource Taxes                           : double
+Non-Resource Tax                         : string
+Unnamed: 28                              : string
+Direct Taxes                             : string
+Unnamed: 30                              : string
+Unnamed: 31                              : string
+Unnamed: 32                              : string
+Taxes on Income, Profits & Capital Gains : string
+Unnamed: 34                              : string
+Unnamed: 35                              : string
+Unnamed: 36                              : string
+Unnamed: 37                              : string
+Unnamed: 38                              : string
+Unnamed: 39                              : string
+Taxes on Payroll & Workforce             : double
+Property Taxes                           : double
+Indirect Taxes                           : string
+Unnamed: 43                              : string
+Unnamed: 44                              : string
+Taxes on Goods and Services              : string
+Unnamed: 46                              : string
+Unnamed: 47                              : string
+Unnamed: 48                              : string
+Taxes on International Trade             : string
+Unnamed: 50                              : string
+Unnamed: 51                              : string
+Other Taxes                              : double
+Non-Tax Revenue                          : string
+Unnamed: 54                              : string
+Unnamed: 55                              : string
+Social Contributions                     : double
+Grants                                   : double
+General Notes                            : string
+Caution1 Accuracy, Quality or Comparability of data is questionable. : string
+Caution 1  Notes                         : string
+Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes : string
+Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible : string
+Resource Revenue Notes                   : string
+Caution 4 Inconsistencies with Social Contributions : string
+Social contributions notes               : string
+Unnamed: 66                              : string
+Unnamed: 67                              : string
+Unnamed: 68                              : string
+Unnamed: 69                              : string
+Unnamed: 70                              : string
+Unnamed: 71                              : string
+Unnamed: 72                              : string
+Unnamed: 73                              : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  61 columns
+double         :  13 columns
+
+SAMPLE DATA:
++---------------+-----------+--------------+----------+-----------+----+----------+-----------+-----------+------+----------+----------+-----------+--------------+----------+-----------------+------------------------------------------+-------------------+-------------------+-------------------+------------------+-------------------+----------------------+-----------------------------------+-------------------+--------------------+--------------+----------------+------------+--------------------+-----------+--------------------+-----------+----------------------------------------+------------------+----------------------+--------------------+---------------------+------------------+-----------------------+----------------------------+---------------------+-------------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-------------------+----------------------+---------------------+--------------------+------------------+----------------------+---------------------+-------------------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|Database source|Govern-ment|datastatuscode|identifier|    country| iso|downloadyr|Data status|Fiscal year|  year|       Reg|       Inc|Unnamed: 12|      currency|GDP lcu mn|Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|Revenue Data Scalar|      Total Revenue|        Unnamed: 19|       Unnamed: 20|        Unnamed: 21|Total Resource Revenue|Total Non-Resource Revenue (inc SC)|              Taxes|         Unnamed: 25|Resource Taxes|Non-Resource Tax| Unnamed: 28|        Direct Taxes|Unnamed: 30|         Unnamed: 31|Unnamed: 32|Taxes on Income, Profits & Capital Gains|       Unnamed: 34|           Unnamed: 35|         Unnamed: 36|          Unnamed: 37|       Unnamed: 38|            Unnamed: 39|Taxes on Payroll & Workforce|       Property Taxes|     Indirect Taxes|       Unnamed: 43|           Unnamed: 44|Taxes on Goods and Services|                             Unnamed: 46|Unnamed: 47|Unnamed: 48|Taxes on International Trade|        Unnamed: 50|           Unnamed: 51|          Other Taxes|     Non-Tax Revenue|       Unnamed: 54|           Unnamed: 55| Social Contributions|             Grants|General Notes|Caution1 Accuracy, Quality or Comparability of data is questionable.|Caution 1  Notes|Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes|Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible|Resource Revenue Notes|Caution 4 Inconsistencies with Social Contributions|Social contributions notes|Unnamed: 66|Unnamed: 67|Unnamed: 68|Unnamed: 69|Unnamed: 70|Unnamed: 71|Unnamed: 72|Unnamed: 73|
++---------------+-----------+--------------+----------+-----------+----+----------+-----------+-----------+------+----------+----------+-----------+--------------+----------+-----------------+------------------------------------------+-------------------+-------------------+-------------------+------------------+-------------------+----------------------+-----------------------------------+-------------------+--------------------+--------------+----------------+------------+--------------------+-----------+--------------------+-----------+----------------------------------------+------------------+----------------------+--------------------+---------------------+------------------+-----------------------+----------------------------+---------------------+-------------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-------------------+----------------------+---------------------+--------------------+------------------+----------------------+---------------------+-------------------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|           NULL|       NULL|          NULL|      NULL|       NULL|NULL|      NULL|       NULL|       NULL|  NULL|      NULL|      NULL|       NULL|          NULL|      NULL|             NULL|                                      NULL|               NULL|   Including Grants|               NULL|  Excluding Grants|               NULL|                  NULL|                               NULL|       Including SC|        Excluding SC|          NULL|    Including SC|Excluding SC|        Including SC|       NULL|        Excluding SC|       NULL|                                   Total|Resource Component|Non-Resource Component|             o/w PIT|              o/w CIT|              NULL|                   NULL|                        NULL|                 NULL|              Total|Resource Component|Non-Resource Component|                      Total|o/w General (Sales, VAT, Turnover, TFCT)|        VAT|o/w Excises|                       Total|         o/w Import|            o/w Export|                 NULL|               Total|Resource Component|Non-Resource Component|                 NULL|               NULL|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|           NULL|       NULL|          NULL|      NULL|       NULL|NULL|      NULL|       NULL|       NULL|  NULL|      NULL|      NULL|       NULL|          NULL|      NULL|             NULL|                                      NULL|               NULL|             Inc SC|              Ex SC|            Inc SC|              Ex SC|                  NULL|                               NULL|               NULL|                NULL|          NULL|            NULL|        NULL|        Inc Resource|Ex Resource|        Inc Resource|Ex Resource|                                    NULL|              NULL|                  NULL|                NULL|                Total|Resource component|Non- Resource component|                        NULL|                 NULL|               NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|               NULL|                  NULL|                 NULL|                NULL|              NULL|                  NULL|                 NULL|               NULL|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|        IMF GFS|    General|          NULL|   AFG2006|Afghanistan| AFG|      NULL|     Actual|       2006|2006.0|South Asia|Low income|       NULL|Afghan afghani|      NULL|         345817.0|                                       1.0|                1.0|0.30223417816262066|0.30120082206098314| 0.093559692861139|0.09252633675950142|                  NULL|                               NULL|0.07228558012758192| 0.07125222402594435|          NULL|            NULL|        NULL|0.013719970798283486|       NULL|0.012686614696645915|       NULL|                    0.012664877078194537|              NULL|                  NULL|0.004888969183585538|0.0062799025229818084|              NULL|                   NULL|                        NULL|2.1737618451377463E-5|0.05856560932929845|              NULL|   0.05856560932929845|        0.01792278589537241|                     0.01619657207708123|       NULL|       NULL|          0.0336596148222904| 0.0335889745154229| 7.064030686750507e-05| 0.006983208611635633| 0.02127411273355561|              NULL|                  NULL|0.0010333561016375712| 0.2086744853014817|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|        IMF GFS|    General|          NULL|   AFG2007|Afghanistan| AFG|      NULL|     Actual|       2007|2007.0|South Asia|Low income|       NULL|Afghan afghani|      NULL|         427495.0|                                       1.0|                1.0| 0.3664007870592896| 0.3654686912429642| 0.082491280547452|0.08155918473112665|                  NULL|                               NULL|0.06178428432470695|0.060852188508381616|          NULL|            NULL|        NULL|0.014785437061645144|       NULL|0.013853341245319806|       NULL|                    0.013784129446351396|              NULL|                  NULL|0.004755036258318811|0.0073425450717973075|              NULL|                   NULL|                        NULL| 6.921179896840898E-5|0.04699884726306172|              NULL|   0.04699884726306172|       0.015677777037337512|                    0.013907666846575049|       NULL|       NULL|        0.030936289498452146|0.03092809144233453|  8.19805611761541e-06| 3.847807272720617E-4| 0.02070699622274389|              NULL|                  NULL| 9.320958163253372E-4|0.28390950651183755|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|        IMF GFS|    General|          NULL|   AFG2008|Afghanistan| AFG|      NULL|     Actual|       2008|2008.0|South Asia|Low income|       NULL|Afghan afghani|      NULL|         517509.0|                                       1.0|                1.0| 0.8791622351028677| 0.8777091581708724|0.0834576775614144|0.08200460062941904|                  NULL|                               NULL|0.06246941700860159|  0.0610163400766062|          NULL|            NULL|        NULL|0.018750955487247565|       NULL|0.017297878555252177|       NULL|                     0.01681311892788338|              NULL|                  NULL| 0.00437873427971301| 0.008908767317264048|              NULL|                   NULL|                        NULL|4.8475962736879935E-4|0.04371846152135403|              NULL|   0.04371846152135403|        0.01559527445606627|                    0.013265780092365542|       NULL|       NULL|        0.027689849784254962|0.02767808940520841|1.1760379046547983e-05|4.3333728103279366E-4|0.020988260552812412|              NULL|                  NULL|0.0014530769319953858| 0.7957045575414533|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
++---------------+-----------+--------------+----------+-----------+----+----------+-----------+-----------+------+----------+----------+-----------+--------------+----------+-----------------+------------------------------------------+-------------------+-------------------+-------------------+------------------+-------------------+----------------------+-----------------------------------+-------------------+--------------------+--------------+----------------+------------+--------------------+-----------+--------------------+-----------+----------------------------------------+------------------+----------------------+--------------------+---------------------+------------------+-----------------------+----------------------------+---------------------+-------------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-------------------+----------------------+---------------------+--------------------+------------------+----------------------+---------------------+-------------------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_General::PCTGDP
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+------------------+-------------------+------------------------------------------+-------------------+
+|summary|        downloadyr|              year|  Common GDP Series|Flag 1 if substitute GDP, 0 if leave alone|Revenue Data Scalar|
++-------+------------------+------------------+-------------------+------------------------------------------+-------------------+
+|  count|              2705|              5119|               5032|                                      5119|               5119|
+|   mean|2023.1194085027726|2005.0554795858566|9.859725087721902E7|                        0.9546786481734714|                1.0|
+| stddev| 1.288953845901995|11.374321701839943| 8.86538226973205E8|                       0.20802831741677366|                0.0|
+|    min|            2020.0|            1980.0|                0.0|                                       0.0|                1.0|
+|    max|            2025.0|            2023.0|           2.089E10|                                       1.0|                1.0|
++-------+------------------+------------------+-------------------+------------------------------------------+-------------------+
+
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_General::GDP
+================================================================================
+BASIC STATISTICS:
+Total Rows: 9,800
+Total Columns: 4
+
+SCHEMA:
+identifier                               : string
+iso                                      : string
+year                                     : int
+GDP, lcu mn. IMF WEO                     : double
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   2 columns
+int            :   1 columns
+double         :   1 columns
+
+SAMPLE DATA:
++----------+---+----+--------------------+
+|identifier|iso|year|GDP, lcu mn. IMF WEO|
++----------+---+----+--------------------+
+|   AFG1980|AFG|1980|                NULL|
+|   AFG1981|AFG|1981|                NULL|
+|   AFG1982|AFG|1982|                NULL|
+|   AFG1983|AFG|1983|                NULL|
+|   AFG1984|AFG|1984|                NULL|
++----------+---+----+--------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_General::GDP
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025_General::Reg_Inc
+================================================================================
+BASIC STATISTICS:
+Total Rows: 218
+Total Columns: 6
+
+SCHEMA:
+country                                  : string
+iso                                      : string
+reg                                      : string
+inc                                      : string
+Unnamed: 4                               : string
+Source: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups Accessed September 2025 : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   6 columns
+
+SAMPLE DATA:
++--------------+---+--------------------------+-------------------+----------+--------------------------------------------------------------------------------------------------------------------------------------+
+|       country|iso|                       reg|                inc|Unnamed: 4|Source: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups Accessed September 2025|
++--------------+---+--------------------------+-------------------+----------+--------------------------------------------------------------------------------------------------------------------------------------+
+|   Afghanistan|AFG|                South Asia|         Low income|      NULL|                                                                                    NB. The World Bank has recently reclassified Af...|
+|       Albania|ALB|     Europe & Central Asia|Upper middle income|      NULL|                                                                                                                                  NULL|
+|       Algeria|DZA|Middle East & North Africa|Upper middle income|      NULL|                                                                                                                                  NULL|
+|American Samoa|ASM|       East Asia & Pacific|        High income|      NULL|                                                                                                                                  NULL|
+|       Andorra|AND|     Europe & Central Asia|        High income|      NULL|                                                                                                                                  NULL|
++--------------+---+--------------------------+-------------------+----------+--------------------------------------------------------------------------------------------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025_General::Reg_Inc
+------------------------------------------------------------
+
+No numeric columns found in this dataset
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025::GRD Info & Documentation
+================================================================================
+BASIC STATISTICS:
+Total Rows: 27
+Total Columns: 3
+
+SCHEMA:
+Unnamed: 0                               : string
+Unnamed: 1                               : string
+Unnamed: 2                               : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   3 columns
+
+SAMPLE DATA:
++----------+-------------------------------------------------+----------+
+|Unnamed: 0|                                       Unnamed: 1|Unnamed: 2|
++----------+-------------------------------------------------+----------+
+|      NULL|UNU-WIDER Government Revenue Dataset 2025: Merged|      NULL|
+|      NULL|                                             NULL|      NULL|
+|      NULL|               Technical Note 1: Source Selection|      NULL|
+|      NULL|   https://doi.org/10.35188/UNU-WIDER/WTN/2021-10|      NULL|
+|      NULL|                                             NULL|      NULL|
++----------+-------------------------------------------------+----------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025::GRD Info & Documentation
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Unnamed: 0                                       27      100.00%
+Unnamed: 2                                       21       77.78%
+Unnamed: 1                                        8       29.63%
+
+No numeric columns found in this dataset
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025::Merged
+================================================================================
+BASIC STATISTICS:
+Total Rows: 8,605
+Total Columns: 57
+
+SCHEMA:
+Identifier                               : string
+General (=1 if General)                  : double
+Source                                   : string
+Country                                  : string
+Reg                                      : string
+Inc                                      : string
+GDP (LCU, mn.)                           : double
+Year                                     : double
+ISO                                      : string
+General Notes                            : string
+Caution1 Accuracy, Quality or Comparability of data is questionable : string
+Caution 1  Notes                         : string
+Caution2 Un-excluded resource revenues / taxes are significant but cannot be isolated from total revenues / taxes : string
+Caution3 Un-excluded Resource Revenues/Taxes are Marginal, but Non-Negligible and cannot be isolated from total revenue / taxes : string
+Resource Revenue Notes                   : string
+Caution 4 Inconsistencies with Social Contributions : string
+Social contributions notes               : string
+Total Revenue                            : string
+Unnamed: 18                              : string
+Unnamed: 19                              : string
+Unnamed: 20                              : string
+Total Resource Revenue                   : double
+Total Non-Resource Revenue (inc SC)      : double
+Taxes                                    : string
+Unnamed: 24                              : string
+Resource Taxes                           : double
+Non-Resource Tax                         : string
+Unnamed: 27                              : string
+Direct Taxes                             : string
+Unnamed: 29                              : string
+Unnamed: 30                              : string
+Unnamed: 31                              : string
+Taxes on Income, Profits & Capital Gains : string
+Unnamed: 33                              : string
+Unnamed: 34                              : string
+Unnamed: 35                              : string
+Unnamed: 36                              : string
+Unnamed: 37                              : string
+Unnamed: 38                              : string
+Taxes on Payroll & Workforce             : double
+Property Taxes                           : double
+Indirect Taxes                           : string
+Unnamed: 42                              : string
+Unnamed: 43                              : string
+Taxes on Goods and Services              : string
+Unnamed: 45                              : string
+Unnamed: 46                              : string
+Unnamed: 47                              : string
+Taxes on International Trade             : string
+Unnamed: 49                              : string
+Unnamed: 50                              : string
+Other Taxes                              : double
+Non-Tax Revenue                          : string
+Unnamed: 53                              : string
+Unnamed: 54                              : string
+Social Contributions                     : double
+Grants                                   : double
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  46 columns
+double         :  11 columns
+
+SAMPLE DATA:
++----------+-----------------------+------+-------+-------------------------+-----------+--------------+------+----+-------------+-------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+----------------+-----------+----------------+-----------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+------+
+|Identifier|General (=1 if General)|Source|Country|                      Reg|        Inc|GDP (LCU, mn.)|  Year| ISO|General Notes|Caution1 Accuracy, Quality or Comparability of data is questionable|Caution 1  Notes|Caution2 Un-excluded resource revenues / taxes are significant but cannot be isolated from total revenues / taxes|Caution3 Un-excluded Resource Revenues/Taxes are Marginal, but Non-Negligible and cannot be isolated from total revenue / taxes|Resource Revenue Notes|Caution 4 Inconsistencies with Social Contributions|Social contributions notes|   Total Revenue|Unnamed: 18|     Unnamed: 19|Unnamed: 20|Total Resource Revenue|Total Non-Resource Revenue (inc SC)|       Taxes| Unnamed: 24|Resource Taxes|Non-Resource Tax| Unnamed: 27|Direct Taxes|Unnamed: 29| Unnamed: 30|Unnamed: 31|Taxes on Income, Profits & Capital Gains|       Unnamed: 33|           Unnamed: 34|Unnamed: 35|Unnamed: 36|       Unnamed: 37|            Unnamed: 38|Taxes on Payroll & Workforce|Property Taxes|Indirect Taxes|       Unnamed: 42|           Unnamed: 43|Taxes on Goods and Services|                             Unnamed: 45|Unnamed: 46|Unnamed: 47|Taxes on International Trade|Unnamed: 49|Unnamed: 50|Other Taxes|Non-Tax Revenue|       Unnamed: 53|           Unnamed: 54|Social Contributions|Grants|
++----------+-----------------------+------+-------+-------------------------+-----------+--------------+------+----+-------------+-------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+----------------+-----------+----------------+-----------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+------+
+|      NULL|                   NULL|  NULL|   NULL|                     NULL|       NULL|          NULL|  NULL|NULL|         NULL|                                                               NULL|            NULL|                                                                                                             NULL|                                                                                                                           NULL|                  NULL|                                               NULL|                      NULL|Including Grants|       NULL|Excluding Grants|       NULL|                  NULL|                               NULL|Including SC|Excluding SC|          NULL|    Including SC|Excluding SC|Including SC|       NULL|Excluding SC|       NULL|                                   Total|Resource Component|Non-Resource Component|    o/w PIT|    o/w CIT|              NULL|                   NULL|                        NULL|          NULL|         Total|Resource Component|Non-Resource Component|                      Total|o/w General (Sales, VAT, Turnover, TFCT)|        VAT|o/w Excises|                       Total| o/w Import| o/w Export|       NULL|          Total|Resource Component|Non-Resource Component|                NULL|  NULL|
+|      NULL|                   NULL|  NULL|   NULL|                     NULL|       NULL|          NULL|  NULL|NULL|         NULL|                                                               NULL|            NULL|                                                                                                             NULL|                                                                                                                           NULL|                  NULL|                                               NULL|                      NULL|          Inc SC|      Ex SC|          Inc SC|      Ex SC|                  NULL|                               NULL|        NULL|        NULL|          NULL|            NULL|        NULL|Inc Resource|Ex Resource|Inc Resource|Ex Resource|                                    NULL|              NULL|                  NULL|       NULL|      Total|Resource component|Non- Resource component|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|  NULL|
+|   ABW1980|                    0.0|  NULL|  Aruba|Latin America & Caribbean|High income|          NULL|1980.0| ABW|         NULL|                                                               NULL|            NULL|                                                                                                             NULL|                                                                                                                           NULL|                  NULL|                                               NULL|                      NULL|            NULL|       NULL|            NULL|       NULL|                  NULL|                               NULL|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|  NULL|
+|   ABW1981|                    0.0|  NULL|  Aruba|Latin America & Caribbean|High income|          NULL|1981.0| ABW|         NULL|                                                               NULL|            NULL|                                                                                                             NULL|                                                                                                                           NULL|                  NULL|                                               NULL|                      NULL|            NULL|       NULL|            NULL|       NULL|                  NULL|                               NULL|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|  NULL|
+|   ABW1982|                    0.0|  NULL|  Aruba|Latin America & Caribbean|High income|          NULL|1982.0| ABW|         NULL|                                                               NULL|            NULL|                                                                                                             NULL|                                                                                                                           NULL|                  NULL|                                               NULL|                      NULL|            NULL|       NULL|            NULL|       NULL|                  NULL|                               NULL|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                  NULL|                       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|  NULL|
++----------+-----------------------+------+-------+-------------------------+-----------+--------------+------+----+-------------+-------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+----------------+-----------+----------------+-----------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+----------------------+---------------------------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025::Merged
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025::General
+================================================================================
+BASIC STATISTICS:
+Total Rows: 5,121
+Total Columns: 72
+
+SCHEMA:
+identifier                               : string
+Database source                          : string
+country                                  : string
+Reg                                      : string
+Inc                                      : string
+GDP (LCU, mn.)                           : double
+iso                                      : string
+year                                     : double
+General Notes                            : string
+Caution1 Accuracy, Quality or Comparability of data is questionable. : string
+Caution 1  Notes                         : string
+Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes : string
+Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible : string
+Resource Revenue Notes                   : string
+Caution 4 Inconsistencies with Social Contributions : string
+Social contributions notes               : string
+Total Revenue                            : string
+Unnamed: 17                              : string
+Unnamed: 18                              : string
+Unnamed: 19                              : string
+Total Resource Revenue                   : double
+Total Non-Resource Revenue (inc SC)      : double
+Taxes                                    : string
+Unnamed: 23                              : string
+Resource Taxes                           : double
+Non-Resource Tax                         : string
+Unnamed: 26                              : string
+Direct Taxes                             : string
+Unnamed: 28                              : string
+Unnamed: 29                              : string
+Unnamed: 30                              : string
+Taxes on Income, Profits & Capital Gains : string
+Unnamed: 32                              : string
+Unnamed: 33                              : string
+Unnamed: 34                              : string
+Unnamed: 35                              : string
+Unnamed: 36                              : string
+Unnamed: 37                              : string
+Taxes on Payroll & Workforce             : double
+Property Taxes                           : double
+Indirect Taxes                           : string
+Unnamed: 41                              : string
+Taxes on Goods and Services              : string
+Unnamed: 43                              : string
+Unnamed: 44                              : string
+Unnamed: 45                              : string
+Unnamed: 46                              : string
+Taxes on International Trade             : string
+Unnamed: 48                              : string
+Unnamed: 49                              : string
+Other Taxes                              : double
+Non-Tax Revenue                          : string
+Unnamed: 52                              : string
+Unnamed: 53                              : string
+Social Contributions                     : double
+Grants                                   : double
+Unnamed: 56                              : string
+Unnamed: 57                              : string
+Unnamed: 58                              : string
+Unnamed: 59                              : string
+Unnamed: 60                              : string
+Unnamed: 61                              : string
+Unnamed: 62                              : string
+Unnamed: 63                              : string
+Unnamed: 64                              : string
+Unnamed: 65                              : string
+Unnamed: 66                              : string
+Unnamed: 67                              : string
+Unnamed: 68                              : string
+Unnamed: 69                              : string
+Unnamed: 70                              : string
+Unnamed: 71                              : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  62 columns
+double         :  10 columns
+
+SAMPLE DATA:
++----------+---------------+-----------+----------+----------+--------------+----+------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-------------------+-------------------+------------------+-------------------+----------------------+-----------------------------------+-------------------+--------------------+--------------+----------------+------------+--------------------+-----------+--------------------+-----------+----------------------------------------+------------------+----------------------+--------------------+---------------------+------------------+-----------------------+----------------------------+---------------------+-------------------+------------------+---------------------------+--------------------+----------------------------------------+-----------+-----------+----------------------------+-------------------+----------------------+---------------------+--------------------+------------------+----------------------+---------------------+-------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|identifier|Database source|    country|       Reg|       Inc|GDP (LCU, mn.)| iso|  year|General Notes|Caution1 Accuracy, Quality or Comparability of data is questionable.|Caution 1  Notes|Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes|Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible|Resource Revenue Notes|Caution 4 Inconsistencies with Social Contributions|Social contributions notes|      Total Revenue|        Unnamed: 17|       Unnamed: 18|        Unnamed: 19|Total Resource Revenue|Total Non-Resource Revenue (inc SC)|              Taxes|         Unnamed: 23|Resource Taxes|Non-Resource Tax| Unnamed: 26|        Direct Taxes|Unnamed: 28|         Unnamed: 29|Unnamed: 30|Taxes on Income, Profits & Capital Gains|       Unnamed: 32|           Unnamed: 33|         Unnamed: 34|          Unnamed: 35|       Unnamed: 36|            Unnamed: 37|Taxes on Payroll & Workforce|       Property Taxes|     Indirect Taxes|       Unnamed: 41|Taxes on Goods and Services|         Unnamed: 43|                             Unnamed: 44|Unnamed: 45|Unnamed: 46|Taxes on International Trade|        Unnamed: 48|           Unnamed: 49|          Other Taxes|     Non-Tax Revenue|       Unnamed: 52|           Unnamed: 53| Social Contributions|             Grants|Unnamed: 56|Unnamed: 57|Unnamed: 58|Unnamed: 59|Unnamed: 60|Unnamed: 61|Unnamed: 62|Unnamed: 63|Unnamed: 64|Unnamed: 65|Unnamed: 66|Unnamed: 67|Unnamed: 68|Unnamed: 69|Unnamed: 70|Unnamed: 71|
++----------+---------------+-----------+----------+----------+--------------+----+------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-------------------+-------------------+------------------+-------------------+----------------------+-----------------------------------+-------------------+--------------------+--------------+----------------+------------+--------------------+-----------+--------------------+-----------+----------------------------------------+------------------+----------------------+--------------------+---------------------+------------------+-----------------------+----------------------------+---------------------+-------------------+------------------+---------------------------+--------------------+----------------------------------------+-----------+-----------+----------------------------+-------------------+----------------------+---------------------+--------------------+------------------+----------------------+---------------------+-------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|      NULL|           NULL|       NULL|      NULL|      NULL|          NULL|NULL|  NULL|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|   Including Grants|               NULL|  Excluding Grants|               NULL|                  NULL|                               NULL|       Including SC|        Excluding SC|          NULL|    Including SC|Excluding SC|        Including SC|       NULL|        Excluding SC|       NULL|                                   Total|Resource Component|Non-Resource Component|             o/w PIT|              o/w CIT|              NULL|                   NULL|                        NULL|                 NULL|              Total|Resource Component|     Non-Resource Component|               Total|o/w General (Sales, VAT, Turnover, TFCT)|        VAT|o/w Excises|                       Total|         o/w Import|            o/w Export|                 NULL|               Total|Resource Component|Non-Resource Component|                 NULL|               NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|      NULL|           NULL|       NULL|      NULL|      NULL|          NULL|NULL|  NULL|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|             Inc SC|              Ex SC|            Inc SC|              Ex SC|                  NULL|                               NULL|               NULL|                NULL|          NULL|            NULL|        NULL|        Inc Resource|Ex Resource|        Inc Resource|Ex Resource|                                    NULL|              NULL|                  NULL|                NULL|                Total|Resource component|Non- Resource component|                        NULL|                 NULL|               NULL|              NULL|                       NULL|                NULL|                                    NULL|       NULL|       NULL|                        NULL|               NULL|                  NULL|                 NULL|                NULL|              NULL|                  NULL|                 NULL|               NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|   AFG2006|        IMF GFS|Afghanistan|South Asia|Low income|      345817.0| AFG|2006.0|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL|0.30223417816262066|0.30120082206098314| 0.093559692861139|0.09252633675950142|                  NULL|                               NULL|0.07228558012758192| 0.07125222402594435|          NULL|            NULL|        NULL|0.013719970798283486|       NULL|0.012686614696645915|       NULL|                    0.012664877078194537|              NULL|                  NULL|0.004888969183585538|0.0062799025229818084|              NULL|                   NULL|                        NULL|2.1737618451377463E-5|0.05856560932929845|              NULL|        0.05856560932929845| 0.01792278589537241|                     0.01619657207708123|       NULL|       NULL|          0.0336596148222904| 0.0335889745154229| 7.064030686750507e-05| 0.006983208611635633| 0.02127411273355561|              NULL|                  NULL|0.0010333561016375712| 0.2086744853014817|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|   AFG2007|        IMF GFS|Afghanistan|South Asia|Low income|      427495.0| AFG|2007.0|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL| 0.3664007870592896| 0.3654686912429642| 0.082491280547452|0.08155918473112665|                  NULL|                               NULL|0.06178428432470695|0.060852188508381616|          NULL|            NULL|        NULL|0.014785437061645144|       NULL|0.013853341245319806|       NULL|                    0.013784129446351396|              NULL|                  NULL|0.004755036258318811|0.0073425450717973075|              NULL|                   NULL|                        NULL| 6.921179896840898E-5|0.04699884726306172|              NULL|        0.04699884726306172|0.015677777037337512|                    0.013907666846575049|       NULL|       NULL|        0.030936289498452146|0.03092809144233453|  8.19805611761541e-06| 3.847807272720617E-4| 0.02070699622274389|              NULL|                  NULL| 9.320958163253372E-4|0.28390950651183755|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|   AFG2008|        IMF GFS|Afghanistan|South Asia|Low income|      517509.0| AFG|2008.0|         NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                      NULL| 0.8791622351028677| 0.8777091581708724|0.0834576775614144|0.08200460062941904|                  NULL|                               NULL|0.06246941700860159|  0.0610163400766062|          NULL|            NULL|        NULL|0.018750955487247565|       NULL|0.017297878555252177|       NULL|                     0.01681311892788338|              NULL|                  NULL| 0.00437873427971301| 0.008908767317264048|              NULL|                   NULL|                        NULL|4.8475962736879935E-4|0.04371846152135403|              NULL|        0.04371846152135403| 0.01559527445606627|                    0.013265780092365542|       NULL|       NULL|        0.027689849784254962|0.02767808940520841|1.1760379046547983e-05|4.3333728103279366E-4|0.020988260552812412|              NULL|                  NULL|0.0014530769319953858| 0.7957045575414533|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
++----------+---------------+-----------+----------+----------+--------------+----+------+-------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------+-------------------+-------------------+------------------+-------------------+----------------------+-----------------------------------+-------------------+--------------------+--------------+----------------+------------+--------------------+-----------+--------------------+-----------+----------------------------------------+------------------+----------------------+--------------------+---------------------+------------------+-----------------------+----------------------------+---------------------+-------------------+------------------+---------------------------+--------------------+----------------------------------------+-----------+-----------+----------------------------+-------------------+----------------------+---------------------+--------------------+------------------+----------------------+---------------------+-------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025::General
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025::Central
+================================================================================
+BASIC STATISTICS:
+Total Rows: 7,299
+Total Columns: 64
+
+SCHEMA:
+identifier                               : string
+Database source                          : string
+country                                  : string
+Reg                                      : string
+Inc                                      : string
+GDP (LCU, mn.)                           : double
+iso                                      : string
+year                                     : double
+General Notes                            : string
+Caution1 Accuracy, Quality or Comparability of data is questionable. : string
+Caution 1  Notes                         : string
+Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes : string
+Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible : double
+Resource Revenue Notes                   : string
+Caution 4 Inconsistencies with Social Contributions : string
+Social contributions notes               : string
+Total Revenue                            : string
+Unnamed: 17                              : string
+Unnamed: 18                              : string
+Unnamed: 19                              : string
+Total Resource Revenue                   : double
+Total Non-Resource Revenue (inc SC)      : double
+Taxes                                    : string
+Unnamed: 23                              : string
+Resource Taxes                           : double
+Non-Resource Tax                         : string
+Unnamed: 26                              : string
+Direct Taxes                             : string
+Unnamed: 28                              : string
+Unnamed: 29                              : string
+Unnamed: 30                              : string
+Taxes on Income, Profits & Capital Gains : string
+Unnamed: 32                              : string
+Unnamed: 33                              : string
+Unnamed: 34                              : string
+Unnamed: 35                              : string
+Unnamed: 36                              : string
+Unnamed: 37                              : string
+Taxes on Payroll & Workforce             : double
+Property Taxes                           : double
+Indirect Taxes                           : string
+Unnamed: 41                              : string
+Taxes on Goods and Services              : string
+Unnamed: 43                              : string
+Unnamed: 44                              : string
+Unnamed: 45                              : string
+Unnamed: 46                              : string
+Taxes on International Trade             : string
+Unnamed: 48                              : string
+Unnamed: 49                              : string
+Other Taxes                              : double
+Non-Tax Revenue                          : string
+Unnamed: 52                              : string
+Unnamed: 53                              : string
+Social Contributions                     : double
+Grants                                   : double
+Unnamed: 56                              : string
+Unnamed: 57                              : string
+Unnamed: 58                              : string
+Unnamed: 59                              : string
+Unnamed: 60                              : string
+Unnamed: 61                              : string
+Unnamed: 62                              : string
+Unnamed: 63                              : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  53 columns
+double         :  11 columns
+
+SAMPLE DATA:
++----------+------------------+-------+-------------------------+-----------+--------------+----+------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+----------------+-------------------+----------------+------------------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+---------------------------+-----------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+--------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|identifier|   Database source|country|                      Reg|        Inc|GDP (LCU, mn.)| iso|  year|                                     General Notes|Caution1 Accuracy, Quality or Comparability of data is questionable.|Caution 1  Notes|Caution2 Resource Revenues / taxes are significant but cannot be isolated from total revenues / taxes|Caution3 Un-excluded Resource Revenue are Marginal, but Non-Negligible|Resource Revenue Notes|Caution 4 Inconsistencies with Social Contributions|                        Social contributions notes|   Total Revenue|        Unnamed: 17|     Unnamed: 18|       Unnamed: 19|Total Resource Revenue|Total Non-Resource Revenue (inc SC)|       Taxes| Unnamed: 23|Resource Taxes|Non-Resource Tax| Unnamed: 26|Direct Taxes|Unnamed: 28| Unnamed: 29|Unnamed: 30|Taxes on Income, Profits & Capital Gains|       Unnamed: 32|           Unnamed: 33|Unnamed: 34|Unnamed: 35|       Unnamed: 36|            Unnamed: 37|Taxes on Payroll & Workforce|Property Taxes|Indirect Taxes|       Unnamed: 41|Taxes on Goods and Services|Unnamed: 43|                             Unnamed: 44|Unnamed: 45|Unnamed: 46|Taxes on International Trade|Unnamed: 48|Unnamed: 49|Other Taxes|Non-Tax Revenue|       Unnamed: 52|           Unnamed: 53|Social Contributions|              Grants|Unnamed: 56|Unnamed: 57|Unnamed: 58|Unnamed: 59|Unnamed: 60|Unnamed: 61|Unnamed: 62|Unnamed: 63|
++----------+------------------+-------+-------------------------+-----------+--------------+----+------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+----------------+-------------------+----------------+------------------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+---------------------------+-----------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+--------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+|      NULL|              NULL|   NULL|                     NULL|       NULL|          NULL|NULL|  NULL|                                              NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                                              NULL|Including Grants|               NULL|Excluding Grants|              NULL|                  NULL|                               NULL|Including SC|Excluding SC|          NULL|    Including SC|Excluding SC|Including SC|       NULL|Excluding SC|       NULL|                                   Total|Resource Component|Non-Resource Component|    o/w PIT|    o/w CIT|              NULL|                   NULL|                        NULL|          NULL|         Total|Resource Component|     Non-Resource Component|      Total|o/w General (Sales, VAT, Turnover, TFCT)|        VAT|o/w Excises|                       Total| o/w Import| o/w Export|       NULL|          Total|Resource Component|Non-Resource Component|                NULL|                NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|      NULL|              NULL|   NULL|                     NULL|       NULL|          NULL|NULL|  NULL|                                              NULL|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|                                              NULL|          Inc SC|              Ex SC|          Inc SC|             Ex SC|                  NULL|                               NULL|        NULL|        NULL|          NULL|            NULL|        NULL|Inc Resource|Ex Resource|Inc Resource|Ex Resource|                                    NULL|              NULL|                  NULL|       NULL|      Total|Resource component|Non- Resource component|                        NULL|          NULL|          NULL|              NULL|                       NULL|       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|                NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|   ABW1986|IMF Country Report|  Aruba|Latin America & Caribbean|High income|        1204.0| ABW|1986.0|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|            NULL| 0.2669435215946844|            NULL| 0.260265780730897|                  NULL|                  0.260265780730897|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                       NULL|       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|0.006677740863787375|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|   ABW1987|IMF Country Report|  Aruba|Latin America & Caribbean|High income|       1268.18| ABW|1987.0|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|            NULL|0.31099686164424606|            NULL|0.3028749862006971|                  NULL|                 0.3028749862006971|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                       NULL|       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|0.008121875443549023|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
+|   ABW1988|IMF Country Report|  Aruba|Latin America & Caribbean|High income|       1335.79| ABW|1988.0|Inconsistencies in clasification (i) across cou...|                                                                NULL|            NULL|                                                                                                 NULL|                                                                  NULL|                  NULL|                                               NULL|Set to missing, as cant be sure if zero or just...|            NULL|0.22600857919283718|            NULL|0.2201693379947447|                  NULL|                 0.2201693379947447|        NULL|        NULL|          NULL|            NULL|        NULL|        NULL|       NULL|        NULL|       NULL|                                    NULL|              NULL|                  NULL|       NULL|       NULL|              NULL|                   NULL|                        NULL|          NULL|          NULL|              NULL|                       NULL|       NULL|                                    NULL|       NULL|       NULL|                        NULL|       NULL|       NULL|       NULL|           NULL|              NULL|                  NULL|                NULL|0.005839241198092515|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|       NULL|
++----------+------------------+-------+-------------------------+-----------+--------------+----+------+--------------------------------------------------+--------------------------------------------------------------------+----------------+-----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------+----------------------+---------------------------------------------------+--------------------------------------------------+----------------+-------------------+----------------+------------------+----------------------+-----------------------------------+------------+------------+--------------+----------------+------------+------------+-----------+------------+-----------+----------------------------------------+------------------+----------------------+-----------+-----------+------------------+-----------------------+----------------------------+--------------+--------------+------------------+---------------------------+-----------+----------------------------------------+-----------+-----------+----------------------------+-----------+-----------+-----------+---------------+------------------+----------------------+--------------------+--------------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025::Central
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025::Common GDP Series
+================================================================================
+BASIC STATISTICS:
+Total Rows: 9,800
+Total Columns: 4
+
+SCHEMA:
+identifier                               : string
+iso                                      : string
+year                                     : int
+GDP, lcu mn. IMF WEO                     : double
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   2 columns
+int            :   1 columns
+double         :   1 columns
+
+SAMPLE DATA:
++----------+---+----+--------------------+
+|identifier|iso|year|GDP, lcu mn. IMF WEO|
++----------+---+----+--------------------+
+|   AFG1980|AFG|1980|                NULL|
+|   AFG1981|AFG|1981|                NULL|
+|   AFG1982|AFG|1982|                NULL|
+|   AFG1983|AFG|1983|                NULL|
+|   AFG1984|AFG|1984|                NULL|
++----------+---+----+--------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025::Common GDP Series
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025::Country Metadata
+================================================================================
+BASIC STATISTICS:
+Total Rows: 202
+Total Columns: 12
+
+SCHEMA:
+Unnamed: 0                               : string
+Unnamed: 1                               : string
+This sheet can be used to alter whether central or general government data is used in the 'merged' sheet for a given country.  Where Column E contains a 1, general government data is used (0 = Central), and the Merged sheet will update automatically when the value is changed. (NB this feature is only availabe in the "…Full" Excel book) : string
+Unnamed: 3                               : string
+Unnamed: 4                               : string
+Unnamed: 5                               : string
+Unnamed: 6                               : string
+Unnamed: 7                               : string
+Unnamed: 8                               : string
+Unnamed: 9                               : string
+Unnamed: 10                              : string
+Data is from the April 2021 IMF World Economic Outlook Statistical Appendix : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  12 columns
+
+SAMPLE DATA:
++----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------+--------------------+----------------------------+----------+----------------------------------+------------------------------------------------+--------------------+-----------+---------------------------------------------------------------------------+
+|Unnamed: 0|  Unnamed: 1|This sheet can be used to alter whether central or general government data is used in the 'merged' sheet for a given country.  Where Column E contains a 1, general government data is used (0 = Central), and the Merged sheet will update automatically when the value is changed. (NB this feature is only availabe in the "…Full" Excel book)|    Unnamed: 3|          Unnamed: 4|                  Unnamed: 5|Unnamed: 6|                        Unnamed: 7|                                      Unnamed: 8|          Unnamed: 9|Unnamed: 10|Data is from the April 2021 IMF World Economic Outlook Statistical Appendix|
++----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------+--------------------+----------------------------+----------+----------------------------------+------------------------------------------------+--------------------+-----------+---------------------------------------------------------------------------+
+|      NULL|Country Info|                                                                                                                                                                                                                                                                                                                                             NULL|          NULL|                NULL|                    GDP Info|      NULL|Government Finance Statistics info|                                            NULL|                NULL|       NULL|                         *CG= Central Government; BCG= Budgetary Central...|
+|      NULL|         ISO|                                                                                                                                                                                                                                                                                                                                          Country|      Currency|General=1; Central=0|System of National Accounts^| Base Year|  Accounting Practice (as of 2021)|Gov't Finance Statistics Manual in Use at Source|Subsectors Coverage*|       NULL|                         ^SNA= System of National Accounts; ESA= Europea...|
+|      NULL|         AFG|                                                                                                                                                                                                                                                                                                                                      Afghanistan|Afghan afghani|                   0|                    SNA 2008|      2016|                              Cash|                                            2001|                  CG|       NULL|                                                                       NULL|
+|      NULL|         ALB|                                                                                                                                                                                                                                                                                                                                          Albania|  Albanian lek|                   1|                    ESA 2010|      1996|                              NULL|                                            1986|  CG,LG,SS,MPC, NFPC|       NULL|                                                                       NULL|
+|      NULL|         DZA|                                                                                                                                                                                                                                                                                                                                          Algeria|Algerian dinar|                   0|                    SNA 1993|      2001|                              Cash|                                            1986|                  CG|       NULL|                                                                       NULL|
++----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------+--------------------+----------------------------+----------+----------------------------------+------------------------------------------------+--------------------+-----------+---------------------------------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025::Country Metadata
+------------------------------------------------------------
+
+No numeric columns found in this dataset
+
+================================================================================
+FULL DATA PROFILE: UNUWIDERGRD_2025::Reg_Inc
+================================================================================
+BASIC STATISTICS:
+Total Rows: 218
+Total Columns: 7
+
+SCHEMA:
+country                                  : string
+iso                                      : string
+reg                                      : string
+inc                                      : string
+reg2                                     : int
+inc2                                     : double
+Source: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups Accessed September 2025 : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   5 columns
+int            :   1 columns
+double         :   1 columns
+
+SAMPLE DATA:
++--------------+---+--------------------------+-------------------+----+----+--------------------------------------------------------------------------------------------------------------------------------------+
+|       country|iso|                       reg|                inc|reg2|inc2|Source: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups Accessed September 2025|
++--------------+---+--------------------------+-------------------+----+----+--------------------------------------------------------------------------------------------------------------------------------------+
+|   Afghanistan|AFG|                South Asia|         Low income|   6| 1.0|                                                                                    NB. The World Bank has recently reclassified Af...|
+|       Albania|ALB|     Europe & Central Asia|Upper middle income|   2| 3.0|                                                                                                                                  NULL|
+|       Algeria|DZA|Middle East & North Africa|Upper middle income|   4| 3.0|                                                                                                                                  NULL|
+|American Samoa|ASM|       East Asia & Pacific|        High income|   1| 4.0|                                                                                                                                  NULL|
+|       Andorra|AND|     Europe & Central Asia|        High income|   2| 4.0|                                                                                                                                  NULL|
++--------------+---+--------------------------+-------------------+----+----+--------------------------------------------------------------------------------------------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: UNUWIDERGRD_2025::Reg_Inc
+------------------------------------------------------------
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+------------------+
+|summary|              reg2|              inc2|
++-------+------------------+------------------+
+|  count|               218|               217|
+|   mean|               3.5| 2.935483870967742|
+| stddev|2.1770694376628255|1.0476975951561867|
+|    min|                 1|               1.0|
+|    max|                 7|               4.0|
++-------+------------------+------------------+
+
+
+================================================================================
+EXPLORATION COMPLETED
+Sheets processed successfully: 15
+Sheets failed or not found: 0

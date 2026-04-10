@@ -1,0 +1,49 @@
+PROFILE FOR: Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_ItemCodes.csv
+Generated on: 2026-04-10 21:13:43
+
+BASIC STATISTICS:
+Total Rows: 204
+Total Columns: 3
+
+SCHEMA:
+Item Code                                : int
+CPC Code                                 : string
+Item                                     : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   2 columns
+int            :   1 columns
+
+SAMPLE DATA:
++---------+---------+--------------------------------------------------+
+|Item Code| CPC Code|                                              Item|
++---------+---------+--------------------------------------------------+
+|      809|'01929.07|                           Abaca; manila hemp; raw|
+|      800|'01929.06|                         Agave fibres; raw; n.e.c.|
+|     2051|   'F2051|                                       Agriculture|
+|      221|   '01371|                                 Almonds; in shell|
+|      711|   '01654|Anise; badian; coriander; cumin; caraway; fenne...|
++---------+---------+--------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_ItemCodes.csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Item Code                                         0        0.00%
+CPC Code                                          0        0.00%
+Item                                              0        0.00%
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+
+|summary|         Item Code|
++-------+------------------+
+|  count|               204|
+|   mean| 603.3725490196078|
+| stddev|453.77678203350405|
+|    min|                15|
+|    max|              2057|
++-------+------------------+
+

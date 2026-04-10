@@ -1,0 +1,49 @@
+PROFILE FOR: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_AreaCodes.csv
+Generated on: 2026-04-10 21:10:10
+
+BASIC STATISTICS:
+Total Rows: 252
+Total Columns: 3
+
+SCHEMA:
+Area Code                                : int
+M49 Code                                 : string
+Area                                     : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   2 columns
+int            :   1 columns
+
+SAMPLE DATA:
++---------+--------+-----------+
+|Area Code|M49 Code|       Area|
++---------+--------+-----------+
+|        2|    '004|Afghanistan|
+|     5100|    '002|     Africa|
+|        3|    '008|    Albania|
+|        4|    '012|    Algeria|
+|     5200|    '019|   Americas|
++---------+--------+-----------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_AreaCodes.csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Area Code                                         0        0.00%
+M49 Code                                          0        0.00%
+Area                                              0        0.00%
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+
+|summary|         Area Code|
++-------+------------------+
+|  count|               252|
+|   mean| 839.3373015873016|
+| stddev|1797.9208646587194|
+|    min|                 1|
+|    max|              5817|
++-------+------------------+
+

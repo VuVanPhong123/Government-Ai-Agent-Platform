@@ -1,0 +1,47 @@
+PROFILE FOR: Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_Elements.csv
+Generated on: 2026-04-10 21:13:09
+
+BASIC STATISTICS:
+Total Rows: 20
+Total Columns: 2
+
+SCHEMA:
+Element Code                             : int
+Element                                  : string
+
+Data Type Distribution:
+------------------------------------------------------------
+int            :   1 columns
+string         :   1 columns
+
+SAMPLE DATA:
++------------+---------------+
+|Element Code|        Element|
++------------+---------------+
+|        5312| Area harvested|
+|        5423|Extraction Rate|
+|        5313|         Laying|
+|        5318|   Milk Animals|
+|        5319|   Prod Popultn|
++------------+---------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_Elements.csv
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Element Code                                      0        0.00%
+Element                                           0        0.00%
+
+NUMERIC STATISTICS (first 5 numeric columns):
++-------+------------------+
+|summary|      Element Code|
++-------+------------------+
+|  count|                20|
+|   mean|           5336.65|
+| stddev|116.00919881856929|
+|    min|              5111|
+|    max|              5513|
++-------+------------------+
+

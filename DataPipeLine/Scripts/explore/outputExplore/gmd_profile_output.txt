@@ -1,0 +1,152 @@
+REPORT GENERATED ON: 2026-04-10 20:52:48
+
+
+================================================================================
+FULL DATA PROFILE: GMD
+================================================================================
+BASIC STATISTICS:
+Total Rows: 56,864
+Total Columns: 84
+
+SCHEMA:
+countryname                              : string
+ISO3                                     : string
+id                                       : string
+year                                     : int
+nGDP                                     : double
+nGDP_USD                                 : double
+rGDP                                     : double
+rGDP_pc                                  : double
+rGDP_USD                                 : double
+deflator                                 : double
+cons                                     : double
+cons_GDP                                 : double
+cons_USD                                 : double
+hcons                                    : double
+hcons_GDP                                : double
+hcons_USD                                : double
+gcons                                    : double
+gcons_GDP                                : double
+gcons_USD                                : double
+inv                                      : double
+inv_GDP                                  : double
+inv_USD                                  : double
+finv                                     : double
+finv_GDP                                 : double
+finv_USD                                 : double
+exports                                  : double
+exports_GDP                              : double
+exports_USD                              : double
+imports                                  : double
+imports_GDP                              : double
+imports_USD                              : double
+CA                                       : double
+CA_GDP                                   : double
+USDfx                                    : double
+REER                                     : double
+govexp                                   : double
+gen_govexp                               : double
+gen_govexp_GDP                           : double
+cgovexp                                  : double
+cgovexp_GDP                              : double
+govrev                                   : double
+gen_govrev                               : double
+cgovrev                                  : double
+gen_govrev_GDP                           : double
+cgovrev_GDP                              : double
+govtax                                   : double
+gen_govtax                               : double
+cgovtax                                  : double
+gen_govtax_GDP                           : double
+cgovtax_GDP                              : double
+govdef_GDP                               : double
+gen_govdef_GDP                           : double
+gen_govdef                               : double
+cgovdef_GDP                              : double
+cgovdef                                  : double
+govdebt_GDP                              : double
+gen_govdebt_GDP                          : double
+gen_govdebt                              : double
+cgovdebt_GDP                             : double
+cgovdebt                                 : double
+HPI                                      : double
+CPI                                      : double
+infl                                     : double
+pop                                      : double
+unemp                                    : double
+strate                                   : double
+ltrate                                   : double
+cbrate                                   : double
+M0                                       : double
+M1                                       : double
+M2                                       : double
+M3                                       : double
+M4                                       : double
+SovDebtCrisis                            : int
+CurrencyCrisis                           : int
+BankingCrisis                            : int
+CA_USD                                   : double
+govdebt                                  : double
+govdef                                   : double
+govexp_GDP                               : double
+govrev_GDP                               : double
+govtax_GDP                               : double
+rGDP_pc_USD                              : double
+income_group                             : string
+
+Data Type Distribution:
+------------------------------------------------------------
+double         :  76 columns
+string         :   4 columns
+int            :   4 columns
+
+SAMPLE DATA:
++-----------+----+---+----+----+--------+----+-------+--------+--------+----+--------+--------+-----+---------+---------+-----+---------+---------+----+-------+-------+----+--------+--------+-------+-----------+-----------+-------+-----------+-----------+----+------+-----+----+------+----------+--------------+-------+-----------+------+----------+-------+--------------+-----------+------+----------+-------+--------------+-----------+----------+--------------+----------+-----------+-------+-----------+---------------+-----------+------------+--------+----+----+----+--------+-----+------+------+------+----+----+----+----+----+-------------+--------------+-------------+------+-------+------+----------+----------+----------+-----------+------------+
+|countryname|ISO3| id|year|nGDP|nGDP_USD|rGDP|rGDP_pc|rGDP_USD|deflator|cons|cons_GDP|cons_USD|hcons|hcons_GDP|hcons_USD|gcons|gcons_GDP|gcons_USD| inv|inv_GDP|inv_USD|finv|finv_GDP|finv_USD|exports|exports_GDP|exports_USD|imports|imports_GDP|imports_USD|  CA|CA_GDP|USDfx|REER|govexp|gen_govexp|gen_govexp_GDP|cgovexp|cgovexp_GDP|govrev|gen_govrev|cgovrev|gen_govrev_GDP|cgovrev_GDP|govtax|gen_govtax|cgovtax|gen_govtax_GDP|cgovtax_GDP|govdef_GDP|gen_govdef_GDP|gen_govdef|cgovdef_GDP|cgovdef|govdebt_GDP|gen_govdebt_GDP|gen_govdebt|cgovdebt_GDP|cgovdebt| HPI| CPI|infl|     pop|unemp|strate|ltrate|cbrate|  M0|  M1|  M2|  M3|  M4|SovDebtCrisis|CurrencyCrisis|BankingCrisis|CA_USD|govdebt|govdef|govexp_GDP|govrev_GDP|govtax_GDP|rGDP_pc_USD|income_group|
++-----------+----+---+----+----+--------+----+-------+--------+--------+----+--------+--------+-----+---------+---------+-----+---------+---------+----+-------+-------+----+--------+--------+-------+-----------+-----------+-------+-----------+-----------+----+------+-----+----+------+----------+--------------+-------+-----------+------+----------+-------+--------------+-----------+------+----------+-------+--------------+-----------+----------+--------------+----------+-----------+-------+-----------+---------------+-----------+------------+--------+----+----+----+--------+-----+------+------+------+----+----+----+----+----+-------------+--------------+-------------+------+-------+------+----------+----------+----------+-----------+------------+
+|      Aruba| ABW|ABW|1960|NULL|    NULL|NULL|   NULL|    NULL|    NULL|NULL|    NULL|    NULL| NULL|     NULL|     NULL| NULL|     NULL|     NULL|NULL|   NULL|   NULL|NULL|    NULL|    NULL|   NULL|       NULL|       NULL|   NULL|       NULL|       NULL|NULL|  NULL| NULL|NULL|  NULL|      NULL|          NULL|   NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|      NULL|          NULL|      NULL|       NULL|   NULL|       NULL|           NULL|       NULL|        NULL|    NULL|NULL|NULL|NULL|0.054922| NULL|  NULL|  NULL|  NULL|NULL|NULL|NULL|NULL|NULL|         NULL|          NULL|         NULL|  NULL|   NULL|  NULL|      NULL|      NULL|      NULL|       NULL| High income|
+|      Aruba| ABW|ABW|1961|NULL|    NULL|NULL|   NULL|    NULL|    NULL|NULL|    NULL|    NULL| NULL|     NULL|     NULL| NULL|     NULL|     NULL|NULL|   NULL|   NULL|NULL|    NULL|    NULL|   NULL|       NULL|       NULL|   NULL|       NULL|       NULL|NULL|  NULL| NULL|NULL|  NULL|      NULL|          NULL|   NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|      NULL|          NULL|      NULL|       NULL|   NULL|       NULL|           NULL|       NULL|        NULL|    NULL|NULL|NULL|NULL|0.055578| NULL|  NULL|  NULL|  NULL|NULL|NULL|NULL|NULL|NULL|         NULL|          NULL|         NULL|  NULL|   NULL|  NULL|      NULL|      NULL|      NULL|       NULL| High income|
+|      Aruba| ABW|ABW|1962|NULL|    NULL|NULL|   NULL|    NULL|    NULL|NULL|    NULL|    NULL| NULL|     NULL|     NULL| NULL|     NULL|     NULL|NULL|   NULL|   NULL|NULL|    NULL|    NULL|   NULL|       NULL|       NULL|   NULL|       NULL|       NULL|NULL|  NULL| NULL|NULL|  NULL|      NULL|          NULL|   NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|      NULL|          NULL|      NULL|       NULL|   NULL|       NULL|           NULL|       NULL|        NULL|    NULL|NULL|NULL|NULL| 0.05632| NULL|  NULL|  NULL|  NULL|NULL|NULL|NULL|NULL|NULL|         NULL|          NULL|         NULL|  NULL|   NULL|  NULL|      NULL|      NULL|      NULL|       NULL| High income|
+|      Aruba| ABW|ABW|1963|NULL|    NULL|NULL|   NULL|    NULL|    NULL|NULL|    NULL|    NULL| NULL|     NULL|     NULL| NULL|     NULL|     NULL|NULL|   NULL|   NULL|NULL|    NULL|    NULL|   NULL|       NULL|       NULL|   NULL|       NULL|       NULL|NULL|  NULL| NULL|NULL|  NULL|      NULL|          NULL|   NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|      NULL|          NULL|      NULL|       NULL|   NULL|       NULL|           NULL|       NULL|        NULL|    NULL|NULL|NULL|NULL|0.057002| NULL|  NULL|  NULL|  NULL|NULL|NULL|NULL|NULL|NULL|         NULL|          NULL|         NULL|  NULL|   NULL|  NULL|      NULL|      NULL|      NULL|       NULL| High income|
+|      Aruba| ABW|ABW|1964|NULL|    NULL|NULL|   NULL|    NULL|    NULL|NULL|    NULL|    NULL| NULL|     NULL|     NULL| NULL|     NULL|     NULL|NULL|   NULL|   NULL|NULL|    NULL|    NULL|   NULL|       NULL|       NULL|   NULL|       NULL|       NULL|NULL|  NULL| NULL|NULL|  NULL|      NULL|          NULL|   NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|  NULL|      NULL|   NULL|          NULL|       NULL|      NULL|          NULL|      NULL|       NULL|   NULL|       NULL|           NULL|       NULL|        NULL|    NULL|NULL|NULL|NULL|0.057619| NULL|  NULL|  NULL|  NULL|NULL|NULL|NULL|NULL|NULL|         NULL|          NULL|         NULL|  NULL|   NULL|  NULL|      NULL|      NULL|      NULL|       NULL| High income|
++-----------+----+---+----+----+--------+----+-------+--------+--------+----+--------+--------+-----+---------+---------+-----+---------+---------+----+-------+-------+----+--------+--------+-------+-----------+-----------+-------+-----------+-----------+----+------+-----+----+------+----------+--------------+-------+-----------+------+----------+-------+--------------+-----------+------+----------+-------+--------------+-----------+----------+--------------+----------+-----------+-------+-----------+---------------+-----------+------------+--------+----+----+----+--------+-----+------+------+------+----+----+----+----+----+-------------+--------------+-------------+------+-------+------+----------+----------+----------+-----------+------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: GMD
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+M4                                           56,576       99.49%
+HPI                                          53,292       93.72%
+gen_govtax                                   53,234       93.62%
+gen_govtax_GDP                               53,234       93.62%
+ltrate                                       51,417       90.42%
+M3                                           50,997       89.68%
+cgovtax                                      50,581       88.95%
+cgovtax_GDP                                  50,581       88.95%
+govtax                                       49,542       87.12%
+govtax_GDP                                   49,542       87.12%
+strate                                       49,209       86.54%
+unemp                                        49,169       86.47%
+cbrate                                       47,931       84.29%
+cgovdef_GDP                                  47,372       83.31%
+cgovdef                                      47,372       83.31%
+and 69 more columns
+
+NUMERIC STATISTICS:
++-------+------------------+-------------------+--------------------+-------------------+------------------+
+|summary|              year|               nGDP|            nGDP_USD|               rGDP|           rGDP_pc|
++-------+------------------+-------------------+--------------------+-------------------+------------------+
+|  count|             56863|              20107|               18490|              22636|             22179|
+|   mean|1884.2733763607266|1.890500130326785E8|1.1767341328012211E7|6.639950373269512E7|1235876.2931441776|
+| stddev|120.69676103487329| 7.86640738989556E9|1.5301334421401522E9|7.455940765063851E8|  8784295.82578417|
+|    min|              1086|           7.41E-14|              1.1E-8|             1.7E-7|           6.76E-8|
+|    max|              2030|             7.0E11|             2.08E11|            2.13E10|             2.2E8|
++-------+------------------+-------------------+--------------------+-------------------+------------------+
+
+
+================================================================================
+EXPLORATION COMPLETED
+Files processed successfully: 1
+Files failed or not found: 0

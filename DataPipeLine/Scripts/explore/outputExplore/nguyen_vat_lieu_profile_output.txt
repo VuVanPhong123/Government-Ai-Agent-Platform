@@ -1,0 +1,67 @@
+REPORT GENERATED ON: 2026-04-10 21:33:29
+
+Source file: C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/Tong_Hop_Nguyen_Vat_Lieu_1995_2024.csv
+
+================================================================================
+FULL DATA PROFILE: Tong_Hop_Nguyen_Vat_Lieu_1995_2024.csv
+================================================================================
+BASIC STATISTICS:
+Total Rows: 6,845
+Total Columns: 22
+
+SCHEMA:
+Date                                     : date
+Nhom                                     : double
+Dau_Brent                                : double
+Dau_WTI                                  : double
+Bong                                     : double
+Vang                                     : double
+Bo_Thit                                  : double
+Lon_Nac                                  : double
+Dong                                     : double
+dau suoi                                 : double
+Ca_Phe                                   : double
+Bo_Song                                  : double
+than                                     : double
+Khi_Tu_Nhien                             : double
+Palladium                                : double
+Bach_Kim                                 : double
+Xang                                     : double
+Duong                                    : double
+Bac                                      : double
+Ngo                                      : double
+Dau_Tuong                                : double
+Lua_Mi                                   : double
+
+Data Type Distribution:
+------------------------------------------------------------
+double         :  21 columns
+date           :   1 columns
+
+SAMPLE DATA:
++----------+----+---------+-------+----+----+-------+-------+----+--------+------+-------+----+------------+---------+------------------+----+-----+----+----+---------+------+
+|      Date|Nhom|Dau_Brent|Dau_WTI|Bong|Vang|Bo_Thit|Lon_Nac|Dong|dau suoi|Ca_Phe|Bo_Song|than|Khi_Tu_Nhien|Palladium|          Bach_Kim|Xang|Duong| Bac| Ngo|Dau_Tuong|Lua_Mi|
++----------+----+---------+-------+----+----+-------+-------+----+--------+------+-------+----+------------+---------+------------------+----+-----+----+----+---------+------+
+|1997-10-29|NULL|     NULL|   NULL|NULL|NULL|   NULL|   NULL|NULL|    NULL|  NULL|   NULL|NULL|        NULL|     NULL|402.70001220703125|NULL| NULL|NULL|NULL|     NULL|  NULL|
+|1997-10-30|NULL|     NULL|   NULL|NULL|NULL|   NULL|   NULL|NULL|    NULL|  NULL|   NULL|NULL|        NULL|     NULL|405.29998779296875|NULL| NULL|NULL|NULL|     NULL|  NULL|
+|1997-10-31|NULL|     NULL|   NULL|NULL|NULL|   NULL|   NULL|NULL|    NULL|  NULL|   NULL|NULL|        NULL|     NULL|404.20001220703125|NULL| NULL|NULL|NULL|     NULL|  NULL|
+|1997-11-03|NULL|     NULL|   NULL|NULL|NULL|   NULL|   NULL|NULL|    NULL|  NULL|   NULL|NULL|        NULL|     NULL|             406.5|NULL| NULL|NULL|NULL|     NULL|  NULL|
+|1997-11-04|NULL|     NULL|   NULL|NULL|NULL|   NULL|   NULL|NULL|    NULL|  NULL|   NULL|NULL|        NULL|     NULL|405.70001220703125|NULL| NULL|NULL|NULL|     NULL|  NULL|
++----------+----+---------+-------+----+----+-------+-------+----+--------+------+-------+----+------------+---------+------------------+----+-----+----+----+---------+------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: Tong_Hop_Nguyen_Vat_Lieu_1995_2024.csv
+------------------------------------------------------------
+
+NUMERIC STATISTICS:
++-------+------------------+------------------+-------------------+------------------+------------------+
+|summary|              Nhom|         Dau_Brent|            Dau_WTI|              Bong|              Vang|
++-------+------------------+------------------+-------------------+------------------+------------------+
+|  count|              2681|              4385|               6139|              6301|              6134|
+|   mean|2160.2830100708693| 78.73268870328688|  64.57474018739438| 71.66922233453195|1157.7326372692007|
+| stddev| 378.0201918783762| 24.39797903660517| 25.076039386180977|24.607547567978138| 581.1152832449111|
+|    min|            1452.0|19.329999923706055|-37.630001068115234|28.520000457763672|255.10000610351562|
+|    max|            3873.0| 146.0800018310547|  145.2899932861328|215.14999389648438|            2788.5|
++-------+------------------+------------------+-------------------+------------------+------------------+
+
