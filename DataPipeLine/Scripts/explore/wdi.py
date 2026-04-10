@@ -26,9 +26,12 @@ def create_optimized_spark_session():
 spark = create_optimized_spark_session()
 logger.info("Spark session initialized")
 
-DATA_DIR = "C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/worldBank/"
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_FILE = os.path.join(SCRIPT_DIR, "wdi_profile_output.txt")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else os.getcwd()
+
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "outputExplore")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "wdi_profile_output.txt")
 
 FILES_CONFIG = {
     "WDICountry": "WDICountry.csv",
