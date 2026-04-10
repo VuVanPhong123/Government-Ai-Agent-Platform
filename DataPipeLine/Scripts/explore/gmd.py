@@ -1,6 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, count, when, isnan, isnull, round as spark_round
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+from pyspark.sql.functions import col, isnan, isnull
 import os
 import sys
 import logging
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def create_optimized_spark_session():
     return SparkSession.builder \
-        .appName("WDIDataExploration") \
+        .appName("GMDDataExploration") \
         .config("spark.sql.adaptive.enabled", "true") \
         .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
         .config("spark.sql.adaptive.skewJoin.enabled", "true") \
@@ -26,22 +25,14 @@ def create_optimized_spark_session():
 spark = create_optimized_spark_session()
 logger.info("Spark session initialized")
 
-DATA_DIR = "C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/worldBank/"
+DATA_DIR = "C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/gmd/"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else os.getcwd()
-
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "outputExplore")
-
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, "wdi_profile_output.txt")
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "gmd_profile_output.txt")
 
 FILES_CONFIG = {
-    "WDICountry": "WDICountry.csv",
-    "WDICountry_Series": "WDICountry-series.csv",
-    "WDICSV": "WDICSV.csv",
-    "WDIFootnote": "WDIFootnote.csv",
-    "WDISeries": "WDISeries.csv",
-    "WDISeries_Time": "WDIseries-time.csv"
+    "GMD": "GMD.csv"
 }
 
 def validate_file_exists(file_path):
@@ -155,11 +146,9 @@ def generate_full_profile(df, file_name):
         logger.error(f"Error generating profile: {e}")
 
 def main():
-    logger.info(f"Starting WDI data exploration from: {DATA_DIR}")
+    logger.info(f"Starting GMD data exploration from: {DATA_DIR}")
     
-    # Mở file để ghi kết quả, dùng utf-8 để tránh lỗi ký tự đặc biệt
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        # Chuyển hướng Standard Output (print) vào file
         original_stdout = sys.stdout
         sys.stdout = f
         
