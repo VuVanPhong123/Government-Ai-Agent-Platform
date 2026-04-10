@@ -1,47 +1,123 @@
-FAO Data Exploration Summary
-Run on: 2026-04-10 21:09:42
 Source directory: C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/fao/
-Total CSV files found: 40
 
-SUCCESS: Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_All_Data_(Normalized).txt
-SUCCESS: Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_AreaCodes.txt
-SUCCESS: Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_Currencys.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_Currencys.txt
-SUCCESS: Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_Elements.txt
-SUCCESS: Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Exchange_rate_E_All_Data_(Normalized)\Exchange_rate_E_Flags.txt
-SUCCESS: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_All_Data_(Normalized).txt
-SUCCESS: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_AreaCodes.txt
-SUCCESS: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_Elements.txt
-SUCCESS: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_Flags.txt
-SUCCESS: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_ItemCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)\Macro-Statistics_Key_Indicators_E_ItemCodes.txt
-SUCCESS: Prices_E_All_Data_(Normalized)\Prices_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Prices_E_All_Data_(Normalized)\Prices_E_All_Data_(Normalized).txt
-SUCCESS: Prices_E_All_Data_(Normalized)\Prices_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Prices_E_All_Data_(Normalized)\Prices_E_AreaCodes.txt
-SUCCESS: Prices_E_All_Data_(Normalized)\Prices_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Prices_E_All_Data_(Normalized)\Prices_E_Elements.txt
-SUCCESS: Prices_E_All_Data_(Normalized)\Prices_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Prices_E_All_Data_(Normalized)\Prices_E_Flags.txt
-SUCCESS: Prices_E_All_Data_(Normalized)\Prices_E_ItemCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Prices_E_All_Data_(Normalized)\Prices_E_ItemCodes.txt
-SUCCESS: Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_All_Data_(Normalized).txt
-SUCCESS: Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_AreaCodes.txt
-SUCCESS: Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_Elements.txt
-SUCCESS: Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_Flags.txt
-SUCCESS: Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_ItemCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Crops_Livestock_E_All_Data_(Normalized)\Production_Crops_Livestock_E_ItemCodes.txt
-SUCCESS: Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_All_Data_(Normalized).txt
-SUCCESS: Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_AreaCodes.txt
-SUCCESS: Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_Elements.txt
-SUCCESS: Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_Flags.txt
-SUCCESS: Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_ItemCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Production_Indices_E_All_Data_(Normalized)\Production_Indices_E_ItemCodes.txt
-SUCCESS: Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_All_Data_(Normalized).txt
-SUCCESS: Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_AreaCodes.txt
-SUCCESS: Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_Elements.txt
-SUCCESS: Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_Flags.txt
-SUCCESS: Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_ItemCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_CropsLivestock_E_All_Data_(Normalized)\Trade_CropsLivestock_E_ItemCodes.txt
-SUCCESS: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_All_Data_(Normalized).txt
-SUCCESS: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_AreaCodes.txt
-SUCCESS: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_Elements.txt
-SUCCESS: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_Flags.txt
-SUCCESS: Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_ItemCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Trade_Indices_E_All_Data_(Normalized)\Trade_Indices_E_ItemCodes.txt
-SUCCESS: Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_All_Data_(Normalized).csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_All_Data_(Normalized).txt
-SUCCESS: Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_AreaCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_AreaCodes.txt
-SUCCESS: Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_Elements.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_Elements.txt
-SUCCESS: Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_Flags.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_Flags.txt
-SUCCESS: Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_ItemCodes.csv -> C:\Users\ADMIN\GovernmentAI\DataPipeLine\Scripts\explore\outputExplore\fao\Value_of_Production_E_All_Data_(Normalized) (1)\Value_of_Production_E_ItemCodes.txt
 
-Processing completed. Successful: 40, Failed: 0
+1) Value_of_Production_E_All_Data_(Normalized)
+- File chính: Value_of_Production_E_All_Data_(Normalized).txt
+- Kích thước: 3,436,565 hàng × 13 cột
+- Schema chính: Area Code (int), Area Code (M49) (string), Area (string), Item Code (int), Item Code (CPC) (string), Item (string), Element Code (int), Element (string), Year Code (int), Year (int), Unit (string), Value (double), Flag (string)
+- Mô tả Element (tập con): Gross Production Value (current thousand US$), Gross Production Value (constant 2014-2016 thousand Int$), v.v. (tham khảo file Elements)
+- Missing: không thấy missing trên các cột chính; các trường flag có giá trị như `E` = Estimated
+- Metadata liên quan: `Value_of_Production_E_AreaCodes.txt` (245 rows, mapping Area Code→M49→Area), `Value_of_Production_E_ItemCodes.txt` (239 rows, danh sách Item Code→CPC→Item), `Value_of_Production_E_Elements.txt` (5 elements), `Value_of_Production_E_Flags.txt` (flag descriptions)
+
+2) Trade_Indices_E_All_Data_(Normalized)
+- File chính: Trade_Indices_E_All_Data_(Normalized).txt
+- Kích thước: 10,406,391 hàng × 13 cột
+- Schema chính: giống cấu trúc Area/Item/Element/Year/Value/Flag (xem file)
+- Nội dung: các chỉ số thương mại (Import/Export Value Index, Quantity Index, Unit/Value Index) với chuẩn 2014-2016 = 100
+- Missing: `Unit` bị NULL 100% (không có unit cho các chỉ số), các cột còn lại đầy đủ
+- Metadata: AreaCodes (283 rows), ItemCodes (194 rows), Elements (6 loại index), Flags (1 flag `E` = Estimated)
+
+3) Trade_CropsLivestock_E_All_Data_(Normalized)
+- File chính: Trade_CropsLivestock_E_All_Data_(Normalized).txt
+- Kích thước: 17,270,631 hàng × 14 cột
+- Schema chính: giống Area/Item/Element/Year/Unit/Value/Flag/Note (có thêm `Note`)
+- Nội dung: dữ liệu xuất, nhập theo sản phẩm nông nghiệp và gia súc (quantity, value, v.v.)
+- Missing: `Note` missing ~94.49%; các cột chính còn lại đầy đủ. Flags có `A`,`E`,`I`,`X` (xem Flags file cho nghĩa đầy đủ)
+- Metadata: AreaCodes (283 rows), ItemCodes (622 rows), Elements (10 loại), Flags (4 flags)
+
+4) Prices_E_All_Data_(Normalized)
+- File chính: Prices_E_All_Data_(Normalized).txt
+- Kích thước: 1,319,563 hàng × 15 cột (có Months/Months Code)
+- Schema chính: Area/Item/Element/Year/Months/Unit/Value/Flag
+- Nội dung: producer prices, price indices; có phân theo tháng/năm
+- Missing: `Unit` missing ~32.85% (một phần dữ liệu không có unit). Elements gồm Producer Price (LCU/tonne), Producer Price (USD/tonne), Price Index
+- Metadata: AreaCodes (233 rows), ItemCodes (242 rows), Elements (4), Flags (5)
+
+5) Exchange_rate_E_All_Data_(Normalized)
+- File chính: Exchange_rate_E_All_Data_(Normalized).txt
+- Kích thước: 145,389 hàng × 14 cột
+- Schema chính: Area/Area M49/Element/ISO Currency Code/Currency/Year/Months/Unit/Value/Flag
+- Nội dung: tỷ giá (local currency units per USD), theo năm/tháng; có mã ISO tiền tệ
+- Missing: `Unit` toàn NULL; `Value` có rất ít missing (15 / 145,389)
+- Metadata: AreaCodes (266 rows), Currencys (294 rows), Elements (LCU, SLC), Flags (4)
+
+6) Macro-Statistics_Key_Indicators_E_All_Data_(Normalized)
+- File chính: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized).txt
+- Kích thước: 708,632 hàng × 13 cột
+- Schema chính: Area/Item/Element/Year/Unit/Value/Flag/Note
+- Nội dung: chỉ báo vĩ mô (GDP, GNI, Gross Output, growth rates, các biến theo SLC/US$ và per capita)
+- Missing: `Note` hoàn toàn missing (100%); `Unit` missing ~3.77% trên tập dữ liệu
+- Metadata: AreaCodes (252 rows), ItemCodes (11), Elements (20), Flags (2)
+
+7) Production_Crops_Livestock_E_All_Data_(Normalized)
+- File chính: Production_Crops_Livestock_E_All_Data_(Normalized).txt
+- Kích thước: 4,209,110 hàng × 14 cột
+- Schema chính: Area/Item/Element/Year/Unit/Value/Flag/Note
+- Nội dung: sản lượng, diện tích, năng suất, và các chỉ số liên quan cho cây trồng & chăn nuôi
+- Missing: `Note` missing ~98.02%; `Value` missing ~2.24% (một số bản ghi không có giá trị numeric)
+- Metadata: AreaCodes (244 rows), ItemCodes (312 rows), Elements (20), Flags (5)
+
+8) Production_Indices_E_All_Data_(Normalized)
+- File chính: Production_Indices_E_All_Data_(Normalized).txt
+- Kích thước: 1,991,350 hàng × 13 cột
+- Schema chính: Area/Item/Element/Year/Value/Flag (Unit phần lớn NULL)
+- Nội dung: chỉ số sản xuất (gross index, per-capita index), thường chuẩn 2014-2016 = 100
+- Missing: `Unit` 100% NULL
+- Metadata: AreaCodes (245 rows), ItemCodes (204 rows), Elements (2), Flags (1)
+
+Value_of_Production_E_All_Data_(Normalized):
+
+File chính: DataPipeLine/Scripts/explore/outputExplore/fao/Value_of_Production_E_All_Data_(Normalized) (1)/Value_of_Production_E_All_Data_(Normalized).txt (1)/Value_of_Production_E_All_Data_(Normalized).txt)
+Nội dung: Dữ liệu giá trị sản xuất (Gross Production Value) chuẩn hoá (nhiều variant: current, constant 2014-2016, v.v.).
+Kích thước: ~3.4 triệu hàng, 13 cột.
+Cột chính: Area Code, Area, Item Code, Item, Element Code, Element, Year, Unit, Value, Flag.
+Ghi chú: Không thiếu dữ liệu cột chính; phần Element gồm vài loại (current/constant, đơn vị khác nhau); flag E = estimated. Xem thêm metadata: AreaCodes, Elements, ItemCodes, Flags (file links trong thư mục).
+Trade_Indices_E_All_Data_(Normalized):
+
+File chính: Trade_Indices_E_All_Data_(Normalized).txt/Trade_Indices_E_All_Data_(Normalized).txt)
+Nội dung: Các chỉ số thương mại (Import/Export Value/Quantity/Unit-value indices), tiêu chuẩn hoá (2014-2016 = 100).
+Kích thước: ~10.4 triệu hàng, 13 cột.
+Cột chính: tương tự (Area, Item, Element, Year, Value, Flag); Unit thường NULL (100% missing).
+Ghi chú: Element mô tả loại index; flag E = estimated.
+Trade_CropsLivestock_E_All_Data_(Normalized):
+
+File chính: Trade_CropsLivestock_E_All_Data_(Normalized).txt/Trade_CropsLivestock_E_All_Data_(Normalized).txt)
+Nội dung: Dữ liệu xuất-nhập cho nông sản & chăn nuôi (số lượng, giá trị, v.v.).
+Kích thước: ~17.3 triệu hàng, 14 cột (có thêm cột Note).
+Cột chính: Area/Item/Element/Year/Unit/Value/Flag/Note.
+Ghi chú: Note nhiều missing (~94%); flags gồm A,E,I,X (ý nghĩa trong Flags file).
+Prices_E_All_Data_(Normalized):
+
+File chính: Prices_E_All_Data_(Normalized).txt/Prices_E_All_Data_(Normalized).txt)
+Nội dung: Giá sản phẩm (producer prices, price indices), có mức tháng/năm.
+Kích thước: ~1.32 triệu hàng, 15 cột (có Months/Months Code).
+Cột chính: Area/Item/Element/Year/Months/Unit/Value/Flag.
+Ghi chú: Unit thiếu khoảng 32.8%; Elements chỉ một vài loại (producer price, index).
+Exchange_rate_E_All_Data_(Normalized):
+
+File chính: Exchange_rate_E_All_Data_(Normalized).txt/Exchange_rate_E_All_Data_(Normalized).txt)
+Nội dung: Tỷ giá tiền tệ (local currency units per USD), theo năm/tháng; kèm mã tiền tệ ISO.
+Kích thước: ~145k hàng, 14 cột.
+Cột chính: Area/Currency/ISO Currency Code/Element/Year/Months/Value/Flag.
+Ghi chú: Unit toàn NULL; Elements gồm LCU, SLC; Flags có A,I,L,X.
+Macro-Statistics_Key_Indicators_E_All_Data_(Normalized):
+
+File chính: Macro-Statistics_Key_Indicators_E_All_Data_(Normalized).txt/Macro-Statistics_Key_Indicators_E_All_Data_(Normalized).txt)
+Nội dung: Các chỉ báo vĩ mô (GDP, GNI, Gross Output, v.v.) chuẩn hoá/đa đơn vị.
+Kích thước: ~708k hàng, 13 cột.
+Cột chính: Area/Item/Element/Year/Unit/Value/Flag/Note.
+Ghi chú: Note toàn missing; có ItemCodes và nhiều Element types (growth, value in SLC/US$, v.v.).
+Production_Crops_Livestock_E_All_Data_(Normalized):
+
+File chính: Production_Crops_Livestock_E_All_Data_(Normalized).txt/Production_Crops_Livestock_E_All_Data_(Normalized).txt)
+Nội dung: Dữ liệu sản lượng/diện tích/năng suất cho cây trồng & gia súc.
+Kích thước: ~4.2 triệu hàng, 14 cột (có Note).
+Cột chính: Area/Item/Element/Year/Unit/Value/Flag/Note.
+Ghi chú: Note missing nhiều (~98%); Elements gồm Area harvested, Yield, Production types.
+Production_Indices_E_All_Data_(Normalized):
+
+File chính: Production_Indices_E_All_Data_(Normalized).txt/Production_Indices_E_All_Data_(Normalized).txt)
+Nội dung: Chỉ số sản xuất (index numbers, 2014-2016 = 100), theo item/năm.
+Kích thước: ~1.99 triệu hàng, 13 cột.
+Cột chính: Area/Item/Element/Year/Value/Flag.
+Ghi chú: Unit toàn NULL; Element gồm các index types (gross, per capita).
