@@ -1,0 +1,417 @@
+REPORT GENERATED ON: 2026-04-10 20:03:38
+
+
+================================================================================
+FULL DATA PROFILE: WDICountry
+================================================================================
+BASIC STATISTICS:
+Total Rows: 265
+Total Columns: 31
+
+SCHEMA:
+Country Code                             : string
+Short Name                               : string
+Table Name                               : string
+Long Name                                : string
+2-alpha code                             : string
+Currency Unit                            : string
+Special Notes                            : string
+Region                                   : string
+Income Group                             : string
+WB-2 code                                : string
+National accounts base year              : string
+National accounts reference year         : int
+SNA price valuation                      : string
+Lending category                         : string
+Other groups                             : string
+System of National Accounts              : string
+Alternative conversion factor            : string
+PPP survey year                          : string
+Balance of Payments Manual in use        : string
+External debt Reporting status           : string
+System of trade                          : string
+Government Accounting concept            : string
+IMF data dissemination standard          : string
+Latest population census                 : string
+Latest household survey                  : string
+Source of most recent Income and expenditure data : string
+Vital registration complete              : string
+Latest agricultural census               : string
+Latest industrial data                   : int
+Latest trade data                        : int
+Latest water withdrawal data             : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  28 columns
+int            :   3 columns
+
+SAMPLE DATA:
++------------+---------------------------+---------------------------+----------------------------+------------+--------------+--------------------------------------------------+--------------------------+-------------------+---------+---------------------------+--------------------------------+---------------------------------+----------------+------------+--------------------------------------------------+-----------------------------+---------------+---------------------------------+------------------------------+--------------------+-------------------------------+--------------------------------------------------+------------------------+-------------------------------------------+-------------------------------------------------+---------------------------+--------------------------+----------------------+-----------------+----------------------------+
+|Country Code|                 Short Name|                 Table Name|                   Long Name|2-alpha code| Currency Unit|                                     Special Notes|                    Region|       Income Group|WB-2 code|National accounts base year|National accounts reference year|              SNA price valuation|Lending category|Other groups|                       System of National Accounts|Alternative conversion factor|PPP survey year|Balance of Payments Manual in use|External debt Reporting status|     System of trade|  Government Accounting concept|                   IMF data dissemination standard|Latest population census|                    Latest household survey|Source of most recent Income and expenditure data|Vital registration complete|Latest agricultural census|Latest industrial data|Latest trade data|Latest water withdrawal data|
++------------+---------------------------+---------------------------+----------------------------+------------+--------------+--------------------------------------------------+--------------------------+-------------------+---------+---------------------------+--------------------------------+---------------------------------+----------------+------------+--------------------------------------------------+-----------------------------+---------------+---------------------------------+------------------------------+--------------------+-------------------------------+--------------------------------------------------+------------------------+-------------------------------------------+-------------------------------------------------+---------------------------+--------------------------+----------------------+-----------------+----------------------------+
+|         ABW|                      Aruba|                      Aruba|                       Aruba|          AW| Aruban florin|                                              NULL| Latin America & Caribbean|        High income|       AW|                       2013|                            NULL|Value added at basic prices (VAB)|            NULL|        NULL|Country uses the 1993 System of National Accoun...|                         NULL|           NULL|                             BPM6|                          NULL|General trade system|                           NULL|Enhanced General Data Dissemination System (e-G...|         2020 (expected)|                                       NULL|                                             NULL|                        Yes|                      NULL|                  NULL|             2018|                        NULL|
+|         AFE|Africa Eastern and Southern|Africa Eastern and Southern| Africa Eastern and Southern|          ZH|          NULL|26 countries, stretching from the Red Sea in th...|                      NULL|               NULL|       ZH|                       NULL|                            NULL|                             NULL|            NULL|        NULL|                                              NULL|                         NULL|           NULL|                             NULL|                          NULL|                NULL|                           NULL|                                              NULL|                    NULL|                                       NULL|                                             NULL|                       NULL|                      NULL|                  NULL|             NULL|                        NULL|
+|         AFG|                Afghanistan|                Afghanistan|Islamic State of Afghanistan|          AF|Afghan afghani|The reporting period for national accounts data...|Middle East & North Africa|         Low income|       AF|                       2016|                            NULL|Value added at basic prices (VAB)|             IDA|        HIPC|Country uses the 2008 System of National Accoun...|                         NULL|           NULL|                             BPM6|                      Estimate|General trade system|Consolidated central government|Enhanced General Data Dissemination System (e-G...|                    1979|Multiple Indicator Cluster Survey 2022-2023|       Integrated household survey (IHS), 2016/17|                       NULL|                      NULL|                  NULL|             2018|                        NULL|
+|         AFW| Africa Western and Central| Africa Western and Central|  Africa Western and Central|          ZI|          NULL|22 countries, stretching from the westernmost p...|                      NULL|               NULL|       ZI|                       NULL|                            NULL|                             NULL|            NULL|        NULL|                                              NULL|                         NULL|           NULL|                             NULL|                          NULL|                NULL|                           NULL|                                              NULL|                    NULL|                                       NULL|                                             NULL|                       NULL|                      NULL|                  NULL|             NULL|                        NULL|
+|         AGO|                     Angola|                     Angola| People's Republic of Angola|          AO|Angolan kwanza|The World Bank systematically assesses the appr...|        Sub-Saharan Africa|Lower middle income|       AO|                       2015|                            NULL|Value added at basic prices (VAB)|            IBRD|        NULL|Country uses the 2008 System of National Accoun...|                         NULL|           NULL|                             BPM6|                        Actual|General trade system|   Budgetary central government|Enhanced General Data Dissemination System (e-G...|                    2014|      Demographic and Health Survey 2015/16|       Integrated household survey (IHS), 2008/09|                       NULL|                      NULL|                  NULL|             2018|                        NULL|
++------------+---------------------------+---------------------------+----------------------------+------------+--------------+--------------------------------------------------+--------------------------+-------------------+---------+---------------------------+--------------------------------+---------------------------------+----------------+------------+--------------------------------------------------+-----------------------------+---------------+---------------------------------+------------------------------+--------------------+-------------------------------+--------------------------------------------------+------------------------+-------------------------------------------+-------------------------------------------------+---------------------------+--------------------------+----------------------+-----------------+----------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: WDICountry
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Alternative conversion factor                   265      100.00%
+PPP survey year                                 265      100.00%
+Latest water withdrawal data                    265      100.00%
+Other groups                                    205       77.36%
+National accounts reference year                173       65.28%
+External debt Reporting status                  145       54.72%
+Vital registration complete                     145       54.72%
+Latest agricultural census                      137       51.70%
+Special Notes                                   132       49.81%
+Lending category                                120       45.28%
+Latest industrial data                          118       44.53%
+Government Accounting concept                   107       40.38%
+Source of most recent Income and expenditure data              97       36.60%
+System of trade                                  93       35.09%
+Latest household survey                          86       32.45%
+and 16 more columns
+
+NUMERIC STATISTICS:
++-------+--------------------------------+----------------------+------------------+
+|summary|National accounts reference year|Latest industrial data| Latest trade data|
++-------+--------------------------------+----------------------+------------------+
+|  count|                              92|                   147|               191|
+|   mean|              2016.2282608695652|    2007.0408163265306|2016.6335078534032|
+| stddev|               5.598475579148324|      9.42081457594045| 3.256043409236539|
+|    min|                            2000|                  1973|              1995|
+|    max|                            2024|                  2014|              2018|
++-------+--------------------------------+----------------------+------------------+
+
+
+================================================================================
+FULL DATA PROFILE: WDICountry_Series
+================================================================================
+BASIC STATISTICS:
+Total Rows: 7,939
+Total Columns: 3
+
+SCHEMA:
+CountryCode                              : string
+SeriesCode                               : string
+DESCRIPTION                              : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   3 columns
+
+SAMPLE DATA:
++-----------+-----------------+--------------------------------------------------+
+|CountryCode|       SeriesCode|                                       DESCRIPTION|
++-----------+-----------------+--------------------------------------------------+
+|        ABW|EG.EGY.PRIM.PP.KD|Sources: Estimated based on UN Energy Statistic...|
+|        ABW|   ST.INT.RCPT.CD|Compiled from data reported in the Internationa...|
+|        ABW|   IT.CEL.SETS.P2|Servicio di Telecomunicacion di Aruba (SETAR). ...|
+|        ABW|   SP.DYN.CBRT.IN|Data source: Central Bureau of Statistics, Unit...|
+|        ABW|   SP.DYN.LE00.IN|Data source: United Nations World Population Pr...|
++-----------+-----------------+--------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: WDICountry_Series
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+CountryCode                                       0        0.00%
+SeriesCode                                        0        0.00%
+DESCRIPTION                                       0        0.00%
+
+No numeric columns found in this dataset
+
+================================================================================
+FULL DATA PROFILE: WDICSV
+================================================================================
+BASIC STATISTICS:
+Total Rows: 403,256
+Total Columns: 70
+
+SCHEMA:
+Country Name                             : string
+Country Code                             : string
+Indicator Name                           : string
+Indicator Code                           : string
+1960                                     : double
+1961                                     : double
+1962                                     : double
+1963                                     : double
+1964                                     : double
+1965                                     : double
+1966                                     : double
+1967                                     : double
+1968                                     : double
+1969                                     : double
+1970                                     : double
+1971                                     : double
+1972                                     : double
+1973                                     : double
+1974                                     : double
+1975                                     : double
+1976                                     : double
+1977                                     : double
+1978                                     : double
+1979                                     : double
+1980                                     : double
+1981                                     : double
+1982                                     : double
+1983                                     : double
+1984                                     : double
+1985                                     : double
+1986                                     : double
+1987                                     : double
+1988                                     : double
+1989                                     : double
+1990                                     : double
+1991                                     : double
+1992                                     : double
+1993                                     : double
+1994                                     : double
+1995                                     : double
+1996                                     : double
+1997                                     : double
+1998                                     : double
+1999                                     : double
+2000                                     : double
+2001                                     : double
+2002                                     : double
+2003                                     : double
+2004                                     : double
+2005                                     : double
+2006                                     : double
+2007                                     : double
+2008                                     : double
+2009                                     : double
+2010                                     : double
+2011                                     : double
+2012                                     : double
+2013                                     : double
+2014                                     : double
+2015                                     : double
+2016                                     : double
+2017                                     : double
+2018                                     : double
+2019                                     : double
+2020                                     : double
+2021                                     : double
+2022                                     : double
+2023                                     : double
+2024                                     : double
+2025                                     : bigint
+
+Data Type Distribution:
+------------------------------------------------------------
+double         :  65 columns
+string         :   4 columns
+bigint         :   1 columns
+
+SAMPLE DATA:
++---------------------------+------------+--------------------------------------------------+-----------------+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+----+----+
+|               Country Name|Country Code|                                    Indicator Name|   Indicator Code|1960|1961|1962|1963|1964|1965|1966|1967|1968|1969|1970|1971|1972|1973|1974|1975|1976|1977|1978|1979|1980|1981|1982|1983|1984|1985|1986|1987|1988|1989|1990|1991|1992|1993|1994|1995|1996|1997|1998|1999|       2000|       2001|       2002|       2003|       2004|       2005|       2006|       2007|       2008|       2009|       2010|       2011|       2012|       2013|       2014|       2015|       2016|       2017|       2018|       2019|       2020|       2021|       2022|       2023|2024|2025|
++---------------------------+------------+--------------------------------------------------+-----------------+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+----+----+
+|Africa Eastern and Southern|         AFE|Access to clean fuels and technologies for cook...|   EG.CFT.ACCS.ZS|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|11.49470428|11.84105507|12.20252281|   12.57338|12.95869007|13.37114202|13.78271406|14.25417763|14.73658579|15.17155711|15.62017344|16.12319846|  16.599734|17.06104931|17.63415021|18.14583339|18.68511838|19.20563243|19.74277233|20.33267897|20.86280007|21.41962074|21.99645623|22.54144021|NULL|NULL|
+|Africa Eastern and Southern|         AFE|Access to clean fuels and technologies for cook...|EG.CFT.ACCS.RU.ZS|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|3.548166794|3.704024302| 3.89004254|4.091719963| 4.27424866|4.532520666| 4.75749014|5.004034662|5.248924101|5.499746606|5.747850934|6.028196445|6.309217697|6.643625318|6.932310306|7.259936008|7.606712057|7.926604446|8.309895632| 8.70459079|9.106639547|9.480803899|9.903208962| 10.2881539|NULL|NULL|
+|Africa Eastern and Southern|         AFE|Access to clean fuels and technologies for cook...|EG.CFT.ACCS.UR.ZS|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|32.35068942|32.68334001|33.10017672|33.49046486|33.99118256|34.47060773|34.92265553|35.50102801| 35.9153539| 36.4352159|36.82268666|37.25256997|37.63598705|37.96932072|38.34023239|38.74198831|39.05262616|39.32106816|39.64953356| 39.9682986|40.35462821|40.72380518|41.02635051|41.28997416|NULL|NULL|
+|Africa Eastern and Southern|         AFE|           Access to electricity (% of population)|   EG.ELC.ACCS.ZS|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|19.91725633|19.94427742|21.54864662|22.49321672|23.72445493|23.44953936|25.17248231|26.79514459|25.90884513|26.18784648|27.41495376|28.90975623|31.67342746|31.72357357|31.87195613|33.92227566|38.85959766|40.22374417|43.03507335|44.39086053|46.28237095|48.12721104|48.80125796|50.66751579|NULL|NULL|
+|Africa Eastern and Southern|         AFE|Access to electricity, rural (% of rural popula...|EG.ELC.ACCS.RU.ZS|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|NULL|8.672653467|       NULL|       NULL|9.792810781| 10.8909786|10.33647433|12.42004677| 12.3649963|12.79847703|15.53884904|14.58882973|16.05663889| 19.3999028| 18.7830579|17.68545456|  16.495064|24.58490633|25.37503742|26.94198366|28.98318278|30.90999097|32.70983655|33.74722151|35.24023629|NULL|NULL|
++---------------------------+------------+--------------------------------------------------+-----------------+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+----+----+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: WDICSV
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+2025                                        387,399       96.07%
+1960                                        365,905       90.74%
+1961                                        360,570       89.41%
+1962                                        359,292       89.10%
+1963                                        358,358       88.87%
+1964                                        357,856       88.74%
+1965                                        356,027       88.29%
+1966                                        355,766       88.22%
+1967                                        355,126       88.06%
+1968                                        354,525       87.92%
+1969                                        353,744       87.72%
+1970                                        330,660       82.00%
+1971                                        326,513       80.97%
+1972                                        324,782       80.54%
+1973                                        324,153       80.38%
+and 55 more columns
+
+NUMERIC STATISTICS:
++-------+--------------------+--------------------+--------------------+--------------------+--------------------+
+|summary|                1960|                1961|                1962|                1963|                1964|
++-------+--------------------+--------------------+--------------------+--------------------+--------------------+
+|  count|               37351|               42686|               43964|               44898|               45400|
+|   mean|1.860159278989012E12|1.733369647627483...|1.777795016966648...|1.846402673149200...|1.997935683842798...|
+| stddev|9.543776170495308E13|9.634334778292358E13|1.012430552750976...|1.070983913189233...|1.158695857961405E14|
+|    min|            -6.98E14|            -1.05E15|            -1.19E15|            -1.32E15|             -1.4E15|
+|    max|             7.62E15|             8.41E15|             9.07E15|             9.71E15|             1.05E16|
++-------+--------------------+--------------------+--------------------+--------------------+--------------------+
+
+
+================================================================================
+FULL DATA PROFILE: WDIFootnote
+================================================================================
+BASIC STATISTICS:
+Total Rows: 838,922
+Total Columns: 4
+
+SCHEMA:
+CountryCode                              : string
+SeriesCode                               : string
+Year                                     : string
+DESCRIPTION                              : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   4 columns
+
+SAMPLE DATA:
++-----------+-----------------+------+--------------------------------------------------+
+|CountryCode|       SeriesCode|  Year|                                       DESCRIPTION|
++-----------+-----------------+------+--------------------------------------------------+
+|        ABW|      SP.POP.GROW|YR1972|Break in series. Data up to the year before thi...|
+|        ABW|      SP.POP.TOTL|YR1972|Break in series. Data up to the year before thi...|
+|        ABW|BX.TRF.PWKR.CD.DT|YR2024|Data on Personal Transfers and Compensation of ...|
+|        ABW|      IT.NET.SECR|YR2012|                                    December, 2012|
+|        ABW|       PA.NUS.PPP|YR2017|                                 ICP benchmark PPP|
++-----------+-----------------+------+--------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: WDIFootnote
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+CountryCode                                       0        0.00%
+SeriesCode                                        0        0.00%
+Year                                              0        0.00%
+DESCRIPTION                                       0        0.00%
+
+No numeric columns found in this dataset
+
+================================================================================
+FULL DATA PROFILE: WDISeries
+================================================================================
+BASIC STATISTICS:
+Total Rows: 1,516
+Total Columns: 20
+
+SCHEMA:
+Series Code                              : string
+Topic                                    : string
+Indicator Name                           : string
+Short definition                         : string
+Long definition                          : string
+Unit of measure                          : string
+Periodicity                              : string
+Base Period                              : string
+Other notes                              : string
+Aggregation method                       : string
+Limitations and exceptions               : string
+Notes from original source               : string
+General comments                         : string
+Source                                   : string
+Statistical concept and methodology      : string
+Development relevance                    : string
+Related source links                     : string
+Other web links                          : string
+Related indicators                       : string
+License Type                             : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :  20 columns
+
+SAMPLE DATA:
++-----------------+------------------------------------+--------------------------------------------------+----------------+--------------------------------------------------+-----------------------------+-----------+-----------+--------------------------------------------------+------------------+--------------------------------------------------+--------------------------+----------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------+---------------+------------------+------------+
+|      Series Code|                               Topic|                                    Indicator Name|Short definition|                                   Long definition|              Unit of measure|Periodicity|Base Period|                                       Other notes|Aggregation method|                        Limitations and exceptions|Notes from original source|General comments|                                            Source|               Statistical concept and methodology|                             Development relevance|Related source links|Other web links|Related indicators|License Type|
++-----------------+------------------------------------+--------------------------------------------------+----------------+--------------------------------------------------+-----------------------------+-----------+-----------+--------------------------------------------------+------------------+--------------------------------------------------+--------------------------+----------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------+---------------+------------------+------------+
+|AG.CON.FERT.PT.ZS|Environment: Agricultural production|Fertilizer consumption (% of fertilizer product...|            NULL|Fertilizer consumption measures the quantity of...|                    % (ratio)|     Annual|       NULL|The world and regional aggregate series do not ...|  Weighted average|The FAO has revised the time series for fertili...|                      NULL|            NULL|FAO electronic files and web site, Food and Agr...|Methodology: Fertilizer consumption measures th...|Factors, such as the green revolution, have led...|                NULL|           NULL|              NULL|   CC BY-4.0|
+|   AG.CON.FERT.ZS|Environment: Agricultural production|Fertilizer consumption (kilograms per hectare o...|            NULL|Fertilizer consumption measures the quantity of...|kg per hectare of arable land|     Annual|       NULL|The world and regional aggregate series do not ...|  Weighted average|The FAO has revised the time series for fertili...|                      NULL|            NULL|FAO electronic files and web site, Food and Agr...|Methodology: Fertilizer consumption measures th...|Factors, such as the green revolution, have led...|                NULL|           NULL|              NULL|   CC BY-4.0|
+|   AG.LND.AGRI.K2|               Environment: Land use|                        Agricultural land (sq. km)|            NULL|Agricultural land refers to the land area that ...|   square kilometers (sq. km)|     Annual|       NULL|Areas of former states are included in the succ...|               Sum|The data are collected by the Food and Agricult...|                      NULL|            NULL|FAO electronic files and web site, Food and Agr...|Methodology: Agricultural land constitutes only...|Agricultural land covers more than one-third of...|                NULL|           NULL|              NULL|   CC BY-4.0|
+|   AG.LND.AGRI.ZS|               Environment: Land use|                Agricultural land (% of land area)|            NULL|Agricultural land refers to the share of land a...|       % (share) of land area|     Annual|       NULL|Areas of former states are included in the succ...|  Weighted average|The data are collected by the Food and Agricult...|                      NULL|            NULL|FAO electronic files and web site, Food and Agr...|Methodology: Agriculture is still a major secto...|Agricultural land covers more than one-third of...|                NULL|           NULL|              NULL|   CC BY-4.0|
+|   AG.LND.ARBL.HA|               Environment: Land use|                            Arable land (hectares)|            NULL|Arable land (in hectares) includes land defined...|                     hectares|     Annual|       NULL|Areas of former states are included in the succ...|              NULL|The Food and Agriculture Organization (FAO) tri...|                      NULL|            NULL|FAO electronic files and web site, Food and Agr...|Methodology: Temporary fallow land refers to la...|Agricultural land covers more than one-third of...|                NULL|           NULL|              NULL|   CC BY-4.0|
++-----------------+------------------------------------+--------------------------------------------------+----------------+--------------------------------------------------+-----------------------------+-----------+-----------+--------------------------------------------------+------------------+--------------------------------------------------+--------------------------+----------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------+---------------+------------------+------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: WDISeries
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+Short definition                              1,516      100.00%
+Base Period                                   1,516      100.00%
+Notes from original source                    1,516      100.00%
+Related source links                          1,516      100.00%
+Other web links                               1,516      100.00%
+Related indicators                            1,516      100.00%
+General comments                              1,511       99.67%
+Other notes                                   1,130       74.54%
+Limitations and exceptions                      609       40.17%
+Aggregation method                              401       26.45%
+Unit of measure                                 317       20.91%
+Development relevance                           203       13.39%
+Periodicity                                      33        2.18%
+Long definition                                  17        1.12%
+Source                                           17        1.12%
+and 5 more columns
+
+No numeric columns found in this dataset
+
+================================================================================
+FULL DATA PROFILE: WDISeries_Time
+================================================================================
+BASIC STATISTICS:
+Total Rows: 143
+Total Columns: 3
+
+SCHEMA:
+SeriesCode                               : string
+Year                                     : string
+DESCRIPTION                              : string
+
+Data Type Distribution:
+------------------------------------------------------------
+string         :   3 columns
+
+SAMPLE DATA:
++--------------+------+--------------------------------------------------+
+|    SeriesCode|  Year|                                       DESCRIPTION|
++--------------+------+--------------------------------------------------+
+|   SP.UWT.TFRT|YR1990|Averages for regions/groups are based on countr...|
+|SP.REG.DTHS.ZS|YR1990|Averages for regions/groups are based on countr...|
+|   SP.DYN.WFRT|YR1990|Averages for regions/groups are based on countr...|
+|SP.DYN.CONU.ZS|YR1990|Averages for regions/groups are based on countr...|
+|SH.FPL.SATM.ZS|YR1990|Averages for regions/groups are based on countr...|
++--------------+------+--------------------------------------------------+
+only showing top 5 rows
+
+
+NULL MISSING VALUE ANALYSIS: WDISeries_Time
+------------------------------------------------------------
+Top 15 Columns with Most Missing Values:
+Column                                   Null Count   Percentage
+SeriesCode                                        0        0.00%
+Year                                              0        0.00%
+DESCRIPTION                                       0        0.00%
+
+No numeric columns found in this dataset
+
+================================================================================
+EXPLORATION COMPLETED
+Files processed successfully: 6
+Files failed or not found: 0
