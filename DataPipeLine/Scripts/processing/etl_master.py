@@ -102,7 +102,7 @@ def create_dim_country(spark, df_wdi_country, selected_countries):
     return dim_country
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from etl_gmd import process_gmd
+from etl_gmd import process_gmd, get_gmd_metadata
 from etl_wdi import process_wdi, get_wdi_metadata
 #from etl_fao import process_fao
 from etl_unuwider import process_unuwider
@@ -112,8 +112,9 @@ def main():
     logger.info("STARTING ETL PIPELINE")
     logger.info("=" * 80)
     
-    logger.info("Loading WDI metadata...")
+    logger.info("Loading Metadata for all sources...")
     df_wdi_country, df_wdi_series = get_wdi_metadata(spark)
+    df_gmd_meta = get_gmd_metadata(spark)
 
     dim_country = create_dim_country(spark, df_wdi_country, SELECTED_COUNTRIES)
     
@@ -149,7 +150,6 @@ def main():
         spark.stop()
         sys.exit(1)
     
-    # 3. Combine all facts (without deduplication)
     logger.info("Combining all fact tables (keeping all rows)...")
     combined = all_facts[0]
     for df in all_facts[1:]:
@@ -166,7 +166,6 @@ def main():
     combined_sorted.write.mode("overwrite").parquet(fact_output)
     logger.info(f"Fact table saved with {total_rows:,} rows")
     
-    # 5. Create dim_indicator
     logger.info("Creating dim_indicator from distinct indicator codes...")
     distinct_indicators = combined.select("indicator_code").distinct()
     
@@ -182,17 +181,16 @@ def main():
             col("Statistical concept and methodology").alias("statistical_concept")
         )
         
+        if df_gmd_meta is not None:
+            all_meta = wdi_meta.unionByName(df_gmd_meta, allowMissingColumns=True)
+        else:
+            all_meta = wdi_meta
+            
         dim_indicator = distinct_indicators.join(
-            wdi_meta,
-            distinct_indicators.indicator_code == wdi_meta.meta_code,
+            all_meta,
+            distinct_indicators.indicator_code == all_meta.meta_code,
             "left"
         ).drop("meta_code")
-        
-        dim_indicator = dim_indicator.withColumn("indicator_name", when(col("indicator_name").isNull(), col("indicator_code")).otherwise(col("indicator_name"))) \
-                                     .withColumn("topic", when(col("topic").isNull(), lit("Other Source")).otherwise(col("topic")))
-    else:
-        dim_indicator = distinct_indicators.withColumn("indicator_name", col("indicator_code")) \
-                                           .withColumn("topic", lit("Unknown"))
     
     dim_indicator_output = f"{PROCESSED_DIR}/dim_indicator"
     dim_indicator.coalesce(1).write.mode("overwrite").parquet(dim_indicator_output)
