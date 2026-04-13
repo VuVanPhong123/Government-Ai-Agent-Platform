@@ -1,164 +1,155 @@
-# fao.py
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, isnan, isnull
 import os
-import sys
-import logging
-from datetime import datetime
 import glob
+import logging
+from pyspark.sql.functions import col, lit
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s"
-)
 logger = logging.getLogger(__name__)
 
-def create_optimized_spark_session():
-    return SparkSession.builder \
-        .appName("FAODataExploration") \
-        .config("spark.sql.adaptive.enabled", "true") \
-        .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
-        .config("spark.sql.adaptive.skewJoin.enabled", "true") \
-        .config("spark.sql.shuffle.partitions", "200") \
-        .config("spark.driver.memory", "8g") \
-        .config("spark.executor.memory", "8g") \
-        .config("spark.sql.files.maxPartitionBytes", "256m") \
-        .getOrCreate()
+FAO_ELEMENT_MAPPING = {
+    "Production": "AGRI_PRODUCTION",
+    "Yield": "AGRI_YIELD",
+    "Area harvested": "AGRI_AREA_HARVESTED",
+    "Gross Production Value (current thousand US$)": "AGRI_VALUE_USD",
+    "Gross Production Value (constant 2014-2016 thousand I$)": "AGRI_VALUE_INT",
+    "Gross Production Value (current thousand SLC)": "AGRI_VALUE_SLC",
+    "Gross Production Index Number (2014-2016 = 100)": "AGRI_PROD_INDEX",
+    "Export value": "AGRI_TRADE_EXPORT_VALUE",
+    "Import value": "AGRI_TRADE_IMPORT_VALUE",
+    "Export quantity": "AGRI_TRADE_EXPORT_QUANTITY",
+    "Import quantity": "AGRI_TRADE_IMPORT_QUANTITY",
+    "Export Unit/Value Index (2014-2016 = 100)": "EXPORT_PRICE_INDEX",
+    "Import Unit/Value Index (2014-2016 = 100)": "IMPORT_PRICE_INDEX",
+    "Export Value Index (2014-2016 = 100)": "EXPORT_VALUE_INDEX",
+    "Import Value Index (2014-2016 = 100)": "IMPORT_VALUE_INDEX",
+    "Local currency units per USD": "EXCHANGE_RATE",
+    "Producer Price (USD/tonne)": "PRODUCER_PRICE",
+    "Producer Price Index (2014-2016 = 100)": "PRODUCER_PRICE_INDEX",
+    "Annual growth US$": "GDP_GROWTH",
+    "Value US$": "GDP_USD",
+}
 
-spark = create_optimized_spark_session()
-logger.info("Spark session initialized")
-
-DATA_DIR = "C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/fao/"
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else os.getcwd()
-OUTPUT_BASE_DIR = os.path.join(SCRIPT_DIR, "outputExplore", "fao")
-os.makedirs(OUTPUT_BASE_DIR, exist_ok=True)
-
-SUMMARY_FILE = os.path.join(OUTPUT_BASE_DIR, "fao_processing_summary.txt")
-
-def read_csv_robust(file_path, encoding_list=None):
-    if encoding_list is None:
-        encoding_list = ["UTF-8", "ISO-8859-1", "latin1"]
-    for encoding in encoding_list:
+def read_csv_robust(spark, file_path):
+    for encoding in ["UTF-8", "ISO-8859-1", "latin1"]:
         try:
-            df = spark.read \
-                .option("header", "true") \
-                .option("inferSchema", "true") \
-                .option("encoding", encoding) \
-                .option("quote", '"') \
-                .option("escape", '"') \
-                .option("multiLine", "true") \
-                .csv(file_path)
-            logger.info(f"Successfully read {file_path} with encoding: {encoding}")
-            return df
-        except Exception as e:
-            logger.debug(f"Failed with encoding {encoding}: {str(e)[:50]}")
+            return spark.read.option("header", "true") \
+                             .option("inferSchema", "true") \
+                             .option("encoding", encoding) \
+                             .csv(file_path)
+        except:
             continue
-    logger.error(f"Failed to read file: {file_path}")
     return None
 
-def analyze_null_values(df, file_name):
-    print(f"\nNULL MISSING VALUE ANALYSIS: {file_name}")
-    print("-" * 60)
-    try:
-        row_count = df.count()
-        if row_count == 0:
-            print("Dataset is empty, cannot analyze nulls.")
-            return
-        null_stats = []
-        for column in df.columns:
-            null_count = df.where(col(column).isNull() | isnan(col(column))).count()
-            null_percent = (null_count / row_count * 100) if row_count > 0 else 0
-            null_stats.append({"column": column, "null_count": null_count, "null_percent": null_percent})
-        null_stats.sort(key=lambda x: x["null_percent"], reverse=True)
-        print("Top 15 Columns with Most Missing Values:")
-        print(f"{'Column':<35} {'Null Count':>15} {'Percentage':>12}")
-        for i, stat in enumerate(null_stats[:15], 1):
-            print(f"{stat['column']:<35} {stat['null_count']:>15,} {stat['null_percent']:>11.2f}%")
-        if len(null_stats) > 15:
-            print(f"and {len(null_stats) - 15} more columns")
-    except Exception as e:
-        logger.error(f"Error in null analysis: {e}")
-
-def analyze_data_types(df, file_name):
-    print("\nData Type Distribution:")
-    print("-" * 60)
-    dtype_dist = {}
-    for _, dtype in df.dtypes:
-        dtype_dist[str(dtype)] = dtype_dist.get(str(dtype), 0) + 1
-    for dtype, count in sorted(dtype_dist.items(), key=lambda x: x[1], reverse=True):
-        print(f"{dtype:<15}: {count:>3} columns")
-
-def generate_full_profile(df, file_name, output_file_path):
-    with open(output_file_path, "w", encoding="utf-8") as f:
-        original_stdout = sys.stdout
-        sys.stdout = f
-        print(f"PROFILE FOR: {file_name}")
-        print(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        try:
-            row_count = df.count()
-            col_count = len(df.columns)
-            print("BASIC STATISTICS:")
-            print(f"Total Rows: {row_count:,}")
-            print(f"Total Columns: {col_count}")
-            print("\nSCHEMA:")
-            for name, dtype in df.dtypes:
-                print(f"{name:<40} : {dtype}")
-            analyze_data_types(df, file_name)
-            print("\nSAMPLE DATA:")
-            df.show(5, truncate=50, vertical=False)
-            analyze_null_values(df, file_name)
-            numeric_cols = [name for name, dtype in df.dtypes if dtype in ("int", "double", "float", "bigint", "long")]
-            if numeric_cols:
-                print("\nNUMERIC STATISTICS (first 5 numeric columns):")
-                df.select(numeric_cols[:5]).describe().show()
-            else:
-                print("\nNo numeric columns found in this dataset")
-        except Exception as e:
-            print(f"Error generating profile: {e}")
-        sys.stdout = original_stdout
-
-def main():
-    logger.info(f"Starting FAO data exploration from: {DATA_DIR}")
-    csv_files = glob.glob(os.path.join(DATA_DIR, "**", "*.csv"), recursive=True)
-    logger.info(f"Found {len(csv_files)} CSV files")
-    summary_lines = [
-        f"FAO Data Exploration Summary",
-        f"Run on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        f"Source directory: {DATA_DIR}",
-        f"Total CSV files found: {len(csv_files)}",
-        ""
-    ]
-    processed, failed = 0, 0
-    for csv_path in csv_files:
-        rel_path = os.path.relpath(csv_path, DATA_DIR)
-        output_rel_path = os.path.splitext(rel_path)[0] + ".txt"
-        output_full_path = os.path.join(OUTPUT_BASE_DIR, output_rel_path)
-        os.makedirs(os.path.dirname(output_full_path), exist_ok=True)
-        logger.info(f"Processing: {rel_path}")
-        try:
-            df = read_csv_robust(csv_path)
-            if df is None:
-                failed += 1
-                summary_lines.append(f"FAILED: {rel_path} - Cannot read CSV")
+def process_fao(spark, selected_countries, dim_indicator):
+    data_dir = "C:/Users/ADMIN/GovernmentAI/DataPipeLine/data/raw/fao/"
+    # Tìm tất cả file CSV nằm trong thư mục con (sâu 1 cấp)
+    data_files = glob.glob(os.path.join(data_dir, "*", "*.csv"))
+    # Lọc chỉ lấy các file dữ liệu chính (không phải metadata)
+    data_files = [f for f in data_files if "_All_Data_" in f]
+    logger.info(f"Found {len(data_files)} FAO data files")
+    
+    all_facts = []
+    # Map tên quốc gia từ FAO (Area) sang ISO3
+    # Tạo dictionary từ selected_countries: name -> code
+    name_to_iso = {v: k for k, v in selected_countries.items()}
+    # Thêm các tên viết tắt nếu có
+    # Một số quốc gia trong FAO có thể dùng tên khác, cần bổ sung mapping
+    extra_mapping = {
+        "United States of America": "USA",
+        "Russian Federation": "RUS",
+        "Korea, Republic of": "KOR",
+        "Iran (Islamic Republic of)": "IRN",
+        "Viet Nam": "VNM",
+        "Lao People's Democratic Republic": "LAO",
+        "Syrian Arab Republic": "SYR",
+        "Venezuela (Bolivarian Republic of)": "VEN",
+        "Bolivia (Plurinational State of)": "BOL",
+        "Tanzania, United Republic of": "TZA",
+        "Côte d'Ivoire": "CIV",
+        "Congo, Democratic Republic of the": "COD",
+        "Congo": "COG",
+        "Egypt": "EGY",
+        "Gambia": "GMB",
+        "Guinea-Bissau": "GNB",
+        "Equatorial Guinea": "GNQ",
+        "Macedonia": "MKD",
+        "Moldova": "MDA",
+        "Kyrgyzstan": "KGZ",
+        "Tajikistan": "TJK",
+        "Turkmenistan": "TKM",
+        "Uzbekistan": "UZB",
+        "Azerbaijan": "AZE",
+        "Georgia": "GEO",
+        "Armenia": "ARM",
+        "Belarus": "BLR",
+        "Bosnia and Herzegovina": "BIH",
+        "Serbia": "SRB",
+        "Montenegro": "MNE",
+        "Kosovo": "XKX",
+    }
+    for name, code in extra_mapping.items():
+        name_to_iso[name] = code
+    
+    for file_path in data_files:
+        file_name = os.path.basename(file_path)
+        logger.info(f"Processing FAO file: {file_name}")
+        df = read_csv_robust(spark, file_path)
+        if df is None:
+            continue
+        
+        if "Area" in df.columns and "Element" in df.columns and "Year" in df.columns:
+            # Lọc các quốc gia có trong mapping (cả tên gốc và tên thay thế)
+            fao_areas = df.select("Area").distinct().collect()
+            fao_areas_list = [row["Area"] for row in fao_areas]
+            matched_areas = [area for area in fao_areas_list if area in name_to_iso]
+            logger.info(f"  Matching {len(matched_areas)} countries out of {len(fao_areas_list)}")
+            if not matched_areas:
+                logger.warning(f"  No matching countries in {file_name}")
                 continue
-            df.cache()
-            generate_full_profile(df, rel_path, output_full_path)
-            df.unpersist()
-            processed += 1
-            summary_lines.append(f"SUCCESS: {rel_path} -> {output_full_path}")
-            logger.info(f"Profile saved to: {output_full_path}")
-        except Exception as e:
-            failed += 1
-            error_msg = f"Error processing {rel_path}: {str(e)}"
-            logger.error(error_msg)
-            summary_lines.append(f"ERROR: {rel_path} - {str(e)}")
-    summary_lines.extend(["", f"Processing completed. Successful: {processed}, Failed: {failed}"])
-    with open(SUMMARY_FILE, "w", encoding="utf-8") as f:
-        f.write("\n".join(summary_lines))
-    logger.info(f"Summary saved to: {SUMMARY_FILE}")
-    logger.info(f"FAO data exploration completed. Processed {processed} files, failed {failed}")
-    spark.stop()
-    logger.info("Spark session stopped")
-
-if __name__ == "__main__":
-    main()
+            
+            df_filtered = df.filter(col("Area").isin(matched_areas))
+            df_filtered = df_filtered.filter((col("Year") >= 1995) & (col("Year") <= 2024))
+            
+            for element, std_code in FAO_ELEMENT_MAPPING.items():
+                # Thử lấy trực tiếp cột có tên element
+                if element in df.columns:
+                    temp_df = df_filtered.select(
+                        col("Area").alias("country_name"),
+                        col("Year").alias("year"),
+                        lit(std_code).alias("indicator_code"),
+                        col(element).cast("double").alias("value"),
+                        lit(4).alias("source_priority"),
+                        lit(f"FAO_{file_name}_{element}").alias("source_specific")
+                    ).filter(col("value").isNotNull())
+                    if temp_df.count() > 0:
+                        all_facts.append(temp_df)
+                else:
+                    # Dùng cột Element
+                    element_df = df_filtered.filter(col("Element") == element)
+                    if element_df.count() > 0:
+                        temp_df = element_df.select(
+                            col("Area").alias("country_name"),
+                            col("Year").alias("year"),
+                            lit(std_code).alias("indicator_code"),
+                            col("Value").cast("double").alias("value"),
+                            lit(4).alias("source_priority"),
+                            lit(f"FAO_{file_name}_{element}").alias("source_specific")
+                        ).filter(col("value").isNotNull())
+                        all_facts.append(temp_df)
+    
+    if not all_facts:
+        logger.warning("No FAO facts collected")
+        return None
+    
+    result = all_facts[0]
+    for df in all_facts[1:]:
+        result = result.union(df)
+    
+    # Map country name to ISO3
+    from pyspark.sql.functions import create_map, lit
+    mapping_expr = create_map([lit(x) for x in sum(name_to_iso.items(), ())])
+    result = result.withColumn("country_code", mapping_expr.getItem(col("country_name"))) \
+                   .drop("country_name") \
+                   .filter(col("country_code").isNotNull())
+    
+    logger.info(f"FAO processed: {result.count():,} rows")
+    return result
