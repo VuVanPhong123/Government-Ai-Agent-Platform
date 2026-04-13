@@ -3,9 +3,8 @@ import sys
 import logging
 from datetime import datetime
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, lit, when
+from pyspark.sql.functions import col, lit, when, coalesce
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, BooleanType
-
 
 os.environ["PYSPARK_PYTHON"] = sys.executable.replace("\\", "/")
 os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable.replace("\\", "/")
@@ -14,6 +13,7 @@ os.environ["SPARK_LOCAL_IP"] = "127.0.0.1"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Đường dẫn thư mục
 BASE_DIR = "C:/Users/ADMIN/GovernmentAI/DataPipeLine"
 RAW_DIR = f"{BASE_DIR}/data/raw"
 PROCESSED_DIR = f"{BASE_DIR}/data/processed"
@@ -77,11 +77,17 @@ SELECTED_COUNTRIES = {
     "ZMB": "Zambia", "ZWE": "Zimbabwe"
 }
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from etl_gmd import process_gmd, get_gmd_metadata
+from etl_wdi import process_wdi, get_wdi_metadata
+from etl_unuwider import process_unuwider, get_unuwider_country_metadata, get_unuwider_indicator_metadata
+from etl_fao import process_fao
+
 def create_dim_country(spark, df_wdi_country, df_unuwider_meta, selected_countries):
     if df_wdi_country is None:
         logger.error("WDI Country metadata is missing.")
         return None
-        
+
     dim_country = df_wdi_country.select(
         col("Country Code").alias("country_code"),
         col("Short Name").alias("short_name"),
@@ -92,85 +98,86 @@ def create_dim_country(spark, df_wdi_country, df_unuwider_meta, selected_countri
         col("Lending category").alias("lending_category"),
         col("Special Notes").alias("special_notes")
     ).filter(col("country_code").isin(list(selected_countries.keys())))
-    
+
     if df_unuwider_meta is not None:
-        dim_country = dim_country.join(df_unuwider_meta, on="country_code", how="left")
-    
+        unw_cols = [c for c in df_unuwider_meta.columns if c not in dim_country.columns]
+        if unw_cols:
+            dim_country = dim_country.join(
+                df_unuwider_meta.select("country_code", *unw_cols),
+                on="country_code",
+                how="left"
+            )
+
     output_path = f"{PROCESSED_DIR}/dim_country"
     dim_country.coalesce(1).write.mode("overwrite").parquet(output_path)
-    
     logger.info(f"Created dim_country with {dim_country.count()} rows")
     return dim_country
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from etl_gmd import process_gmd, get_gmd_metadata
-from etl_wdi import process_wdi, get_wdi_metadata
-#from etl_fao import process_fao
-from etl_unuwider import process_unuwider, get_unuwider_country_metadata, get_unuwider_indicator_metadata
+def create_dim_indicator(spark, fact_df, list_of_metadata_dfs):
+    distinct_indicators = fact_df.select("indicator_code").distinct()
+
+    all_meta = None
+    for meta_df in list_of_metadata_dfs:
+        if meta_df is None:
+            continue
+        meta_renamed = meta_df.withColumnRenamed("meta_code", "indicator_code")
+        if all_meta is None:
+            all_meta = meta_renamed
+        else:
+            all_meta = all_meta.unionByName(meta_renamed, allowMissingColumns=True)
+
+    if all_meta is not None:
+        all_meta = all_meta.dropDuplicates(["indicator_code"])
+        dim_indicator = distinct_indicators.join(all_meta, on="indicator_code", how="left")
+    else:
+        dim_indicator = distinct_indicators
+
+    required_cols = ["topic", "indicator_name", "long_definition", "unit_of_measure",
+                     "periodicity", "statistical_concept", "source"]
+    for c in required_cols:
+        if c not in dim_indicator.columns:
+            dim_indicator = dim_indicator.withColumn(c, lit(None))
+
+    output_path = f"{PROCESSED_DIR}/dim_indicator"
+    dim_indicator.coalesce(1).write.mode("overwrite").parquet(output_path)
+    logger.info(f"Created dim_indicator with {dim_indicator.count()} rows")
+    return dim_indicator
 
 def main():
     logger.info("=" * 80)
     logger.info("STARTING ETL PIPELINE")
     logger.info("=" * 80)
-    
-    logger.info("Loading Metadata for all sources...")
+
+    logger.info("Loading metadata from all sources...")
     df_wdi_country, df_wdi_series = get_wdi_metadata(spark)
     df_gmd_meta = get_gmd_metadata(spark)
     df_unuwider_meta = get_unuwider_country_metadata(spark)
     df_unuwider_ind_meta = get_unuwider_indicator_metadata(spark)
+
     dim_country = create_dim_country(spark, df_wdi_country, df_unuwider_meta, SELECTED_COUNTRIES)
-    
-    # 2. Process sources
+    if dim_country is None:
+        logger.error("Cannot proceed without dim_country.")
+        spark.stop()
+        sys.exit(1)
+
     all_facts = []
-    
+    all_metadata = []
+
+    # GMD
     logger.info("Processing GMD...")
     gmd_facts = process_gmd(spark, SELECTED_COUNTRIES, None)
     if gmd_facts is not None:
         all_facts.append(gmd_facts)
         logger.info(f"GMD rows: {gmd_facts.count():,}")
-    
+    if df_gmd_meta is not None:
+        all_metadata.append(df_gmd_meta)
+
+    # WDI
     logger.info("Processing WDI...")
     wdi_facts = process_wdi(spark, SELECTED_COUNTRIES, None)
     if wdi_facts is not None:
         all_facts.append(wdi_facts)
         logger.info(f"WDI rows: {wdi_facts.count():,}")
-    
-    # logger.info("Processing FAO...")
-    # fao_facts = process_fao(spark, SELECTED_COUNTRIES, None)
-    # if fao_facts is not None:
-    #     all_facts.append(fao_facts)
-    #     logger.info(f"FAO rows: {fao_facts.count():,}")
-    
-    logger.info("Processing UNU-WIDER...")
-    unw_facts = process_unuwider(spark, SELECTED_COUNTRIES, None)
-    if unw_facts is not None:
-        all_facts.append(unw_facts)
-        logger.info(f"UNU-WIDER rows: {unw_facts.count():,}")
-    
-    if not all_facts:
-        logger.error("No data processed!")
-        spark.stop()
-        sys.exit(1)
-    
-    logger.info("Combining all fact tables (keeping all rows)...")
-    combined = all_facts[0]
-    for df in all_facts[1:]:
-        combined = combined.union(df)
-    
-    total_rows = combined.count()
-    logger.info(f"Total rows before deduplication: {total_rows:,}")
-    
-    fact_output = f"{PROCESSED_DIR}/fact_economic_indicators"
-    
-    logger.info("Sorting fact table by Country -> Indicator -> Year...")
-    combined_sorted = combined.orderBy("country_code", "indicator_code", "year")
-    
-    combined_sorted.write.mode("overwrite").parquet(fact_output)
-    logger.info(f"Fact table saved with {total_rows:,} rows")
-    
-    logger.info("Creating dim_indicator from distinct indicator codes...")
-    distinct_indicators = combined.select("indicator_code").distinct()
-    
     if df_wdi_series is not None:
         wdi_meta = df_wdi_series.select(
             col("Series Code").alias("meta_code"),
@@ -182,27 +189,52 @@ def main():
             col("Source").alias("source"),
             col("Statistical concept and methodology").alias("statistical_concept")
         )
-        
-        all_meta = wdi_meta
-        if df_gmd_meta is not None:
-            all_meta = all_meta.unionByName(df_gmd_meta, allowMissingColumns=True)
-        if df_unuwider_ind_meta is not None:
-            all_meta = all_meta.unionByName(df_unuwider_ind_meta, allowMissingColumns=True)
-            
-        dim_indicator = distinct_indicators.join(
-            all_meta,
-            distinct_indicators.indicator_code == all_meta.meta_code,
-            "left"
-        ).drop("meta_code")
-    
-    dim_indicator_output = f"{PROCESSED_DIR}/dim_indicator"
-    dim_indicator.coalesce(1).write.mode("overwrite").parquet(dim_indicator_output)
-    logger.info(f"dim_indicator created with {dim_indicator.count():,} rows")
-    
+        all_metadata.append(wdi_meta)
+
+    # UNU-WIDER
+    logger.info("Processing UNU-WIDER...")
+    unw_facts = process_unuwider(spark, SELECTED_COUNTRIES, None)
+    if unw_facts is not None:
+        all_facts.append(unw_facts)
+        logger.info(f"UNU-WIDER rows: {unw_facts.count():,}")
+    if df_unuwider_ind_meta is not None:
+        all_metadata.append(df_unuwider_ind_meta)
+
+    # FAO
+    logger.info("Processing FAO...")
+    fao_facts, fao_meta = process_fao(spark, SELECTED_COUNTRIES, None)
+    if fao_facts is not None:
+        all_facts.append(fao_facts)
+        logger.info(f"FAO rows: {fao_facts.count():,}")
+    if fao_meta is not None:
+        all_metadata.append(fao_meta)
+
+    if not all_facts:
+        logger.error("No data processed from any source!")
+        spark.stop()
+        sys.exit(1)
+
+    logger.info("Combining all fact tables...")
+    combined_fact = all_facts[0]
+    for df in all_facts[1:]:
+        combined_fact = combined_fact.union(df)
+
+    total_rows = combined_fact.count()
+    logger.info(f"Total rows before deduplication: {total_rows:,}")
+
+    combined_fact = combined_fact.orderBy("country_code", "indicator_code", "year")
+
+    fact_output = f"{PROCESSED_DIR}/fact_economic_indicators"
+    combined_fact.write.mode("overwrite").parquet(fact_output)
+    logger.info(f"Fact table saved with {total_rows:,} rows")
+
+    logger.info("Creating dim_indicator...")
+    dim_indicator = create_dim_indicator(spark, combined_fact, all_metadata)
+
     logger.info("=" * 80)
     logger.info("ETL PIPELINE COMPLETED SUCCESSFULLY")
     logger.info("=" * 80)
-    
+
     spark.stop()
 
 if __name__ == "__main__":
