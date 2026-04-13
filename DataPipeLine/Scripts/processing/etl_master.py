@@ -35,12 +35,14 @@ def create_spark_session():
 spark = create_spark_session()
 logger.info("Spark session initialized")
 SELECTED_COUNTRIES = {
-    # East Asia & Pacific
+    # East Asia & Pacific (19)
     "AUS": "Australia", "CHN": "China", "FJI": "Fiji", "IDN": "Indonesia",
     "JPN": "Japan", "KHM": "Cambodia", "KOR": "Korea, Rep.", "LAO": "Lao PDR",
     "MMR": "Myanmar", "MYS": "Malaysia", "PHL": "Philippines", "PNG": "Papua New Guinea",
     "SGP": "Singapore", "THA": "Thailand", "VNM": "Vietnam",
-    # Europe & Central Asia
+    "NZL": "New Zealand", "MNG": "Mongolia", "BRN": "Brunei Darussalam", "PRK": "Korea, Dem. People's Rep.",
+    
+    # Europe & Central Asia (47)
     "ALB": "Albania", "ARM": "Armenia", "AUT": "Austria", "BEL": "Belgium",
     "BGR": "Bulgaria", "CHE": "Switzerland", "CYP": "Cyprus", "CZE": "Czech Republic",
     "DEU": "Germany", "DNK": "Denmark", "ESP": "Spain", "EST": "Estonia",
@@ -48,25 +50,35 @@ SELECTED_COUNTRIES = {
     "HRV": "Croatia", "HUN": "Hungary", "IRL": "Ireland", "ITA": "Italy",
     "LTU": "Lithuania", "LVA": "Latvia", "NLD": "Netherlands", "NOR": "Norway",
     "POL": "Poland", "PRT": "Portugal", "ROU": "Romania", "RUS": "Russian Federation",
-    "SVK": "Slovak Republic", "SVN": "Slovenia", "SWE": "Sweden", "TUR": "Turkey",
-    "UKR": "Ukraine",
-    # Latin America & Caribbean
+    "SVK": "Slovak Republic", "SVN": "Slovenia", "SWE": "Sweden", "TUR": "Turkey", "UKR": "Ukraine",
+    "AZE": "Azerbaijan", "BIH": "Bosnia and Herzegovina", "GEO": "Georgia", "ISL": "Iceland",
+    "KAZ": "Kazakhstan", "KGZ": "Kyrgyz Republic", "LUX": "Luxembourg", "MKD": "North Macedonia",
+    "MLT": "Malta", "MNE": "Montenegro", "SRB": "Serbia", "TJK": "Tajikistan", "TKM": "Turkmenistan", "UZB": "Uzbekistan",
+    
+    # Latin America & Caribbean (22)
     "ARG": "Argentina", "BOL": "Bolivia", "BRA": "Brazil", "CHL": "Chile",
     "COL": "Colombia", "CRI": "Costa Rica", "DOM": "Dominican Republic", "ECU": "Ecuador",
     "GTM": "Guatemala", "HND": "Honduras", "MEX": "Mexico", "NIC": "Nicaragua",
     "PAN": "Panama", "PER": "Peru", "PRY": "Paraguay", "SLV": "El Salvador",
     "URY": "Uruguay", "VEN": "Venezuela, RB",
-    # Middle East & North Africa
+    "CUB": "Cuba", "JAM": "Jamaica", "HTI": "Haiti", "BHS": "Bahamas, The",
+    
+    # Middle East & North Africa (18)
     "ARE": "United Arab Emirates", "DZA": "Algeria", "EGY": "Egypt, Arab Rep.",
     "IRN": "Iran, Islamic Rep.", "IRQ": "Iraq", "ISR": "Israel", "JOR": "Jordan",
     "KWT": "Kuwait", "LBN": "Lebanon", "MAR": "Morocco", "SAU": "Saudi Arabia",
     "TUN": "Tunisia", "YEM": "Yemen, Rep.",
-    # North America
+    "QAT": "Qatar", "OMN": "Oman", "BHR": "Bahrain", "SYR": "Syrian Arab Republic", "PSE": "West Bank and Gaza",
+    
+    # North America (2)
     "CAN": "Canada", "USA": "United States",
-    # South Asia
+    
+    # South Asia (8)
     "AFG": "Afghanistan", "BGD": "Bangladesh", "IND": "India", "LKA": "Sri Lanka",
     "NPL": "Nepal", "PAK": "Pakistan",
-    # Sub-Saharan Africa
+    "MDV": "Maldives", "BTN": "Bhutan",
+    
+    # Sub-Saharan Africa (34)
     "AGO": "Angola", "BEN": "Benin", "BFA": "Burkina Faso", "BWA": "Botswana",
     "CIV": "Cote d'Ivoire", "CMR": "Cameroon", "COD": "Congo, Dem. Rep.",
     "COG": "Congo, Rep.", "ETH": "Ethiopia", "GHA": "Ghana", "GIN": "Guinea",
@@ -74,7 +86,8 @@ SELECTED_COUNTRIES = {
     "MRT": "Mauritania", "MWI": "Malawi", "NAM": "Namibia", "NER": "Niger",
     "NGA": "Nigeria", "RWA": "Rwanda", "SEN": "Senegal", "SLE": "Sierra Leone",
     "TCD": "Chad", "TGO": "Togo", "UGA": "Uganda", "ZAF": "South Africa",
-    "ZMB": "Zambia", "ZWE": "Zimbabwe"
+    "ZMB": "Zambia", "ZWE": "Zimbabwe",
+    "TZA": "Tanzania", "SDN": "Sudan", "BDI": "Burundi", "GAB": "Gabon", "SOM": "Somalia"
 }
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))

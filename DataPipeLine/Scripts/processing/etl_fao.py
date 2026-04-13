@@ -96,11 +96,6 @@ def normalize_name(name):
     return name
 
 def build_country_mapping(spark, data_dir, selected_countries):
-    """
-    Xây dựng mapping từ FAO area_code (số) và area_code_m49 sang ISO3.
-    Sử dụng alias cho các tên không khớp chính xác.
-    """
-    # Định nghĩa alias cho các quốc gia có tên khác biệt lớn
     country_aliases = {
         "VNM": ["vietnam", "viet nam"],
         "USA": ["united states", "united states of america"],
@@ -117,9 +112,11 @@ def build_country_mapping(spark, data_dir, selected_countries):
         "COG": ["congo republic of the", "congo rep"],
         "CIV": ["cote d'ivoire", "ivory coast"],
         "MKD": ["north macedonia", "macedonia"],
-        "PSE": ["palestine", "state of palestine"],
-        "BOL": ["bolivia plurinational state of", "bolivia"],
-        "PRK": ["korea democratic people's republic of", "north korea"],
+        "BOL": ["bolivia plurinational state of", "bolivia"],        
+        "PSE": ["west bank and gaza", "palestine", "state of palestine"],
+        "PRK": ["korea dem peoples rep", "korea democratic people's republic of", "north korea", "dprk"],
+        "KGZ": ["kyrgyz republic", "kyrgyzstan"],
+        "BHS": ["bahamas the", "bahamas"]
     }
     
     # Tìm file AreaCodes bất kỳ
