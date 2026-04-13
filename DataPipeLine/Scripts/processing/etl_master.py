@@ -14,8 +14,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 BASE_DIR = "C:/Users/ADMIN/GovernmentAI/DataPipeLine"
-RAW_DIR = os.path.join(BASE_DIR, "data/raw")
-PROCESSED_DIR = os.path.join(BASE_DIR, "data/processed")
+RAW_DIR = f"{BASE_DIR}/data/raw"
+PROCESSED_DIR = f"{BASE_DIR}/data/processed"
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 
 def create_spark_session():
@@ -25,7 +25,7 @@ def create_spark_session():
         .config("spark.sql.adaptive.enabled", "true") \
         .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
         .config("spark.sql.adaptive.skewJoin.enabled", "true") \
-        .config("spark.sql.shuffle.partitions", "400") \
+        .config("spark.sql.shuffle.partitions", "16") \
         .config("spark.driver.memory", "12g") \
         .config("spark.executor.memory", "8g") \
         .config("spark.sql.execution.arrow.pyspark.enabled", "false") \
@@ -142,7 +142,11 @@ def create_dim_country():
     data = [(code, name, REGION_MAPPING.get(code, "Other"), "Unknown", True) 
             for code, name in SELECTED_COUNTRIES.items()]
     df = spark.createDataFrame(data, schema)
-    df.write.mode("overwrite").parquet(os.path.join(PROCESSED_DIR, "dim_country"))
+    
+    output_path = f"{PROCESSED_DIR}/dim_country"
+    
+    df.coalesce(1).write.mode("overwrite").parquet(output_path)
+    
     logger.info(f"Created dim_country with {df.count()} rows")
     return df
 
@@ -202,19 +206,24 @@ def main():
     total_rows = combined.count()
     logger.info(f"Total rows before deduplication: {total_rows:,}")
     
-    # 4. Save fact table (NO DEDUPLICATION)
-    fact_output = os.path.join(PROCESSED_DIR, "fact_economic_indicators")
-    combined.write.mode("overwrite").parquet(fact_output)
+    fact_output = f"{PROCESSED_DIR}/fact_economic_indicators"
+    
+    logger.info("Sorting fact table by Country -> Indicator -> Year...")
+    combined_sorted = combined.orderBy("country_code", "indicator_code", "year")
+    
+    combined_sorted.write.mode("overwrite").parquet(fact_output)
     logger.info(f"Fact table saved with {total_rows:,} rows")
     
-    # 5. Create dim_indicator from distinct indicator codes
+    # 5. Create dim_indicator
     logger.info("Creating dim_indicator from distinct indicator codes...")
     distinct_indicators = combined.select("indicator_code", "source_specific").distinct()
     dim_indicator = distinct_indicators.withColumn("indicator_name", col("indicator_code")) \
                                        .withColumn("category", lit("Unknown")) \
                                        .withColumn("unit", lit("Unknown")) \
                                        .withColumn("source_priority_str", lit(""))
-    dim_indicator.write.mode("overwrite").parquet(os.path.join(PROCESSED_DIR, "dim_indicator"))
+    
+    dim_indicator_output = f"{PROCESSED_DIR}/dim_indicator"
+    dim_indicator.coalesce(1).write.mode("overwrite").parquet(dim_indicator_output)
     logger.info(f"dim_indicator created with {dim_indicator.count():,} rows")
     
     logger.info("=" * 80)
