@@ -77,7 +77,7 @@ SELECTED_COUNTRIES = {
     "ZMB": "Zambia", "ZWE": "Zimbabwe"
 }
 
-def create_dim_country(spark, df_wdi_country, selected_countries):
+def create_dim_country(spark, df_wdi_country, df_unuwider_meta, selected_countries):
     if df_wdi_country is None:
         logger.error("WDI Country metadata is missing.")
         return None
@@ -93,7 +93,8 @@ def create_dim_country(spark, df_wdi_country, selected_countries):
         col("Special Notes").alias("special_notes")
     ).filter(col("country_code").isin(list(selected_countries.keys())))
     
-    dim_country = dim_country.withColumn("is_selected", lit(True))
+    if df_unuwider_meta is not None:
+        dim_country = dim_country.join(df_unuwider_meta, on="country_code", how="left")
     
     output_path = f"{PROCESSED_DIR}/dim_country"
     dim_country.coalesce(1).write.mode("overwrite").parquet(output_path)
@@ -105,7 +106,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from etl_gmd import process_gmd, get_gmd_metadata
 from etl_wdi import process_wdi, get_wdi_metadata
 #from etl_fao import process_fao
-from etl_unuwider import process_unuwider
+from etl_unuwider import process_unuwider, get_unuwider_country_metadata, get_unuwider_indicator_metadata
 
 def main():
     logger.info("=" * 80)
@@ -115,8 +116,9 @@ def main():
     logger.info("Loading Metadata for all sources...")
     df_wdi_country, df_wdi_series = get_wdi_metadata(spark)
     df_gmd_meta = get_gmd_metadata(spark)
-
-    dim_country = create_dim_country(spark, df_wdi_country, SELECTED_COUNTRIES)
+    df_unuwider_meta = get_unuwider_country_metadata(spark)
+    df_unuwider_ind_meta = get_unuwider_indicator_metadata(spark)
+    dim_country = create_dim_country(spark, df_wdi_country, df_unuwider_meta, SELECTED_COUNTRIES)
     
     # 2. Process sources
     all_facts = []
@@ -181,10 +183,11 @@ def main():
             col("Statistical concept and methodology").alias("statistical_concept")
         )
         
+        all_meta = wdi_meta
         if df_gmd_meta is not None:
-            all_meta = wdi_meta.unionByName(df_gmd_meta, allowMissingColumns=True)
-        else:
-            all_meta = wdi_meta
+            all_meta = all_meta.unionByName(df_gmd_meta, allowMissingColumns=True)
+        if df_unuwider_ind_meta is not None:
+            all_meta = all_meta.unionByName(df_unuwider_ind_meta, allowMissingColumns=True)
             
         dim_indicator = distinct_indicators.join(
             all_meta,

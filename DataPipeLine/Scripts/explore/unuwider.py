@@ -1,4 +1,3 @@
-# unuwider.py - improved version with multi-level header handling
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, isnan, isnull
 import os
@@ -8,6 +7,7 @@ import pandas as pd
 from datetime import datetime
 import shutil
 import re
+import glob
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,139 +36,51 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "unuwider_profile_output.txt")
 TEMP_CSV_DIR = os.path.join(SCRIPT_DIR, "temp_unuwider_csv")
 
-FILES_CONFIG = {
-    "UNUWIDERGRD_2025_Central": "UNUWIDERGRD_2025_Central.xlsx",
-    "UNUWIDERGRD_2025_General": "UNUWIDERGRD_2025_General.xlsx",
-    "UNUWIDERGRD_2025": "UNUWIDERGRD_2025.xlsx"
-}
-
-def validate_file_exists(file_path):
-    if not os.path.exists(file_path):
-        logger.warning(f"File not found: {file_path}")
-        return False
-    logger.info(f"File found: {file_path}")
-    return True
-
 def clean_column_name(col_name):
-    """Làm sạch tên cột: loại bỏ ký tự đặc biệt, thay khoảng trắng bằng _"""
-    if not col_name or str(col_name).strip() == '':
-        return None
+    if pd.isna(col_name) or str(col_name).strip() == '':
+        return ""
+    
     clean = str(col_name).strip()
-    clean = re.sub(r'[^\w\s]', '', clean)  # xóa ký tự đặc biệt
-    clean = re.sub(r'\s+', '_', clean)     # thay khoảng trắng bằng _
+    
+    if re.search(r'(?i)unnamed', clean):
+        return ""
+        
+    clean = re.sub(r'[^\w\s]', '', clean)
+    clean = re.sub(r'\s+', '_', clean)
+    clean = clean.strip('_')
+    
     return clean
 
-def read_multi_header_excel(file_path, sheet_name):
-    """
-    Đọc Excel với multi-level header, gộp các cột phân cấp.
-    Trả về DataFrame với tên cột dạng 'Parent_Child' hoặc 'Child' nếu parent là NULL.
-    """
-    # Đọc toàn bộ sheet, lấy nhiều dòng đầu để phân tích header
-    df_raw = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
+def read_excel_smart_headers(file_path, sheet_name):
+    df_raw = pd.read_excel(file_path, sheet_name=sheet_name, header=[0, 1, 2])
     
-    # Tìm dòng bắt đầu dữ liệu (dòng đầu tiên có nhiều giá trị không null)
-    data_start = 0
-    for i in range(min(50, len(df_raw))):
-        non_null = df_raw.iloc[i].notna().sum()
-        if non_null >= 3:  # có ít nhất 3 giá trị không null
-            data_start = i
-            break
+    df_raw = df_raw.dropna(axis=1, how='all').dropna(axis=0, how='all')
     
-    # Đọc lại với header ở dòng data_start (giả sử header ở trên)
-    # Nhưng thực tế, các file UNU-WIDER có header ở dòng 1-3
-    # Ta sẽ đọc với header=0,1,2 để lấy multi-level
-    try:
-        # Thử đọc với 2 dòng header
-        df_multi = pd.read_excel(file_path, sheet_name=sheet_name, header=[0, 1])
-        # Kiểm tra xem có nhiều cột Unnamed không
-        unnamed_cols = [col for col in df_multi.columns.levels[0] if 'Unnamed' in str(col)]
-        if len(unnamed_cols) > len(df_multi.columns.levels[0]) / 2:
-            # Quá nhiều Unnamed, thử với 1 dòng header
-            df_multi = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
-            # Tạo tên cột phẳng
-            new_cols = []
-            for col in df_multi.columns:
-                clean = clean_column_name(col)
-                if clean is None or clean == '':
-                    clean = f"Column_{len(new_cols)}"
-                new_cols.append(clean)
-            df_multi.columns = new_cols
+    new_cols = []
+    for col_tuple in df_raw.columns:
+        parts = []
+        for val in col_tuple:
+            clean_val = clean_column_name(val)
+            if clean_val and clean_val not in parts:
+                parts.append(clean_val)
+        
+        combined_name = "_".join(parts) if parts else "Column"
+        new_cols.append(combined_name)
+        
+    final_cols = []
+    seen = {}
+    for col in new_cols:
+        if col in seen:
+            seen[col] += 1
+            final_cols.append(f"{col}_{seen[col]}")
         else:
-            # Ghép các level header lại
-            new_cols = []
-            for level0, level1 in df_multi.columns:
-                level0_str = clean_column_name(level0) if pd.notna(level0) else ''
-                level1_str = clean_column_name(level1) if pd.notna(level1) else ''
-                if level0_str and level1_str and level1_str not in ['Unnamed', '']:
-                    col_name = f"{level0_str}_{level1_str}"
-                elif level1_str:
-                    col_name = level1_str
-                elif level0_str:
-                    col_name = level0_str
-                else:
-                    col_name = f"Column_{len(new_cols)}"
-                new_cols.append(col_name)
-            df_multi.columns = new_cols
-    except Exception as e:
-        logger.warning(f"Multi-header read failed for {sheet_name}: {e}")
-        # Fallback: đọc với header mặc định
-        df_multi = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
-        new_cols = []
-        for col in df_multi.columns:
-            clean = clean_column_name(col)
-            if clean is None or clean == '' or 'Unnamed' in clean:
-                clean = f"Column_{len(new_cols)}"
-            new_cols.append(clean)
-        df_multi.columns = new_cols
-    
-    # Loại bỏ các cột toàn NaN
-    df_multi = df_multi.dropna(axis=1, how='all')
-    # Loại bỏ các dòng toàn NaN
-    df_multi = df_multi.dropna(axis=0, how='all')
-    
-    return df_multi
-
-def excel_file_to_csvs(excel_path, temp_dir, base_name):
-    """Chuyển đổi Excel thành CSV, xử lý multi-level header."""
-    if not validate_file_exists(excel_path):
-        return {}
-    
-    file_temp_dir = os.path.join(temp_dir, base_name)
-    if os.path.exists(file_temp_dir):
-        shutil.rmtree(file_temp_dir)
-    os.makedirs(file_temp_dir)
-    
-    sheet_to_csv = {}
-    try:
-        # Lấy danh sách sheet names
-        xls = pd.ExcelFile(excel_path, engine='openpyxl')
-        sheet_names = xls.sheet_names
-    except Exception:
-        try:
-            xls = pd.ExcelFile(excel_path, engine='xlrd')
-            sheet_names = xls.sheet_names
-        except Exception as e:
-            logger.error(f"Cannot read Excel file {base_name}: {e}")
-            return {}
-    
-    for sheet_name in sheet_names:
-        logger.info(f"Reading sheet: {sheet_name} from {base_name}")
-        try:
-            df = read_multi_header_excel(excel_path, sheet_name)
-            if df.empty:
-                logger.warning(f"Sheet {sheet_name} is empty after processing.")
-                continue
+            seen[col] = 0
+            final_cols.append(col)
             
-            safe_name = sheet_name.replace(" ", "_").replace("/", "_").replace("\\", "_")
-            csv_path = os.path.join(file_temp_dir, f"{safe_name}.csv")
-            df.to_csv(csv_path, index=False, encoding='utf-8')
-            full_key = f"{base_name}::{sheet_name}"
-            sheet_to_csv[full_key] = csv_path
-            logger.info(f"Saved {full_key} -> {csv_path} ({len(df)} rows, {len(df.columns)} cols)")
-        except Exception as e:
-            logger.error(f"Error processing sheet {sheet_name} in {base_name}: {e}")
+    # Gán danh sách cột đã làm phẳng
+    df_raw.columns = final_cols
     
-    return sheet_to_csv
+    return df_raw
 
 def read_csv_robust(file_path, encoding_list=None):
     if encoding_list is None:
@@ -199,18 +111,29 @@ def analyze_null_values(df, sheet_key):
         if row_count == 0:
             print("Dataset is empty, cannot analyze nulls.")
             return
+            
         null_stats = []
+        dtypes_dict = dict(df.dtypes)
+        
         for column in df.columns:
-            null_count = df.where(col(column).isNull() | isnan(col(column))).count()
+            safe_col = f"`{column}`"
+            dtype = dtypes_dict.get(column, "string")
+            
+            if dtype in ('double', 'float'):
+                null_count = df.where(col(safe_col).isNull() | isnan(col(safe_col))).count()
+            else:
+                null_count = df.where(col(safe_col).isNull()).count()
+                
             null_percent = (null_count / row_count * 100) if row_count > 0 else 0
             null_stats.append({"column": column, "null_count": null_count, "null_percent": null_percent})
+            
         null_stats.sort(key=lambda x: x["null_percent"], reverse=True)
-        print("Top 15 Columns with Most Missing Values:")
-        print(f"{'Column':<40} {'Null Count':>15} {'Percentage':>12}")
-        for i, stat in enumerate(null_stats[:15], 1):
-            print(f"{stat['column']:<40} {stat['null_count']:>15,} {stat['null_percent']:>11.2f}%")
-        if len(null_stats) > 15:
-            print(f"and {len(null_stats) - 15} more columns")
+        
+        print("All Columns Missing Values:")
+        print(f"{'Column':<60} {'Null Count':>15} {'Percentage':>12}")
+        for stat in null_stats:
+            print(f"{stat['column']:<60} {stat['null_count']:>15,} {stat['null_percent']:>11.2f}%")
+            
     except Exception as e:
         logger.error(f"Error in null analysis: {e}")
 
@@ -233,56 +156,88 @@ def generate_full_profile(df, sheet_key):
         print("BASIC STATISTICS:")
         print(f"Total Rows: {row_count:,}")
         print(f"Total Columns: {col_count}")
-        print("\nSCHEMA (first 30 columns):")
-        for i, (name, dtype) in enumerate(df.dtypes):
-            if i >= 30:
-                print(f"... and {col_count - 30} more columns")
-                break
-            print(f"{name:<50} : {dtype}")
+        
+        print("\nSCHEMA (ALL COLUMNS):")
+        for name, dtype in df.dtypes:
+            print(f"{name:<60} : {dtype}")
+            
         analyze_data_types(df, sheet_key)
-        print("\nSAMPLE DATA (first 5 rows, first 10 columns):")
-        df.select(df.columns[:10]).show(5, truncate=50, vertical=False)
+        
+        print("\nSAMPLE DATA (first 5 rows, ALL columns):")
+        df.show(5, truncate=50, vertical=False)
+        
         analyze_null_values(df, sheet_key)
+        
         numeric_cols = [name for name, dtype in df.dtypes if dtype in ("int", "double", "float", "bigint", "long")]
         if numeric_cols:
-            print("\nNUMERIC STATISTICS (first 5 numeric columns):")
-            df.select(numeric_cols[:5]).describe().show()
+            print("\nNUMERIC STATISTICS (ALL numeric columns):")
+            safe_numeric_cols = [f"`{c}`" for c in numeric_cols]
+            df.select(*safe_numeric_cols).describe().show()
         else:
             print("\nNo numeric columns found in this dataset")
     except Exception as e:
         logger.error(f"Error generating profile: {e}")
 
 def main():
-    logger.info(f"Starting UNU-WIDER data exploration from: {DATA_DIR}")
+    if not os.path.exists(TEMP_CSV_DIR):
+        os.makedirs(TEMP_CSV_DIR)
+        
+    all_files = glob.glob(os.path.join(DATA_DIR, "**", "*.xlsx"), recursive=True) + \
+                glob.glob(os.path.join(DATA_DIR, "**", "*.xls"), recursive=True) + \
+                glob.glob(os.path.join(DATA_DIR, "**", "*.csv"), recursive=True)
+                
+    target_files = [f for f in all_files if "UNUWIDERGRD_2025" in os.path.basename(f) and "Central" not in os.path.basename(f) and "General" not in os.path.basename(f)]
     
-    if os.path.exists(TEMP_CSV_DIR):
-        shutil.rmtree(TEMP_CSV_DIR)
-    os.makedirs(TEMP_CSV_DIR)
+    logger.info(f"Found {len(target_files)} target data files matching 'UNUWIDERGRD_2025'")
     
     all_sheets = {}
-    for base_name, filename in FILES_CONFIG.items():
-        full_path = os.path.join(DATA_DIR, filename)
-        sheets = excel_file_to_csvs(full_path, TEMP_CSV_DIR, base_name)
-        all_sheets.update(sheets)
     
+    for file_path in target_files:
+        base_name = os.path.basename(file_path)
+        logger.info(f"Reading file: {base_name}")
+        
+        if file_path.endswith(('.xlsx', '.xls')):
+            try:
+                xls = pd.ExcelFile(file_path)
+                target_sheets = [s for s in xls.sheet_names if s.strip().lower() in ['merged', 'country metadata', 'countrymetadata']]
+                
+                for sheet_name in target_sheets:
+                    logger.info(f"  Extracting sheet: {sheet_name}")
+                    try:
+                        df_sheet = read_excel_smart_headers(file_path, sheet_name)
+                        safe_sheet_name = clean_column_name(sheet_name)
+                        if not safe_sheet_name: safe_sheet_name = "Sheet"
+                        
+                        csv_name = f"{base_name.split('.')[0]}_{safe_sheet_name}.csv"
+                        csv_path = os.path.join(TEMP_CSV_DIR, csv_name)
+                        
+                        df_sheet.to_csv(csv_path, index=False)
+                        all_sheets[f"{base_name}::{sheet_name}"] = csv_path
+                    except Exception as e:
+                        logger.error(f"  Failed to read sheet {sheet_name}: {e}")
+            except Exception as e:
+                logger.error(f"Failed to open Excel file {file_path}: {e}")
+        else:
+            logger.info(f"Skipping CSV file (expecting only the main Excel file): {base_name}")
+            
     if not all_sheets:
-        logger.error("No sheets found or unable to read any Excel file.")
-        spark.stop()
-        sys.exit(1)
-    
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        logger.error("No valid sheets found to process. Exiting.")
+        return
+
+    output_file = os.path.join(OUTPUT_DIR, "unuwider_profile_output.txt")
+    with open(output_file, 'w', encoding='utf-8') as f:
         original_stdout = sys.stdout
         sys.stdout = f
         
         print(f"REPORT GENERATED ON: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         print(f"Source directory: {DATA_DIR}")
-        print(f"Total sheets across all files: {len(all_sheets)}\n")
+        print(f"Total target sheets processed: {len(all_sheets)}\n")
         
         successful_sheets = 0
         failed_sheets = 0
         
         for sheet_key, csv_path in all_sheets.items():
-            logger.info(f"Processing: {sheet_key}")
+            logger.info(f"Profiling: {sheet_key}")
             try:
                 df = read_csv_robust(csv_path)
                 if df is None:
@@ -293,7 +248,7 @@ def main():
                 successful_sheets += 1
                 df.unpersist()
             except Exception as e:
-                logger.error(f"Error processing {sheet_key}: {e}")
+                logger.error(f"Error profiling {sheet_key}: {e}")
                 failed_sheets += 1
         
         print(f"\n{'='*80}")
@@ -305,11 +260,9 @@ def main():
     
     if os.path.exists(TEMP_CSV_DIR):
         shutil.rmtree(TEMP_CSV_DIR)
-        logger.info("Removed temporary CSV directory")
-    
-    logger.info(f"Data profiling completed. Results saved to: {OUTPUT_FILE}")
-    spark.stop()
-    logger.info("Spark session stopped")
+        logger.info("Removed temporary CSV files.")
+        
+    logger.info(f"Done! Profile saved to: {output_file}")
 
 if __name__ == "__main__":
     main()
