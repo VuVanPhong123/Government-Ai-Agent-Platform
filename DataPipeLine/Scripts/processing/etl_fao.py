@@ -236,16 +236,14 @@ def process_fao_dataset(spark, data_dir, dataset_name, country_mapping, years=ra
     )
 
     elements_df, itemcodes_df, _ = load_fao_metadata(spark, data_dir, dataset_name)
-    
-    all_indicators = fact_df.select("indicator_code").distinct()
-    
+    distinct_indicators = fact_df.select("indicator_code").distinct()
     if "Unit" in df.columns:
-        fact_units = df.select("indicator_code", col("Unit").alias("unit_from_fact")) \
-                       .filter(col("Unit").isNotNull() & (col("Unit") != "")) \
-                       .dropDuplicates(["indicator_code"])
-        distinct_indicators = all_indicators.join(fact_units, on="indicator_code", how="left")
+        unit_mapping = df.filter(col("Unit").isNotNull() & (col("Unit") != "")) \
+                         .select("indicator_code", col("Unit").alias("unit_from_fact")) \
+                         .dropDuplicates(["indicator_code"])
+        distinct_indicators = distinct_indicators.join(unit_mapping, on="indicator_code", how="left")
     else:
-        distinct_indicators = all_indicators.withColumn("unit_from_fact", lit(None))
+        distinct_indicators = distinct_indicators.withColumn("unit_from_fact", lit(None))
         
     distinct_indicators = distinct_indicators.withColumn(
         "element_code",
@@ -288,11 +286,9 @@ def process_fao_dataset(spark, data_dir, dataset_name, country_mapping, years=ra
     else:
         metadata = metadata.withColumn("long_definition", col("element_description"))
         
-    element_unit = col("unit") if "unit" in metadata.columns else lit(None)
-    
     metadata = metadata.withColumn(
         "unit_of_measure",
-        coalesce(element_unit, col("unit_from_fact"), lit("Not specified"))
+        when(col("unit_from_fact").isNotNull(), col("unit_from_fact")).otherwise(lit("Not specified"))
     )
     metadata = metadata.withColumn("periodicity", lit("Annual"))
     metadata = metadata.withColumn(

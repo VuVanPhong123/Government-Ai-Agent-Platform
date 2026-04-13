@@ -4,6 +4,7 @@ env/
 .venv/
 config/keys.env
 
+logs/
 data/
 __pycache__/
 *.pyc
