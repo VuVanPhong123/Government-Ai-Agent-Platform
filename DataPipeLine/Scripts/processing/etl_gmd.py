@@ -13,8 +13,7 @@ def process_gmd(spark, selected_countries, dim_indicator=None):
         
     df = spark.read.option("header", "true").option("inferSchema", "true").csv(file_path)
     df = df.filter(col("ISO3").isin(list(selected_countries.keys())))
-    df = df.filter((col("year") >= 1995) & (col("year") <= 2025))
-
+    df = df.filter((col("year") >= 1990) & (col("year") <= 2024))
     metadata_cols = ["countryname", "ISO3", "id", "year", "income_group"]
     indicator_cols = [c for c in df.columns if c not in metadata_cols]
 

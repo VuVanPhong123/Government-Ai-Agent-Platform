@@ -100,7 +100,7 @@ def process_unuwider(spark, selected_countries, dim_indicator=None):
         col("value").cast("double"),
         lit(3).alias("source_priority"),
         concat(lit("UNUWIDER_"), col("indicator_code")).alias("source_specific")
-    ).filter(col("value").isNotNull())
+    ).filter((col("value").isNotNull()) & (col("year") >= 1990) & (col("year") <= 2024))
     
     logger.info(f"UNU-WIDER processed: {result.count():,} rows")
     return result

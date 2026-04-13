@@ -14,7 +14,7 @@ def process_wdi(spark, selected_countries, dim_indicator=None):
     df = spark.read.option("header", "true").option("inferSchema", "true").csv(file_path)
     df = df.filter(col("Country Code").isin(list(selected_countries.keys())))
 
-    year_cols = [str(y) for y in range(1995, 2025)]
+    year_cols = [str(y) for y in range(1990, 2025)]
     existing = [c for c in year_cols if c in df.columns]
     stack_expr = f"stack({len(existing)}, " + ", ".join([f"'{y}', `{y}`" for y in existing]) + ") as (year, value)"
 
