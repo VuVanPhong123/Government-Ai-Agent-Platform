@@ -6,6 +6,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit, when
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, BooleanType
 
+
 os.environ["PYSPARK_PYTHON"] = sys.executable.replace("\\", "/")
 os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable.replace("\\", "/")
 os.environ["SPARK_LOCAL_IP"] = "127.0.0.1"
@@ -76,85 +77,34 @@ SELECTED_COUNTRIES = {
     "ZMB": "Zambia", "ZWE": "Zimbabwe"
 }
 
-REGION_MAPPING = {
-    # East Asia & Pacific
-    "AUS": "East Asia & Pacific", "CHN": "East Asia & Pacific", "FJI": "East Asia & Pacific",
-    "IDN": "East Asia & Pacific", "JPN": "East Asia & Pacific", "KHM": "East Asia & Pacific",
-    "KOR": "East Asia & Pacific", "LAO": "East Asia & Pacific", "MMR": "East Asia & Pacific",
-    "MYS": "East Asia & Pacific", "PHL": "East Asia & Pacific", "PNG": "East Asia & Pacific",
-    "SGP": "East Asia & Pacific", "THA": "East Asia & Pacific", "VNM": "East Asia & Pacific",
-    # Europe & Central Asia
-    "ALB": "Europe & Central Asia", "ARM": "Europe & Central Asia", "AUT": "Europe & Central Asia",
-    "BEL": "Europe & Central Asia", "BGR": "Europe & Central Asia", "CHE": "Europe & Central Asia",
-    "CYP": "Europe & Central Asia", "CZE": "Europe & Central Asia", "DEU": "Europe & Central Asia",
-    "DNK": "Europe & Central Asia", "ESP": "Europe & Central Asia", "EST": "Europe & Central Asia",
-    "FIN": "Europe & Central Asia", "FRA": "Europe & Central Asia", "GBR": "Europe & Central Asia",
-    "GRC": "Europe & Central Asia", "HRV": "Europe & Central Asia", "HUN": "Europe & Central Asia",
-    "IRL": "Europe & Central Asia", "ITA": "Europe & Central Asia", "LTU": "Europe & Central Asia",
-    "LVA": "Europe & Central Asia", "NLD": "Europe & Central Asia", "NOR": "Europe & Central Asia",
-    "POL": "Europe & Central Asia", "PRT": "Europe & Central Asia", "ROU": "Europe & Central Asia",
-    "RUS": "Europe & Central Asia", "SVK": "Europe & Central Asia", "SVN": "Europe & Central Asia",
-    "SWE": "Europe & Central Asia", "TUR": "Europe & Central Asia", "UKR": "Europe & Central Asia",
-    # Latin America & Caribbean
-    "ARG": "Latin America & Caribbean", "BOL": "Latin America & Caribbean",
-    "BRA": "Latin America & Caribbean", "CHL": "Latin America & Caribbean",
-    "COL": "Latin America & Caribbean", "CRI": "Latin America & Caribbean",
-    "DOM": "Latin America & Caribbean", "ECU": "Latin America & Caribbean",
-    "GTM": "Latin America & Caribbean", "HND": "Latin America & Caribbean",
-    "MEX": "Latin America & Caribbean", "NIC": "Latin America & Caribbean",
-    "PAN": "Latin America & Caribbean", "PER": "Latin America & Caribbean",
-    "PRY": "Latin America & Caribbean", "SLV": "Latin America & Caribbean",
-    "URY": "Latin America & Caribbean", "VEN": "Latin America & Caribbean",
-    # Middle East & North Africa
-    "ARE": "Middle East & North Africa", "DZA": "Middle East & North Africa",
-    "EGY": "Middle East & North Africa", "IRN": "Middle East & North Africa",
-    "IRQ": "Middle East & North Africa", "ISR": "Middle East & North Africa",
-    "JOR": "Middle East & North Africa", "KWT": "Middle East & North Africa",
-    "LBN": "Middle East & North Africa", "MAR": "Middle East & North Africa",
-    "SAU": "Middle East & North Africa", "TUN": "Middle East & North Africa",
-    "YEM": "Middle East & North Africa",
-    # North America
-    "CAN": "North America", "USA": "North America",
-    # South Asia
-    "AFG": "South Asia", "BGD": "South Asia", "IND": "South Asia", "LKA": "South Asia",
-    "NPL": "South Asia", "PAK": "South Asia",
-    # Sub-Saharan Africa
-    "AGO": "Sub-Saharan Africa", "BEN": "Sub-Saharan Africa", "BFA": "Sub-Saharan Africa",
-    "BWA": "Sub-Saharan Africa", "CIV": "Sub-Saharan Africa", "CMR": "Sub-Saharan Africa",
-    "COD": "Sub-Saharan Africa", "COG": "Sub-Saharan Africa", "ETH": "Sub-Saharan Africa",
-    "GHA": "Sub-Saharan Africa", "GIN": "Sub-Saharan Africa", "KEN": "Sub-Saharan Africa",
-    "MDG": "Sub-Saharan Africa", "MLI": "Sub-Saharan Africa", "MOZ": "Sub-Saharan Africa",
-    "MRT": "Sub-Saharan Africa", "MWI": "Sub-Saharan Africa", "NAM": "Sub-Saharan Africa",
-    "NER": "Sub-Saharan Africa", "NGA": "Sub-Saharan Africa", "RWA": "Sub-Saharan Africa",
-    "SEN": "Sub-Saharan Africa", "SLE": "Sub-Saharan Africa", "TCD": "Sub-Saharan Africa",
-    "TGO": "Sub-Saharan Africa", "UGA": "Sub-Saharan Africa", "ZAF": "Sub-Saharan Africa",
-    "ZMB": "Sub-Saharan Africa", "ZWE": "Sub-Saharan Africa"
-}
-
-def create_dim_country():
-    schema = StructType([
-        StructField("country_code", StringType(), True),
-        StructField("country_name", StringType(), True),
-        StructField("region", StringType(), True),
-        StructField("income_group", StringType(), True),
-        StructField("is_selected", BooleanType(), True)
-    ])
-    data = [(code, name, REGION_MAPPING.get(code, "Other"), "Unknown", True) 
-            for code, name in SELECTED_COUNTRIES.items()]
-    df = spark.createDataFrame(data, schema)
+def create_dim_country(spark, df_wdi_country, selected_countries):
+    if df_wdi_country is None:
+        logger.error("WDI Country metadata is missing.")
+        return None
+        
+    dim_country = df_wdi_country.select(
+        col("Country Code").alias("country_code"),
+        col("Short Name").alias("short_name"),
+        col("Long Name").alias("long_name"),
+        col("Region").alias("region"),
+        col("Income Group").alias("income_group"),
+        col("Currency Unit").alias("currency_unit"),
+        col("Lending category").alias("lending_category"),
+        col("Special Notes").alias("special_notes")
+    ).filter(col("country_code").isin(list(selected_countries.keys())))
+    
+    dim_country = dim_country.withColumn("is_selected", lit(True))
     
     output_path = f"{PROCESSED_DIR}/dim_country"
+    dim_country.coalesce(1).write.mode("overwrite").parquet(output_path)
     
-    df.coalesce(1).write.mode("overwrite").parquet(output_path)
-    
-    logger.info(f"Created dim_country with {df.count()} rows")
-    return df
+    logger.info(f"Created dim_country with {dim_country.count()} rows")
+    return dim_country
 
-# Import các module ETL
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from etl_gmd import process_gmd
-from etl_wdi import process_wdi
-from etl_fao import process_fao
+from etl_wdi import process_wdi, get_wdi_metadata
+#from etl_fao import process_fao
 from etl_unuwider import process_unuwider
 
 def main():
@@ -162,8 +112,10 @@ def main():
     logger.info("STARTING ETL PIPELINE")
     logger.info("=" * 80)
     
-    # 1. dim_country
-    dim_country = create_dim_country()
+    logger.info("Loading WDI metadata...")
+    df_wdi_country, df_wdi_series = get_wdi_metadata(spark)
+
+    dim_country = create_dim_country(spark, df_wdi_country, SELECTED_COUNTRIES)
     
     # 2. Process sources
     all_facts = []
@@ -180,11 +132,11 @@ def main():
         all_facts.append(wdi_facts)
         logger.info(f"WDI rows: {wdi_facts.count():,}")
     
-    logger.info("Processing FAO...")
-    fao_facts = process_fao(spark, SELECTED_COUNTRIES, None)
-    if fao_facts is not None:
-        all_facts.append(fao_facts)
-        logger.info(f"FAO rows: {fao_facts.count():,}")
+    # logger.info("Processing FAO...")
+    # fao_facts = process_fao(spark, SELECTED_COUNTRIES, None)
+    # if fao_facts is not None:
+    #     all_facts.append(fao_facts)
+    #     logger.info(f"FAO rows: {fao_facts.count():,}")
     
     logger.info("Processing UNU-WIDER...")
     unw_facts = process_unuwider(spark, SELECTED_COUNTRIES, None)
@@ -216,11 +168,31 @@ def main():
     
     # 5. Create dim_indicator
     logger.info("Creating dim_indicator from distinct indicator codes...")
-    distinct_indicators = combined.select("indicator_code", "source_specific").distinct()
-    dim_indicator = distinct_indicators.withColumn("indicator_name", col("indicator_code")) \
-                                       .withColumn("category", lit("Unknown")) \
-                                       .withColumn("unit", lit("Unknown")) \
-                                       .withColumn("source_priority_str", lit(""))
+    distinct_indicators = combined.select("indicator_code").distinct()
+    
+    if df_wdi_series is not None:
+        wdi_meta = df_wdi_series.select(
+            col("Series Code").alias("meta_code"),
+            col("Topic").alias("topic"),
+            col("Indicator Name").alias("indicator_name"),
+            col("Long definition").alias("long_definition"),
+            col("Unit of measure").alias("unit_of_measure"),
+            col("Periodicity").alias("periodicity"),
+            col("Source").alias("source"),
+            col("Statistical concept and methodology").alias("statistical_concept")
+        )
+        
+        dim_indicator = distinct_indicators.join(
+            wdi_meta,
+            distinct_indicators.indicator_code == wdi_meta.meta_code,
+            "left"
+        ).drop("meta_code")
+        
+        dim_indicator = dim_indicator.withColumn("indicator_name", when(col("indicator_name").isNull(), col("indicator_code")).otherwise(col("indicator_name"))) \
+                                     .withColumn("topic", when(col("topic").isNull(), lit("Other Source")).otherwise(col("topic")))
+    else:
+        dim_indicator = distinct_indicators.withColumn("indicator_name", col("indicator_code")) \
+                                           .withColumn("topic", lit("Unknown"))
     
     dim_indicator_output = f"{PROCESSED_DIR}/dim_indicator"
     dim_indicator.coalesce(1).write.mode("overwrite").parquet(dim_indicator_output)
