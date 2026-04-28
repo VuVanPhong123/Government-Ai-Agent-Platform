@@ -58,7 +58,7 @@ def save_trends_to_analytics(table_name: str, indicator: str, results_df: pd.Dat
         logger.info(f"No trend data to save for {indicator} in {table_name}")
         return
         
-    temp_table = f"temp_{table_name}_{indicator}"
+    temp_table = f"temp_{table_name}_{indicator}".lower()
     
     try:
         results_df.to_sql(temp_table, engine, if_exists="replace", index=False)

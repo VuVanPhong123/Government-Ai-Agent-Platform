@@ -61,7 +61,7 @@ def update_anomaly_scores(table_name: str, indicator: str):
         return
 
     results_df = pd.DataFrame(results)
-    temp_table = f"temp_anomaly_{table_name}_{indicator}"
+    temp_table = f"temp_anomaly_{table_name}_{indicator}".lower()
     
     try:
         results_df.to_sql(temp_table, engine, if_exists="replace", index=False)
