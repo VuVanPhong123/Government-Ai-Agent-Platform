@@ -15,8 +15,59 @@ export class CountriesService {
     private growthRepo: Repository<GoldGrowthDynamics>,
     @InjectRepository(AnalyticsGoldGrowthDynamics)
     private anGrowthRepo: Repository<AnalyticsGoldGrowthDynamics>,
-  ) {}
+  ) { }
+  async getCountryAnomalies(countryCode: string, threshold: number = 0.75) {
+    const data = await this.getFullCountryAnalytics(countryCode);
 
+    const anomalies: any[] = [];
+
+    data.forEach(row => {
+      const events: Array<{ type: string; score: number; actual: number }> = [];
+
+      if (row.anomaly_growth >= threshold) {
+        events.push({ type: 'Sốc Tăng trưởng', score: row.anomaly_growth, actual: row.actual_growth });
+      }
+      if (row.anomaly_debt >= threshold) {
+        events.push({ type: 'Cảnh báo Nợ công', score: row.anomaly_debt, actual: row.actual_debt });
+      }
+      if (row.anomaly_reer_deviation >= threshold) {
+        events.push({ type: 'Rủi ro Tiền tệ', score: row.anomaly_reer_deviation, actual: row.actual_reer_deviation });
+      }
+
+      if (events.length > 0) {
+        anomalies.push({
+          year: row.year,
+          events: events
+        });
+      }
+    });
+
+    return anomalies;
+  }
+
+  async triggerAnalyticsWorker() {
+    try {
+      const response = await fetch('http://localhost:8001/analytics/run-all', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw new Error(`Không thể kết nối đến Analytics Worker: ${error.message}`);
+    }
+  }
+  async findAll() {
+    const results = await this.growthRepo
+      .createQueryBuilder('g')
+      .select([
+        'g.country_code as country_code',
+        'g.country as country_name',
+      ])
+      .distinct(true)
+      .orderBy('g.country', 'ASC')
+      .getRawMany();
+    return results;
+  }
   async getFullCountryAnalytics(countryCode: string) {
     const qb = this.growthRepo.createQueryBuilder('g');
 
