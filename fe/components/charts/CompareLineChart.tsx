@@ -2,21 +2,21 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface Props {
-  data: Record<string, { year: number; value: number }[]>;
+  data: Record<string, { year: number; value: number | null }[]>;
   indicatorName: string;
 }
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe'];
 
-export default function CompareLineChart({ data, indicatorName }: Props) {
+export default function CompareLineChart({ data }: Props) {
   const allYears = new Set<number>();
   Object.values(data).forEach(countryData => {
     countryData.forEach(point => allYears.add(point.year));
   });
   const years = Array.from(allYears).sort();
-
+  
   const chartData = years.map(year => {
-    const point: any = { year };
+    const point: Record<string, number | null | undefined> = { year };
     Object.entries(data).forEach(([countryCode, countryData]) => {
       const found = countryData.find(d => d.year === year);
       point[countryCode] = found?.value ?? null;
