@@ -19,8 +19,10 @@ const INDICATOR_NAMES: Record<string, string> = {
 export default function ComparePage() {
   const [selectedCountries, setSelectedCountries] = useUrlState<string[]>('countries', []);
   const [selectedIndicator, setSelectedIndicator] = useUrlState<string>('indicator', 'rGDP_growth_YoY');
-  
   const { data, isLoading, error } = useCompare(selectedCountries, selectedIndicator);
+
+  const hasData = selectedCountries.length > 0 && Object.keys(data).length > 0;
+  const missingCountries = selectedCountries.filter(code => !data[code]);
 
   return (
     <div>
@@ -37,14 +39,27 @@ export default function ComparePage() {
       </div>
 
       {selectedCountries.length === 0 && (
-        <div className="bg-yellow-50 p-4 rounded text-yellow-800 mb-4">Vui lòng chọn ít nhất một quốc gia.</div>
+        <div className="bg-blue-50 p-4 rounded text-blue-800 mb-4 border border-blue-200">
+          Vui lòng chọn ít nhất một quốc gia để bắt đầu so sánh.
+        </div>
       )}
-      {error && <div className="bg-red-50 p-4 rounded text-red-800 mb-4">Lỗi: {error.message}</div>}
-      {isLoading && <div className="h-64 bg-gray-200 animate-pulse rounded" />}
 
-      {!isLoading && !error && selectedCountries.length > 0 && Object.keys(data).length > 0 && (
+      {missingCountries.length > 0 && (
+        <div className="bg-yellow-50 p-4 rounded text-yellow-800 mb-4 border border-yellow-200 flex items-start gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          <div>
+            <p className="font-medium">Dữ liệu thiếu cho các quốc gia: {missingCountries.join(', ')}</p>
+            <p className="text-sm opacity-80">Biểu đồ sẽ hiển thị cảnh báo tại các năm không có số liệu.</p>
+          </div>
+        </div>
+      )}
+
+      {error && <div className="bg-red-50 p-4 rounded text-red-800 mb-4">Lỗi: {error.message}</div>}
+      
+      {isLoading && <div className="h-64 bg-gray-200 animate-pulse rounded" />}
+      
+      {!isLoading && hasData && (
         <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-lg font-semibold mb-2">{INDICATOR_NAMES[selectedIndicator] || selectedIndicator}</h2>
           <CompareLineChart data={data} indicatorName={INDICATOR_NAMES[selectedIndicator] || selectedIndicator} />
         </div>
       )}
