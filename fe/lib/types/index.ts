@@ -44,3 +44,12 @@ export interface CountryAnalyticsRow {
   anomaly_reer_deviation?: number | null;
   cluster_id?: number | null;
 }
+
+export interface CompareDataPoint {
+  year: number;
+  value: number | null;
+}
+
+export interface CompareGroupedData {
+  [countryCode: string]: CompareDataPoint[];
+}
