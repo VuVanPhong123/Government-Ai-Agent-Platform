@@ -17,9 +17,9 @@ interface ContextPanelProps {
 
 export default function ContextPanel({ title, items, actions, className }: ContextPanelProps) {
   return (
-    <div className={cn('bg-white max-h-[200px] rounded-md border border-gray-200 p-6 space-y-6', className)}>
+    <div className={cn('bg-white rounded-md border border-gray-200 p-5 space-y-4', className)}>
       <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {items.map((item, idx) => (
           <div key={idx} className="flex items-center justify-between">
             <div className="flex items-center gap-3 text-sm text-gray-600">

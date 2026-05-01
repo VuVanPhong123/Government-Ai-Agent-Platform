@@ -3,6 +3,11 @@ export const formatNumber = (value: number | null | undefined, decimals = 2): st
   return value.toFixed(decimals);
 };
 
+export const formatValue = (value: number | null | undefined, decimals = 2, suffix = ''): string => {
+  if (value === null || value === undefined) return 'N/A';
+  return `${Number(value).toFixed(decimals)}${suffix}`;
+};
+
 export const getAnomalyColor = (score: number | null | undefined): string => {
   if (score == null) return 'bg-gray-100 text-gray-600';
   if (score >= 0.9) return 'bg-red-100 text-red-700 border border-red-200';

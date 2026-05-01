@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
@@ -12,6 +12,8 @@ interface Tab {
 
 interface TabsProps {
   tabs: Tab[];
+  defaultActiveId?: string;
+  onChange?: (id: string) => void;
 }
 
 const StatusIcon = ({ status, className }: { status?: Tab['status']; className?: string }) => {
@@ -21,9 +23,21 @@ const StatusIcon = ({ status, className }: { status?: Tab['status']; className?:
   return null;
 };
 
-export default function Tabs({ tabs }: TabsProps) {
-  const [activeId, setActiveId] = useState(tabs[0]?.id || '');
+export default function Tabs({ tabs, defaultActiveId, onChange }: TabsProps) {
+  const [activeId, setActiveId] = useState(defaultActiveId || tabs[0]?.id || '');
+
+  useEffect(() => {
+    if (defaultActiveId && defaultActiveId !== activeId) {
+      setActiveId(defaultActiveId);
+    }
+  }, [defaultActiveId]);
+
   const activeTab = tabs.find(t => t.id === activeId) || tabs[0];
+
+  const handleTabChange = (id: string) => {
+    setActiveId(id);
+    onChange?.(id);
+  };
 
   return (
     <div>
@@ -32,7 +46,7 @@ export default function Tabs({ tabs }: TabsProps) {
           {tabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveId(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={cn(
                 'py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center gap-2 transition-colors',
                 tab.id === activeId
@@ -46,7 +60,9 @@ export default function Tabs({ tabs }: TabsProps) {
           ))}
         </nav>
       </div>
-      <div className="min-h-[300px]">{activeTab?.content}</div>
+      <div key={activeId} className="min-h-[300px] transition-all duration-200">
+        {activeTab?.content}
+      </div>
     </div>
   );
 }
