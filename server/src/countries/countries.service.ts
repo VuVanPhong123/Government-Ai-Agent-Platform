@@ -8,7 +8,7 @@ import { AnalyticsGoldSocialWelfare } from '../entities/analytics-gold-social-we
 import { AnalyticsClusters } from '../entities/analytics-clusters.entity';
 import { AnalyticsGoldStructuralComposition } from '../entities/analytics-gold-structural-composition.entity';
 import { AnalyticsGoldCrisisRisk } from '../entities/analytics-gold-crisis-risk.entity';
-
+import { GoldStructuralComposition } from '../entities/gold-structural-composition.entity';
 @Injectable()
 export class CountriesService {
   constructor(
@@ -82,12 +82,14 @@ export class CountriesService {
         'an_struct.manuf_va_share_actual as actual_manuf_share', 'an_struct.agri_va_share_actual as actual_agri_share',
         'an_risk.REER_deviation_actual as actual_reer_deviation', 'an_risk.REER_deviation_anomaly_score as anomaly_reer_deviation',
         'c.cluster_id as cluster_id',
-        'g.completeness_score as completeness_score', 'an_struct.flag_score as flag_score'
+        'g.completeness_score as completeness_score',
+        'COALESCE(gold_struct.flag_score, 0) as flag_score'
       ])
       .leftJoin(AnalyticsGoldGrowthDynamics, 'an_growth', 'g.country_code = an_growth.country_code AND g.year = an_growth.year')
       .leftJoin(AnalyticsGoldFiscalMonetary, 'an_fiscal', 'g.country_code = an_fiscal.country_code AND g.year = an_fiscal.year')
       .leftJoin(AnalyticsGoldSocialWelfare, 'an_social', 'g.country_code = an_social.country_code AND g.year = an_social.year')
       .leftJoin(AnalyticsGoldStructuralComposition, 'an_struct', 'g.country_code = an_struct.country_code AND g.year = an_struct.year')
+      .leftJoin(GoldStructuralComposition, 'gold_struct', 'g.country_code = gold_struct.country_code AND g.year = gold_struct.year')
       .leftJoin(AnalyticsGoldCrisisRisk, 'an_risk', 'g.country_code = an_risk.country_code AND g.year = an_risk.year')
       .leftJoin(AnalyticsClusters, 'c', 'g.country_code = c.country_code AND g.year = c.year')
       .where('g.country_code = :countryCode', { countryCode })
