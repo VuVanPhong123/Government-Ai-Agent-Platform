@@ -41,19 +41,21 @@ class AiAgentChartConfig(BaseModel):
 
 class AiAgentMetadata(BaseModel):
     source: Literal["template", "gemini", "mock"] = "mock"
-    toolsUsed: list[str] = []
-    indicators: list[str] = []
-    countries: list[str] = []
-    years: list[int] = []
+    toolsUsed: list[str] = Field(default_factory=list)
+    indicators: list[str] = Field(default_factory=list)
+    countries: list[str] = Field(default_factory=list)
+    years: list[int] = Field(default_factory=list)
+
+    resolved: dict[str, Any] | None = None
 
 
 class AiChatResponse(BaseModel):
     answer: str
     questionType: QuestionType = "VALID_SIMPLE_QUERY"
-    data: list[dict[str, Any]] = []
-    chart: AiAgentChartConfig = AiAgentChartConfig()
-    warnings: list[str] = []
-    metadata: AiAgentMetadata = AiAgentMetadata()
+    data: list[dict[str, Any]] = Field(default_factory=list)
+    chart: AiAgentChartConfig = Field(default_factory=AiAgentChartConfig)
+    warnings: list[str] = Field(default_factory=list)
+    metadata: AiAgentMetadata = Field(default_factory=AiAgentMetadata)
 
 
 class HealthResponse(BaseModel):
