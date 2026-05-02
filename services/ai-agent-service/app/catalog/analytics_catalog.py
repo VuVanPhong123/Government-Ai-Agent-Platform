@@ -65,6 +65,9 @@ CLUSTER_TARGET_YEARS: tuple[int, ...] = (
 )
 
 
+ANOMALY_SCORE_WARNING_THRESHOLD = 0.75
+
+
 def analytics_table_for_gold_table(gold_table: str) -> str:
     return f"analytics_{gold_table}"
 
