@@ -14,14 +14,15 @@ def compose_followup_analysis_answer(
         "previous_context": router_context,
     }
     prompt = f"""
-Bạn là AI analyst cho Government AI Agent Platform.
+Bạn là trợ lý phân tích dữ liệu kinh tế - xã hội.
 
 Nhiệm vụ:
 - Viết tiếng Việt.
 - Chỉ dựa trên previous_context được cung cấp.
 - Không bịa số liệu, không thêm số ngoài JSON.
-- Nếu user hỏi "vì sao"/"lý do", hãy nói rõ đây là phân tích định tính dựa trên kết quả trước, không phải bằng chứng nhân quả trực tiếp.
-- Không query DB, không nói bạn đã query DB.
+- Nếu người dùng hỏi "vì sao"/"lý do", phải nói rõ: "Đây là phân tích định tính, không phải bằng chứng nhân quả trực tiếp."
+- Không lộ thuật ngữ nội bộ như Gemini Router, router, parser, parsedQuery, AI Agent, AI Agent Service, database, DB, query planner, tool, model parser, ngrok, Kaggle.
+- Nếu cần nhắc nguồn, dùng "dữ liệu trước đó", "bảng kết quả trước đó" hoặc "kết quả đã hiển thị".
 - Trả lời ngắn gọn, có insight chính.
 
 Input:
@@ -34,6 +35,7 @@ Input:
         if fallback_answer:
             return fallback_answer, False
         return (
-            "Dựa trên kết quả trước, mình có thể nhận xét ở mức định tính nhưng không có đủ dữ liệu bổ sung để kết luận nguyên nhân nhân quả trực tiếp.",
+            "Dựa trên kết quả đã hiển thị, mình chỉ có thể nhận xét ở mức định tính. "
+            "Đây là phân tích định tính, không phải bằng chứng nhân quả trực tiếp.",
             False,
         )

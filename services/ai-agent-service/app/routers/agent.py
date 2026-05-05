@@ -1,3 +1,4 @@
+import re
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends
@@ -91,6 +92,104 @@ def plan_to_dict(plan: QueryPlan) -> dict:
     }
 
 
+FORBIDDEN_FINAL_ANSWER_TERMS = (
+    "Gemini Router",
+    "router",
+    "parser",
+    "parsedQuery",
+    "AI Agent Service",
+    "AI Agent",
+    "database",
+    "DB",
+    "query planner",
+    "tool",
+    "model parser",
+    "ngrok",
+    "Kaggle",
+)
+
+
+def is_user_facing_answer(answer: str | None) -> bool:
+    if not answer or len(answer.strip()) < 20:
+        return False
+
+    normalized = answer.strip()
+    forbidden_patterns = [
+        r"\bGemini Router\b",
+        r"\brouter\b",
+        r"\bparser\b",
+        r"\bparsedQuery\b",
+        r"\bAI Agent Service\b",
+        r"\bAI Agent\b",
+        r"\bdatabase\b",
+        r"\bDB\b",
+        r"\bquery planner\b",
+        r"\btool\b",
+        r"\bmodel parser\b",
+        r"\bngrok\b",
+        r"\bKaggle\b",
+    ]
+    if any(re.search(pattern, normalized, flags=re.IGNORECASE) for pattern in forbidden_patterns):
+        return False
+
+    system_phrases = (
+        "Gemini Router có thể",
+        "hệ thống có thể",
+        "model có thể",
+    )
+    lowered = normalized.lower()
+    return not any(phrase.lower() in lowered for phrase in system_phrases)
+
+
+def sanitize_user_facing_answer(answer: str) -> str:
+    sanitized = answer
+    replacements = {
+        "Gemini Router": "Trợ lý",
+        "AI Agent Service": "dịch vụ",
+        "AI Agent": "trợ lý",
+        "parsedQuery": "phần diễn giải",
+        "query planner": "bước xử lý",
+        "model parser": "bước xử lý",
+        "database": "dữ liệu",
+        "DB": "dữ liệu",
+        "ngrok": "kết nối",
+        "Kaggle": "môi trường xử lý",
+    }
+    for old, new in replacements.items():
+        sanitized = re.sub(rf"\b{re.escape(old)}\b", new, sanitized, flags=re.IGNORECASE)
+
+    sanitized = re.sub(r"\brouter\b", "bước định hướng", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"\bparser\b", "bước xử lý", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"\btool\b", "công cụ xử lý", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"\s+", " ", sanitized).strip()
+    return sanitized
+
+
+def local_followup_answer(previous_context: dict[str, Any], router_context: dict[str, Any], message: str) -> str:
+    data_summary = router_context.get("last_data_summary") or {}
+    row_count = data_summary.get("row_count")
+    indicator = data_summary.get("indicator") or "chỉ số đang xét"
+    years = data_summary.get("years") or []
+    last_answer = previous_context.get("last_answer")
+
+    details = []
+    if row_count:
+        details.append(f"{row_count} dòng kết quả")
+    if years:
+        details.append(f"năm/giai đoạn {', '.join(str(year) for year in years[:3])}")
+    scope = f" ({'; '.join(details)})" if details else ""
+
+    base = (
+        f"Dựa trên kết quả đã hiển thị cho {indicator}{scope}, có thể nhận xét ở mức định tính rằng "
+        "sự khác biệt giữa các nước thường gắn với bối cảnh kinh tế, chính sách giá, tỷ giá, cú sốc cung cầu "
+        "và cách đo lường dữ liệu."
+    )
+    if last_answer and "phân tích" not in message.lower():
+        base = f"Dựa trên câu trả lời trước đó, {base[0].lower()}{base[1:]}"
+
+    return f"{base} Đây là phân tích định tính, không phải bằng chứng nhân quả trực tiếp."
+
+
 def maybe_gemini_answer(
     user_message: str,
     question_type: str,
@@ -99,7 +198,9 @@ def maybe_gemini_answer(
     template_answer: str,
     row_count: int,
 ) -> tuple[str, MetadataSource]:
-    if not should_use_gemini(question_type, row_count):
+    template_answer = sanitize_user_facing_answer(template_answer)
+
+    if not should_use_gemini(question_type, row_count, user_message):
         return template_answer, "template"
 
     answer = compose_gemini_answer(
@@ -109,9 +210,13 @@ def maybe_gemini_answer(
         result_payload=result_payload,
         template_answer=template_answer,
     )
+    answer = sanitize_user_facing_answer(answer)
 
     if answer == template_answer:
         return answer, "template"
+
+    if not is_user_facing_answer(answer):
+        return template_answer, "template"
 
     return answer, "gemini"
 
@@ -188,8 +293,12 @@ def _handle_direct_answer(
     message: str,
     router_decision: RouterDecision,
 ) -> AiChatResponse:
-    answer = router_decision.answer or "Câu hỏi này có thể trả lời trực tiếp mà không cần truy vấn dữ liệu."
-    source: MetadataSource = "gemini" if router_decision.source == "gemini_router" else "template"
+    router_answer_valid = is_user_facing_answer(router_decision.answer)
+    answer = router_decision.answer
+    if not router_answer_valid:
+        answer = "Câu hỏi này có thể trả lời trực tiếp mà không cần dữ liệu mới."
+    answer = sanitize_user_facing_answer(answer)
+    source: MetadataSource = "gemini" if router_answer_valid and router_decision.source == "gemini_router" else "template"
     response = AiChatResponse(
         answer=answer,
         questionType="VALID_SIMPLE_QUERY",
@@ -256,6 +365,7 @@ def _handle_router_stop(
         answer = router_decision.answer or compose_unsupported_answer([router_decision.reason] if router_decision.reason else None)
         question_type = "UNSUPPORTED"
         status = "unsupported"
+    answer = sanitize_user_facing_answer(answer)
 
     response = AiChatResponse(
         answer=answer,
@@ -301,18 +411,27 @@ def _handle_followup_analysis(
         return _handle_router_clarification(payload, message, fallback_decision)
 
     tools_used = ["gemini_router", "conversation_context"]
-    if router_decision.answer:
-        answer = router_decision.answer
+    if is_user_facing_answer(router_decision.answer):
+        answer = sanitize_user_facing_answer(router_decision.answer or "")
         source: MetadataSource = "gemini" if router_decision.source == "gemini_router" else "template"
     else:
-        answer, used_gemini = compose_followup_analysis_answer(
-            user_message=message,
-            router_context=router_context,
-            fallback_answer=router_decision.answer,
-        )
-        if used_gemini:
-            tools_used.append("gemini_composer")
-        source = "gemini" if used_gemini else "template"
+        answer = local_followup_answer(previous_context, router_context, message)
+        source = "template"
+
+        if not is_user_facing_answer(answer) and settings.enable_gemini and settings.gemini_composer_enabled:
+            answer, used_gemini = compose_followup_analysis_answer(
+                user_message=message,
+                router_context=router_context,
+                fallback_answer=answer,
+            )
+            answer = sanitize_user_facing_answer(answer)
+            if used_gemini and is_user_facing_answer(answer):
+                tools_used.append("gemini_composer")
+                source = "gemini"
+
+    if not is_user_facing_answer(answer):
+        answer = sanitize_user_facing_answer(local_followup_answer(previous_context, router_context, message))
+        source = "template"
 
     response = AiChatResponse(
         answer=answer,
@@ -451,7 +570,7 @@ def _run_parser_db_flow(
         response = AiChatResponse(
             answer=compose_unsupported_answer(
                 [
-                    "Có lỗi khi chạy DB tool.",
+                    "Có lỗi khi xử lý dữ liệu.",
                     str(error),
                 ]
             ),
@@ -514,6 +633,8 @@ def _run_parser_db_flow(
             template_answer=template_answer,
             row_count=len(rows),
         )
+        if source == "gemini":
+            tools_used.append("gemini_composer")
 
         chart = AiAgentChartConfig(
             type="line" if rows else "none",
@@ -567,6 +688,8 @@ def _run_parser_db_flow(
             template_answer=template_answer,
             row_count=len(rows),
         )
+        if source == "gemini":
+            tools_used.append("gemini_composer")
 
         chart = AiAgentChartConfig(
             type="bar" if rows else "none",
@@ -616,6 +739,8 @@ def _run_parser_db_flow(
             template_answer=template_answer,
             row_count=len(rows),
         )
+        if source == "gemini":
+            tools_used.append("gemini_composer")
 
         chart = AiAgentChartConfig(
             type="table" if rows else "none",
@@ -671,6 +796,8 @@ def _run_parser_db_flow(
             template_answer=template_answer,
             row_count=len(rows),
         )
+        if source == "gemini":
+            tools_used.append("gemini_composer")
 
         chart = AiAgentChartConfig(
             type="bar" if rows else "none",
@@ -738,6 +865,8 @@ def _run_parser_db_flow(
             template_answer=template_answer,
             row_count=len(rows),
         )
+        if source == "gemini":
+            tools_used.append("gemini_composer")
 
         chart = AiAgentChartConfig(
             type="line" if rows else "none",

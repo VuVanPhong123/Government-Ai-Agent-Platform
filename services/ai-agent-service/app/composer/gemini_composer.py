@@ -1,6 +1,7 @@
 import json
 from typing import Any
 
+from app.core.config import settings
 from app.llm.gemini_client import GeminiClientError, generate_gemini_text, is_gemini_enabled
 
 
@@ -23,18 +24,40 @@ def _truncate_rows(rows: list[dict], max_rows: int = MAX_ROWS_FOR_GEMINI) -> lis
     return rows[:max_rows]
 
 
-def should_use_gemini(question_type: str, row_count: int) -> bool:
-    if not is_gemini_enabled():
+def should_use_gemini(question_type: str, row_count: int, user_message: str = "") -> bool:
+    if not settings.gemini_composer_enabled or not is_gemini_enabled():
+        return False
+
+    if row_count <= 0:
         return False
 
     if question_type in {
         "OFF_TOPIC",
         "NEED_CLARIFICATION",
         "UNSUPPORTED_DATA_QUERY",
+        "UNSUPPORTED",
     }:
         return False
 
-    return row_count > 0
+    normalized_message = user_message.lower()
+    analysis_keywords = (
+        "phân tích",
+        "phan tich",
+        "giải thích",
+        "giai thich",
+        "nhận xét",
+        "nhan xet",
+        "insight",
+        "why",
+        "analyze",
+    )
+    if any(keyword in normalized_message for keyword in analysis_keywords):
+        return True
+
+    if question_type in {"VALID_RANKING_QUERY", "VALID_COMPARE_QUERY", "VALID_COVERAGE_QUERY"}:
+        return False
+
+    return question_type in {"VALID_TREND_QUERY", "VALID_ANOMALY_QUERY"}
 
 
 def compose_gemini_answer(
@@ -63,7 +86,7 @@ def compose_gemini_answer(
     }
 
     prompt = f"""
-Bạn là AI analyst cho Government AI Agent Platform.
+Bạn là trợ lý phân tích dữ liệu kinh tế - xã hội.
 
 Nhiệm vụ:
 - Viết câu trả lời bằng tiếng Việt.
@@ -71,18 +94,18 @@ Nhiệm vụ:
 - Không bịa số liệu.
 - Không tự suy đoán ngoài dữ liệu.
 - Không viết SQL.
-- Không nói rằng bạn đã query database.
+- Không lộ thuật ngữ nội bộ như Gemini Router, router, parser, parsedQuery, AI Agent, AI Agent Service, database, DB, query planner, tool, model parser, ngrok, Kaggle.
+- Nếu cần nhắc nguồn, dùng "kết quả đã hiển thị" hoặc "dữ liệu được cung cấp".
 - Nếu dữ liệu rỗng, nói rõ là không tìm thấy dữ liệu phù hợp.
 - Trả lời ngắn gọn, có insight chính, không quá dài.
 
 Dữ liệu đầu vào:
 {_safe_json(prompt_payload)}
 
-Hãy viết câu trả lời cuối cho user.
+Hãy viết câu trả lời cuối cho người dùng.
 """.strip()
 
     try:
         return generate_gemini_text(prompt)
     except GeminiClientError:
-        # Fallback an toàn: nếu Gemini lỗi thì vẫn trả template.
         return template_answer

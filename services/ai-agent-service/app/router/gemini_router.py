@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from app.core.config import settings
-from app.llm.gemini_client import GeminiClientError, generate_gemini_text, is_gemini_enabled
+from app.llm.gemini_client import generate_gemini_text, is_gemini_enabled
 from app.resolver.indicator_resolver import normalize_text
 
 
@@ -135,10 +135,7 @@ def route_message_local_fallback(
             needs_parser=False,
             needs_db=False,
             uses_previous_result=True,
-            answer=(
-                "Dựa trên kết quả trước, mình có thể phân tích ở mức định tính. "
-                "Các nhận xét về lý do không phải là bằng chứng nhân quả trực tiếp nếu không có dữ liệu bổ sung."
-            ),
+            answer=_local_contextual_followup_answer(router_context),
             answer_strategy="local_contextual_fallback",
             reason=reason,
             source="local_router_fallback",
@@ -203,26 +200,30 @@ def _build_router_prompt(message: str, router_context: dict[str, Any]) -> str:
         "allowed_routes": sorted(ROUTES),
     }
     return f"""
-Bạn là Gemini Router cho Government AI Agent Platform.
+Bạn là lớp định tuyến và trả lời nhẹ cho một trợ lý phân tích dữ liệu kinh tế - xã hội.
 
 Nhiệm vụ: phân loại message mới thành đúng route và trả về JSON duy nhất.
 
 Luật output:
 - Chỉ trả JSON object, không markdown, không code fence.
 - Không bịa số liệu.
-- Không tự trả lời câu cần DB.
-- Nếu route là DATA_QUERY hoặc FOLLOW_UP_MODIFY_QUERY thì answer phải null hoặc rỗng.
-- Nếu route là FOLLOW_UP_MODIFY_QUERY thì rewritten_query phải là câu đầy đủ dựa trên query trước.
-- Nếu route là FOLLOW_UP_ANALYSIS thì chỉ dùng previous result trong router_context.
-- Nếu nói về nguyên nhân/vì sao dựa trên kết quả trước, phải thể hiện đây là phân tích định tính, không phải bằng chứng nhân quả trực tiếp.
+- Câu trả lời trong field answer phải viết trực tiếp cho người dùng.
+- Không lộ thuật ngữ nội bộ trong answer: Gemini Router, router, parser, parsedQuery, AI Agent, AI Agent Service, database, DB, query planner, tool, model parser, ngrok, Kaggle.
+- Nếu cần nói về dữ liệu, dùng "dữ liệu trước đó", "bảng kết quả trước đó" hoặc "kết quả đã hiển thị".
+- DIRECT_ANSWER hoặc GENERAL_EXPLANATION: nếu hiểu câu hỏi thì answer phải có, không cần parser, không cần dữ liệu mới.
+- FOLLOW_UP_ANALYSIS: nếu router_context có last_data_summary/top_rows/last_answer thì được phép trả answer dựa trên context, không gọi parser, không cần dữ liệu mới, không bịa số liệu mới.
+- FOLLOW_UP_ANALYSIS: nếu nói nguyên nhân/vì sao, phải có câu "Đây là phân tích định tính, không phải bằng chứng nhân quả trực tiếp."
+- FOLLOW_UP_ANALYSIS: nếu context không đủ, answer=null và answer_strategy="needs_composer_or_local_fallback".
+- DATA_QUERY hoặc FOLLOW_UP_MODIFY_QUERY: không trả lời số liệu cụ thể nếu cần dữ liệu mới; answer=null.
+- FOLLOW_UP_MODIFY_QUERY: rewritten_query phải là câu đầy đủ dựa trên query trước.
 
 Routes:
-- DIRECT_ANSWER: khái niệm, định nghĩa, cách hiểu chỉ số, cách dùng hệ thống; không cần DB.
-- GENERAL_EXPLANATION: giải thích chung không cần DB.
+- DIRECT_ANSWER: khái niệm, định nghĩa, cách hiểu chỉ số, cách dùng hệ thống; không cần dữ liệu mới.
+- GENERAL_EXPLANATION: giải thích chung không cần dữ liệu mới.
 - DATA_QUERY: số liệu cụ thể, ranking, top/bottom, so sánh quốc gia, xu hướng theo năm, coverage, anomaly, chart/table.
 - FOLLOW_UP_ANALYSIS: user hỏi phân tích/nhận xét/giải thích kết quả trước; cần có previous result.
 - FOLLOW_UP_MODIFY_QUERY: user sửa query trước như đổi năm, top N, thêm nước, đổi giai đoạn.
-- NEED_CLARIFICATION: thiếu indicator/country/year quan trọng và bạn chắc chắn cần hỏi lại.
+- NEED_CLARIFICATION: thiếu indicator/country/year quan trọng và chắc chắn cần hỏi lại.
 - UNSUPPORTED: dự báo ML/ARIMA, train model, viết SQL, prediction tương lai, tác vụ ngoài phase hiện tại.
 - OFF_TOPIC: ngoài phạm vi government/economic/social indicators.
 
@@ -264,13 +265,18 @@ def _parse_router_response(text: str, attempts: int = 1) -> RouterDecision:
         else _bool_or_default(data.get("uses_previous_result"), False)
     )
 
+    if route in {"DATA_QUERY", "FOLLOW_UP_MODIFY_QUERY"}:
+        answer = None
+    else:
+        answer = _optional_str(data.get("answer"))
+
     return RouterDecision(
         route=route,
         confidence=confidence,
         needs_parser=needs_parser,
         needs_db=needs_db,
         uses_previous_result=uses_previous_result,
-        answer=_optional_str(data.get("answer")),
+        answer=answer,
         answer_strategy=_optional_str(data.get("answer_strategy")),
         rewritten_query=_optional_str(data.get("rewritten_query")),
         clarification_question=_optional_str(data.get("clarification_question")),
@@ -416,9 +422,10 @@ def _rewrite_followup_query(
 
 def _indicator_text(parsed_query: dict[str, Any], base_query: str) -> str:
     indicators = parsed_query.get("indicators") or []
-    if "inflation_cpi" in indicators:
+    normalized_base = normalize_text(base_query)
+    if "inflation_cpi" in indicators or "lam phat" in normalized_base or "cpi" in normalized_base:
         return "lạm phát CPI"
-    if "govdebt_GDP" in indicators:
+    if "govdebt_GDP" in indicators or "no cong" in normalized_base:
         return "nợ công/GDP"
     if indicators:
         return str(indicators[0])
@@ -427,10 +434,40 @@ def _indicator_text(parsed_query: dict[str, Any], base_query: str) -> str:
 
 def _direct_answer_fallback(normalized: str) -> str:
     if "no cong" in normalized or "debt" in normalized:
-        return "Nợ công/GDP là tỷ lệ nợ công so với GDP, dùng để đánh giá quy mô nợ của khu vực công so với nền kinh tế."
+        return (
+            "Nợ công/GDP là tỷ lệ nợ công so với GDP, dùng để đánh giá quy mô nợ của khu vực công "
+            "so với quy mô nền kinh tế."
+        )
     if "lam phat cpi" in normalized or "cpi" in normalized:
-        return "Lạm phát CPI là mức tăng của chỉ số giá tiêu dùng, phản ánh thay đổi giá của rổ hàng hóa và dịch vụ tiêu dùng theo thời gian."
-    return "Đây là câu hỏi giải thích khái niệm, không cần truy vấn dữ liệu. Bạn có thể hỏi thêm về một chỉ số cụ thể để mình giải thích rõ hơn."
+        return (
+            "Lạm phát CPI là mức tăng của chỉ số giá tiêu dùng, phản ánh thay đổi giá của rổ hàng hóa "
+            "và dịch vụ tiêu dùng theo thời gian."
+        )
+    return "Đây là câu hỏi giải thích khái niệm, không cần dữ liệu mới. Bạn có thể nêu rõ chỉ số để mình giải thích cụ thể hơn."
+
+
+def _local_contextual_followup_answer(router_context: dict[str, Any]) -> str:
+    data_summary = router_context.get("last_data_summary") or {}
+    row_count = data_summary.get("row_count")
+    indicator = data_summary.get("indicator") or "chỉ số đang xét"
+    years = data_summary.get("years") or []
+    top_rows = data_summary.get("top_rows") or router_context.get("last_rows") or []
+
+    scope_parts = []
+    if row_count:
+        scope_parts.append(f"{row_count} dòng kết quả")
+    if years:
+        scope_parts.append(f"giai đoạn/năm {', '.join(str(year) for year in years[:3])}")
+    scope = " trong " + ", ".join(scope_parts) if scope_parts else ""
+
+    leading = ""
+    if top_rows:
+        leading = " Các kết quả nổi bật trong bảng trước đó có thể phản ánh khác biệt về bối cảnh kinh tế, chính sách và chất lượng dữ liệu giữa các nước."
+
+    return (
+        f"Dựa trên kết quả đã hiển thị cho {indicator}{scope}, mình có thể đưa ra nhận xét định tính ở mức tổng quát."
+        f"{leading} Đây là phân tích định tính, không phải bằng chứng nhân quả trực tiếp."
+    )
 
 
 def _strip_code_fence(text: str) -> str:
