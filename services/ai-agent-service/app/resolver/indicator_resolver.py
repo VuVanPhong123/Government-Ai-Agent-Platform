@@ -10,28 +10,6 @@ from app.catalog.indicator_catalog import INDICATORS, IndicatorMeta
 from app.catalog.analytics_catalog import get_indicator_analytics_metadata
 
 
-UNSUPPORTED_INDICATOR_ALIASES: dict[str, tuple[str, ...]] = {
-    "cán cân vãng lai/GDP": (
-        "current account/GDP",
-        "current account balance/GDP",
-        "current account GDP",
-        "current account",
-        "current_account_GDP",
-        "curr_account_GDP",
-        "cán cân vãng lai/GDP",
-        "can can vang lai/GDP",
-    ),
-    "nợ nước ngoài/GNI": (
-        "external debt/GNI",
-        "external debt to GNI",
-        "external debt",
-        "external_debt_GNI",
-        "nợ nước ngoài/GNI",
-        "no nuoc ngoai/GNI",
-    ),
-}
-
-
 @dataclass(frozen=True)
 class IndicatorMatch:
     indicator: IndicatorMeta

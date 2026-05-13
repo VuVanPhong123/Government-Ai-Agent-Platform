@@ -1,7 +1,7 @@
 from sqlalchemy import text
 
 from app.db.postgres import engine
-from app.tools.common import quote_identifier, require_indicator, rows_to_dicts
+from app.tools.common import indicator_column_name, quote_identifier, require_indicator, rows_to_dicts
 
 
 def rank_countries(
@@ -13,7 +13,7 @@ def rank_countries(
     indicator = require_indicator(indicator_code)
 
     table_name = indicator.gold_table
-    column_name = quote_identifier(indicator.code)
+    column_name = quote_identifier(indicator_column_name(indicator))
 
     safe_limit = max(1, min(limit, 50))
     direction = "ASC" if order.lower() == "asc" else "DESC"

@@ -14,6 +14,7 @@ from app.composer.display_formatter import (
     safe_number,
     sanitize_user_facing_text,
 )
+from app.resolver.country_resolver import COUNTRIES
 
 
 def _row_value(row: dict) -> Any:
@@ -180,6 +181,7 @@ def compose_compare_answer(
     start_year: int | None,
     end_year: int | None,
     rows: list[dict],
+    result_validation: dict[str, Any] | None = None,
 ) -> str:
     label = get_indicator_label(indicator_code)
     unit = get_indicator_unit(indicator_code)
@@ -206,17 +208,38 @@ def compose_compare_answer(
             f"đến {last.get('year')} là {format_value(end_value, unit)} → {direction}."
         )
 
+    missing_countries = _missing_country_labels(result_validation)
+    is_partial = bool(result_validation and (result_validation.get("is_partial") or missing_countries))
+
     highest, lowest = _best_rows_by_value(final_rows)
-    if highest and lowest and highest is not lowest:
+    if not is_partial and highest and lowest and highest is not lowest:
         high_country = get_country_label(highest)
         low_country = get_country_label(lowest)
         if len(final_rows) == 2:
             lines.append(f"Ở cuối kỳ, {high_country} cao hơn {low_country}.")
         else:
             lines.append(f"Ở cuối kỳ, {high_country} cao nhất và {low_country} thấp nhất trong nhóm này.")
+    elif is_partial and missing_countries:
+        missing_text = ", ".join(missing_countries)
+        lines.append(f"Do thiếu dữ liệu cho {missing_text}, hệ thống không kết luận đầy đủ cho toàn bộ nhóm yêu cầu.")
 
     lines.append("Biểu đồ và bảng bên dưới thể hiện chi tiết theo từng năm.")
     return sanitize_user_facing_text("\n".join(lines))
+
+
+def _missing_country_labels(result_validation: dict[str, Any] | None) -> list[str]:
+    if not isinstance(result_validation, dict):
+        return []
+    labels: list[str] = []
+    for code in result_validation.get("missing_countries") or []:
+        text = str(code).strip()
+        if not text:
+            continue
+        country = COUNTRIES.get(text.upper())
+        label = country.name if country else text
+        if label not in labels:
+            labels.append(label)
+    return labels
 
 
 def compose_ranking_answer(

@@ -10,6 +10,7 @@ class IndicatorMeta:
     category: str
     unit: str
     gold_table: str
+    gold_column: str | None = None
     analytics_table: str | None = None
     description: str = ""
     aliases: tuple[str, ...] = ()
@@ -22,6 +23,7 @@ def _to_legacy_indicator(indicator) -> IndicatorMeta:
         category=indicator.category,
         unit=indicator.unit,
         gold_table=indicator.gold_table,
+        gold_column=indicator.gold_column,
         analytics_table=indicator.analytics_table,
         description=indicator.description_vi,
         aliases=indicator.aliases,

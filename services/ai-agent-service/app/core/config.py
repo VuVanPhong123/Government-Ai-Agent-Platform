@@ -13,6 +13,10 @@ class Settings(BaseSettings):
 
     database_url: str | None = None
 
+    pipeline_mode: str = "hybrid_v2"
+    enable_hybrid_v2_fallback: bool = True
+    hybrid_v2_debug: bool = True
+
     enable_gemini: bool = False
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-3.1-flash-lite-preview"

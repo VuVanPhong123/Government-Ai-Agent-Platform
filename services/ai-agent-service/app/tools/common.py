@@ -22,6 +22,10 @@ def quote_identifier(identifier: str) -> str:
     return f'"{safe}"'
 
 
+def indicator_column_name(indicator) -> str:
+    return getattr(indicator, "gold_column", None) or indicator.code
+
+
 def normalize_country_codes(country_codes: list[str] | None) -> list[str]:
     if not country_codes:
         return []

@@ -28,7 +28,15 @@ def should_use_gemini(question_type: str, row_count: int, user_message: str = ""
     if not settings.gemini_composer_enabled or not is_gemini_enabled():
         return False
 
-    if row_count <= 0:
+    numeric_data_question_types = {
+        "VALID_COMPARE_QUERY",
+        "VALID_RANKING_QUERY",
+        "VALID_COVERAGE_QUERY",
+        "VALID_TREND_QUERY",
+        "VALID_ANOMALY_QUERY",
+        "VALID_SIMPLE_QUERY",
+    }
+    if question_type in numeric_data_question_types and row_count > 0:
         return False
 
     if question_type in {
@@ -37,6 +45,9 @@ def should_use_gemini(question_type: str, row_count: int, user_message: str = ""
         "UNSUPPORTED_DATA_QUERY",
         "UNSUPPORTED",
     }:
+        return False
+
+    if row_count <= 0:
         return False
 
     normalized_message = user_message.lower()

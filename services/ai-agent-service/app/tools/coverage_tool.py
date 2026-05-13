@@ -2,6 +2,7 @@ from sqlalchemy import bindparam, text
 
 from app.db.postgres import engine
 from app.tools.common import (
+    indicator_column_name,
     normalize_country_codes,
     quote_identifier,
     require_indicator,
@@ -16,7 +17,7 @@ def get_data_coverage(
     indicator = require_indicator(indicator_code)
 
     table_name = indicator.gold_table
-    column_name = quote_identifier(indicator.code)
+    column_name = quote_identifier(indicator_column_name(indicator))
 
     countries = normalize_country_codes(country_codes)
 

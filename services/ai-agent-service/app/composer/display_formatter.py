@@ -18,7 +18,7 @@ INDICATOR_LABELS: dict[str, str] = {
     "GDP_growth_YoY": "tăng trưởng GDP danh nghĩa",
     "GDP_growth_trend_5yr": "xu hướng tăng trưởng GDP 5 năm",
     "GDP_pc_growth_gap": "chênh lệch tăng trưởng GDP bình quân đầu người",
-    "log_rGDP_pc_USD": "GDP bình quân đầu người",
+    "log_rGDP_pc_USD": "log GDP thực bình quân đầu người",
     "GDP_per_capita": "GDP bình quân đầu người",
     "tax_revenue_pct_GDP": "thu thuế/GDP",
     "fiscal_balance_GDP": "cán cân ngân sách/GDP",

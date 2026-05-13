@@ -1,7 +1,7 @@
 import re
 from typing import Any, Literal
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.composer.chart_composer import (
     build_anomaly_bar_chart_data,
@@ -34,6 +34,7 @@ from app.core.config import settings
 from app.core.security import verify_internal_api_key
 from app.executor.tool_executor import execute_query_plan
 from app.parser.hybrid_parser import parse_with_hybrid_parser
+from app.pipeline.hybrid_v2_runner import run_hybrid_v2_pipeline
 from app.planner.plan_schema import QueryPlan
 from app.resolver.slot_resolver import resolved_slots_to_metadata
 from app.router.gemini_router import RouterDecision, route_message
@@ -253,36 +254,65 @@ def chat(payload: AiChatRequest) -> AiChatResponse:
     conversation_id = payload.conversationId or "__default__"
     previous_context = get_conversation_context(conversation_id)
     router_context = build_router_context(previous_context)
-    router_decision = route_message(normalized_message, router_context)
-
-    if router_decision.route in {"DIRECT_ANSWER", "GENERAL_EXPLANATION"}:
-        return _handle_direct_answer(
-            payload=payload,
-            message=normalized_message,
-            router_decision=router_decision,
-        )
-
-    if router_decision.route == "NEED_CLARIFICATION":
-        return _handle_router_clarification(
-            payload=payload,
-            message=normalized_message,
-            router_decision=router_decision,
-        )
-
-    if router_decision.route in {"UNSUPPORTED", "OFF_TOPIC"}:
-        return _handle_router_stop(
-            payload=payload,
-            message=normalized_message,
-            router_decision=router_decision,
-        )
-
-    if router_decision.route == "FOLLOW_UP_ANALYSIS":
-        return _handle_followup_analysis(
+    fallback_used = False
+    if settings.pipeline_mode.lower() == "hybrid_v2":
+        v2_response = run_hybrid_v2_pipeline(
             payload=payload,
             message=normalized_message,
             previous_context=previous_context,
             router_context=router_context,
-            router_decision=router_decision,
+        )
+        if v2_response is not None:
+            return v2_response
+        if not settings.enable_hybrid_v2_fallback:
+            raise HTTPException(
+                status_code=500,
+                detail="Hybrid v2 pipeline failed and fallback is disabled",
+            )
+        fallback_used = True
+
+    router_decision = route_message(normalized_message, router_context)
+
+    if router_decision.route in {"DIRECT_ANSWER", "GENERAL_EXPLANATION"}:
+        return _mark_legacy_fallback(
+            _handle_direct_answer(
+                payload=payload,
+                message=normalized_message,
+                router_decision=router_decision,
+            ),
+            fallback_used,
+        )
+
+    if router_decision.route == "NEED_CLARIFICATION":
+        return _mark_legacy_fallback(
+            _handle_router_clarification(
+                payload=payload,
+                message=normalized_message,
+                router_decision=router_decision,
+            ),
+            fallback_used,
+        )
+
+    if router_decision.route in {"UNSUPPORTED", "OFF_TOPIC"}:
+        return _mark_legacy_fallback(
+            _handle_router_stop(
+                payload=payload,
+                message=normalized_message,
+                router_decision=router_decision,
+            ),
+            fallback_used,
+        )
+
+    if router_decision.route == "FOLLOW_UP_ANALYSIS":
+        return _mark_legacy_fallback(
+            _handle_followup_analysis(
+                payload=payload,
+                message=normalized_message,
+                previous_context=previous_context,
+                router_context=router_context,
+                router_decision=router_decision,
+            ),
+            fallback_used,
         )
 
     if router_decision.route == "FOLLOW_UP_MODIFY_QUERY":
@@ -293,25 +323,42 @@ def chat(payload: AiChatRequest) -> AiChatResponse:
             "original_user_message": normalized_message,
             "router_rewritten_query": router_decision.rewritten_query,
         }
-        return _run_parser_db_flow(
-            payload=payload,
-            query_text=query_text,
-            original_message=normalized_message,
-            parser_context=parser_context,
-            router_decision=router_decision,
+        return _mark_legacy_fallback(
+            _run_parser_db_flow(
+                payload=payload,
+                query_text=query_text,
+                original_message=normalized_message,
+                parser_context=parser_context,
+                router_decision=router_decision,
+            ),
+            fallback_used,
         )
 
     parser_context = {
         "frontend_context": payload.context,
         "conversation": router_context,
     }
-    return _run_parser_db_flow(
-        payload=payload,
-        query_text=normalized_message,
-        original_message=normalized_message,
-        parser_context=parser_context,
-        router_decision=router_decision,
+    return _mark_legacy_fallback(
+        _run_parser_db_flow(
+            payload=payload,
+            query_text=normalized_message,
+            original_message=normalized_message,
+            parser_context=parser_context,
+            router_decision=router_decision,
+        ),
+        fallback_used,
     )
+
+
+def _mark_legacy_fallback(response: AiChatResponse, fallback_used: bool) -> AiChatResponse:
+    if not fallback_used:
+        return response
+    response.metadata.pipeline = "legacy_fallback"
+    response.metadata.fallbackUsed = True
+    router_debug = dict(response.routerDebug or {})
+    router_debug["hybridV2FallbackUsed"] = True
+    response.routerDebug = router_debug
+    return response
 
 
 def _handle_direct_answer(
@@ -1016,7 +1063,10 @@ def _update_context_query_success(
             "last_answer": response.answer,
             "last_route": router_decision.route,
             "last_status": response.status,
+            "last_question_type": response.questionType,
             "last_parsed_query": parse_result.parsed_query or {},
+            "last_query_plan": plan_to_dict(parse_result.plan),
+            "last_result_validation": {},
             "last_rows": row_summary["top_rows"],
             "last_chart": chart_without_data,
             "last_data_summary": {

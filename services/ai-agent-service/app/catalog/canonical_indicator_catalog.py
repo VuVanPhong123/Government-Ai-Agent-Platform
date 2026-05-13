@@ -312,6 +312,9 @@ def _score_alias(normalized_text: str, alias: str) -> float:
 
 
 def resolve_indicator_aliases(text: str, limit: int = 3) -> list[IndicatorAliasMatch]:
+    if limit <= 0:
+        return []
+
     normalized_text = normalize_catalog_text(text)
     matches: list[IndicatorAliasMatch] = []
 
@@ -345,7 +348,7 @@ def resolve_indicator_aliases(text: str, limit: int = 3) -> list[IndicatorAliasM
         ),
         reverse=True,
     )
-    return matches[: max(1, limit)]
+    return matches[:limit]
 
 
 def resolve_indicator_alias(text: str) -> IndicatorAliasMatch | None:
