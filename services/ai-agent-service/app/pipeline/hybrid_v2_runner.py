@@ -1,5 +1,5 @@
 import logging
-from dataclasses import asdict
+from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from app.composer.chart_composer import (
@@ -15,6 +15,7 @@ from app.composer.template_composer import (
     compose_compare_answer,
     compose_coverage_answer,
     compose_need_clarification_answer,
+    compose_no_data_answer,
     compose_off_topic_answer,
     compose_ranking_answer,
     compose_trend_answer,
@@ -32,6 +33,7 @@ from app.parser.parser_agent import run_parser_agent
 from app.planner.validated_plan_adapter import build_plan_from_validated_query
 from app.resolver.country_resolver import resolve_countries
 from app.router.front_router_adapter import build_front_router_draft_from_existing_router
+from app.router.front_llm_router import route_with_front_llm_draft
 from app.router.rule_first_router import run_rule_first_router
 from app.schemas.chat import AiAgentChartConfig, AiAgentMetadata, AiChatRequest, AiChatResponse
 from app.validator.query_validator import validate_parsed_candidate
@@ -106,12 +108,24 @@ def run_hybrid_v2_pipeline(
                 ),
             )
         if _looks_like_general_explanation(message):
-            return None
+            return _direct_explanation_response(
+                payload=payload,
+                message=message,
+                rule_draft=rule_draft,
+                router_debug=_router_debug(
+                    "GENERAL_EXPLANATION",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+            )
 
         if _should_execute_front_router(rule_draft):
-            front_router_decision = router_decision or _route_with_front_llm(message, router_context)
-            executed_front_router = True
-            router_result = front_router_decision.to_dict() if hasattr(front_router_decision, "to_dict") else None
+            front_router_decision = router_decision or _route_with_front_llm(message, router_context, rule_draft)
+            executed_front_router = front_router_decision is not None
+            router_result = _decision_to_dict(front_router_decision)
             front_draft = build_front_router_draft_from_existing_router(router_result, rule_draft)
 
         effective_message = message
@@ -145,9 +159,9 @@ def run_hybrid_v2_pipeline(
         validation = validate_parsed_candidate(candidate)
 
         if validation.status == "needs_clarification" and not executed_front_router and rule_draft.confidence < 0.9:
-            front_router_decision = _route_with_front_llm(message, router_context)
-            executed_front_router = True
-            front_draft = build_front_router_draft_from_existing_router(front_router_decision.to_dict(), rule_draft)
+            front_router_decision = _route_with_front_llm(message, router_context, rule_draft)
+            executed_front_router = front_router_decision is not None
+            front_draft = build_front_router_draft_from_existing_router(_decision_to_dict(front_router_decision), rule_draft)
             candidate = run_parser_agent(
                 user_message=effective_message,
                 conversation_context=router_context,
@@ -271,6 +285,98 @@ def _followup_analysis_response(
     return response
 
 
+def _direct_explanation_response(
+    payload: AiChatRequest,
+    message: str,
+    rule_draft: Any,
+    router_debug: dict[str, Any] | None = None,
+) -> AiChatResponse:
+    answer = _compose_direct_explanation_template(message)
+    response = AiChatResponse(
+        answer=sanitize_user_facing_text(answer),
+        questionType="VALID_SIMPLE_QUERY",
+        status="success",
+        data=[
+            {
+                "message": message,
+                "route": "GENERAL_EXPLANATION",
+            }
+        ],
+        chart=AiAgentChartConfig(type="none"),
+        warnings=[],
+        metadata=_metadata("template", ["rule_first_router", "direct_explanation_template"], rule_draft=rule_draft),
+        parsedQuery=None,
+        parserDebug=None,
+        routerDebug=router_debug or {"route": "GENERAL_EXPLANATION", "pipeline": "hybrid_v2"},
+    )
+    _update_basic(payload.conversationId, message, response.answer, "GENERAL_EXPLANATION", "success", response.questionType)
+    return response
+
+
+def _compose_direct_explanation_template(message: str) -> str:
+    normalized = message.lower()
+
+    if "gdp per capita" in normalized or "bình quân đầu người" in normalized or "binh quan dau nguoi" in normalized or "income per capita" in normalized:
+        return (
+            "GDP per capita là GDP bình quân đầu người: GDP tổng chia cho dân số. "
+            "Trong dữ liệu hiện có, chỉ số gần nhất là GDP thực bình quân đầu người ở dạng log, "
+            "nên giá trị dùng để so sánh là thang log chứ không phải USD trực tiếp."
+        )
+
+    if "trade openness" in normalized or "độ mở thương mại" in normalized or "do mo thuong mai" in normalized:
+        return (
+            "Trade openness là tỷ lệ tổng thương mại so với GDP. "
+            "Chỉ số này thường cho biết mức độ nền kinh tế gắn với trao đổi hàng hóa và dịch vụ với bên ngoài."
+        )
+
+    if "current account" in normalized or "cán cân vãng lai" in normalized or "can can vang lai" in normalized:
+        return (
+            "Current account/GDP là cán cân vãng lai so với GDP, phản ánh thặng dư hoặc thâm hụt "
+            "giao dịch vãng lai so với quy mô nền kinh tế. Hiện dữ liệu của hệ thống chưa có chỉ số này."
+        )
+
+    if "external debt" in normalized or "nợ nước ngoài" in normalized or "no nuoc ngoai" in normalized:
+        return (
+            "External debt/GNI là nợ nước ngoài so với tổng thu nhập quốc dân, thường dùng để nhìn rủi ro "
+            "phụ thuộc vốn bên ngoài và khả năng trả nợ ngoại tệ. Hiện dữ liệu của hệ thống chưa có chỉ số này."
+        )
+
+    if "fiscal balance" in normalized or "budget balance" in normalized or "cán cân ngân sách" in normalized or "can can ngan sach" in normalized:
+        return (
+            "Fiscal balance/GDP là cán cân ngân sách so với GDP. "
+            "Giá trị dương thường là thặng dư ngân sách, còn giá trị âm thường là thâm hụt ngân sách."
+        )
+
+    if "gfcf" in normalized or "gross fixed capital formation" in normalized or "đầu tư cố định" in normalized or "dau tu co dinh" in normalized:
+        return (
+            "GFCF to GDP là đầu tư tài sản cố định so với GDP, phản ánh phần sản lượng được dành cho "
+            "máy móc, nhà xưởng, hạ tầng và các tài sản cố định khác."
+        )
+
+    if "real interest rate" in normalized or "lãi suất thực" in normalized or "lai suat thuc" in normalized:
+        return "Real interest rate là lãi suất thực sau khi điều chỉnh lạm phát, giúp nhìn chi phí vay theo sức mua thực tế."
+
+    if "coverage" in normalized:
+        return "Coverage dữ liệu cho biết một chỉ số có dữ liệu ở những quốc gia nào, từ năm nào đến năm nào và có bao nhiêu quan sát."
+
+    if "nợ công" in normalized or "no cong" in normalized or "public debt" in normalized or "government debt" in normalized:
+        return "Nợ công/GDP là tỷ lệ nợ công so với GDP, dùng để đánh giá quy mô nợ khu vực công so với quy mô nền kinh tế."
+
+    if "lạm phát cpi" in normalized or "lam phat cpi" in normalized or "cpi" in normalized:
+        return "Lạm phát CPI là mức tăng của chỉ số giá tiêu dùng, phản ánh thay đổi giá của rổ hàng hóa và dịch vụ tiêu dùng."
+
+    if "thất nghiệp" in normalized or "that nghiep" in normalized or "unemployment" in normalized:
+        return "Tỷ lệ thất nghiệp phản ánh phần lực lượng lao động đang không có việc làm nhưng có nhu cầu và sẵn sàng làm việc."
+
+    if "tax revenue" in normalized or "thu thuế" in normalized or "thu thue" in normalized:
+        return "Tax revenue/GDP là thu thuế so với GDP, thường dùng để đánh giá năng lực huy động nguồn thu thuế của một nền kinh tế."
+
+    return (
+        "Đây là câu hỏi giải thích khái niệm trong phạm vi dữ liệu kinh tế - xã hội. "
+        "Bạn có thể nêu rõ chỉ số như nợ công/GDP, lạm phát CPI, thất nghiệp, tăng trưởng GDP hoặc độ mở thương mại để mình giải thích cụ thể hơn."
+    )
+
+
 def _clarification_response(
     payload: AiChatRequest,
     message: str,
@@ -349,7 +455,7 @@ def _off_topic_response(
     return response
 
 
-def _no_data_response(
+def _legacy_no_data_response_unused(
     payload: AiChatRequest,
     message: str,
     validation: Any,
@@ -365,6 +471,39 @@ def _no_data_response(
         warnings=validation.warnings,
         metadata=_metadata("template", ["query_validator"], validation=validation),
         parsedQuery=None,
+        parserDebug=None,
+        routerDebug=router_debug or {"route": "DATA_QUERY", "pipeline": "hybrid_v2", "status": "no_data"},
+    )
+    _update_basic(payload.conversationId, message, answer, "DATA_QUERY", "no_data", response.questionType)
+    return response
+
+
+def _no_data_response(
+    payload: AiChatRequest,
+    message: str,
+    validation: Any,
+    router_debug: dict[str, Any] | None = None,
+) -> AiChatResponse:
+    answer = compose_no_data_answer(
+        validation_reason=getattr(validation, "reason", None),
+        warnings=getattr(validation, "warnings", []),
+        validated_query=getattr(validation, "validated_query", None),
+    )
+    response = AiChatResponse(
+        answer=answer,
+        questionType="NO_DATA",
+        status="no_data",
+        data=[
+            {
+                "message": message,
+                "route": "DATA_QUERY",
+                "validation": asdict(validation) if validation else None,
+            }
+        ],
+        chart=AiAgentChartConfig(type="none"),
+        warnings=getattr(validation, "warnings", []),
+        metadata=_metadata("template", ["query_validator"], validation=validation),
+        parsedQuery=getattr(validation, "validated_query", None),
         parserDebug=None,
         routerDebug=router_debug or {"route": "DATA_QUERY", "pipeline": "hybrid_v2", "status": "no_data"},
     )
@@ -502,10 +641,24 @@ def _should_execute_front_router(rule_draft: Any) -> bool:
     return bool(rule_draft.needs_front_llm or rule_draft.confidence < 0.9)
 
 
-def _route_with_front_llm(message: str, router_context: dict[str, Any]) -> Any:
-    from app.router.gemini_router import route_message
+def _route_with_front_llm(message: str, router_context: dict[str, Any], rule_draft: Any | None = None) -> Any:
+    return route_with_front_llm_draft(
+        user_message=message,
+        conversation_context=router_context,
+        rule_route_draft=rule_draft,
+    )
 
-    return route_message(message, router_context)
+
+def _decision_to_dict(decision: Any | None) -> dict[str, Any] | None:
+    if decision is None:
+        return None
+    if isinstance(decision, dict):
+        return decision
+    if hasattr(decision, "to_dict"):
+        return decision.to_dict()
+    if is_dataclass(decision):
+        return asdict(decision)
+    return None
 
 
 def _should_call_parser_model(message: str, rule_draft: Any, front_draft: Any) -> bool:
@@ -626,16 +779,47 @@ def _call_parser_model_candidate(
             "original_user_message": original_message,
         },
     )
+
     parsed = parser_response.get("parsed") if isinstance(parser_response, dict) else None
     parser_debug = _parser_model_debug(parser_response)
+
     debug = {
         "executed_model_parser": True,
         "parserServiceAvailable": isinstance(parser_response, dict),
         "parserModelDebug": parser_debug,
     }
-    if isinstance(parsed, dict) and parsed.get("intent"):
+
+    if _parser_response_is_safe(parser_response) and isinstance(parsed, dict):
         return parsed, debug
+
     return None, debug
+
+
+def _parser_response_is_safe(parser_response: Any) -> bool:
+    if not isinstance(parser_response, dict):
+        return False
+
+    parsed = parser_response.get("parsed")
+    if not isinstance(parsed, dict):
+        return False
+
+    schema_pass = bool(
+        parser_response.get("deployment_schema_pass")
+        or parser_response.get("schema_pass")
+    )
+
+    allowed_intents = {
+        item.strip()
+        for item in settings.parser_hybrid_allowed_intents.split(",")
+        if item.strip()
+    }
+
+    return (
+        parser_response.get("safe_to_execute") is True
+        and parser_response.get("catalog_pass") is True
+        and schema_pass
+        and parsed.get("intent") in allowed_intents
+    )
 
 
 def _parser_model_debug(parser_response: Any) -> dict[str, Any]:
@@ -670,11 +854,7 @@ def _router_debug(
     executed_front_router: bool,
     parser_model_debug: dict[str, Any],
 ) -> dict[str, Any]:
-    front_decision_dict = (
-        front_router_decision.to_dict()
-        if front_router_decision is not None and hasattr(front_router_decision, "to_dict")
-        else None
-    )
+    front_decision_dict = _decision_to_dict(front_router_decision)
     return {
         "route": route,
         "pipeline": "hybrid_v2",

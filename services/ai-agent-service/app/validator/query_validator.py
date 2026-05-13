@@ -7,7 +7,7 @@ from app.catalog.canonical_indicator_catalog import (
     indicator_supports_trend,
     is_supported_indicator,
 )
-from app.catalog.country_group_catalog import expand_country_groups
+from app.catalog.country_group_catalog import expand_country_groups, get_country_group
 from app.pipeline.schemas import ParsedQueryCandidate, ValidationOutcome
 from app.resolver.country_resolver import COUNTRIES
 
@@ -112,7 +112,12 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
 
     indicator_code = candidate.indicators[0] if candidate.indicators else None
     indicator = get_indicator(indicator_code) if indicator_code else None
-    raw_countries = _dedupe([*candidate.countries, *expand_country_groups(candidate.country_groups)])
+
+    valid_groups, invalid_groups = _normalize_country_groups(candidate.country_groups)
+    if invalid_groups:
+        warnings.append("Một số nhóm quốc gia không hợp lệ đã được bỏ qua: " + ", ".join(invalid_groups) + ".")
+
+    raw_countries = _dedupe([*candidate.countries, *expand_country_groups(valid_groups)])
     countries, invalid_countries = _normalize_country_codes(raw_countries)
     if invalid_countries:
         warnings.append("Một số mã quốc gia không hợp lệ đã được bỏ qua: " + ", ".join(invalid_countries) + ".")
@@ -133,24 +138,29 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
         candidate.end_year,
     )
     warnings.extend(year_warnings)
+
     if no_data_reason:
         return ValidationOutcome(
             ok=False,
             status="no_data",
             question_type="NO_DATA",
-            validated_query=None,
+            validated_query={
+                "route": normalized_route,
+                "intent": intent,
+                "indicator": indicator_code,
+                "indicators": [indicator_code] if indicator_code else [],
+                "countries": countries,
+                "country_groups": valid_groups,
+                "start_year": start_year,
+                "end_year": end_year,
+                "effective_start_year": effective_start_year,
+                "effective_end_year": effective_end_year,
+                "limit": candidate.limit,
+                "ranking_order": candidate.ranking_order,
+                "warnings": warnings,
+            },
             warnings=warnings,
             reason=no_data_reason,
-        )
-    if start_year is not None and end_year is not None and start_year > end_year:
-        return ValidationOutcome(
-            ok=False,
-            status="needs_clarification",
-            question_type="NEED_CLARIFICATION",
-            validated_query=None,
-            warnings=warnings,
-            clarification_questions=["Khoảng thời gian chưa hợp lệ. Bạn muốn xem từ năm nào đến năm nào?"],
-            reason="start_year greater than end_year.",
         )
 
     if intent == "COMPARE_COUNTRIES" and len(countries) < 2:
@@ -186,6 +196,7 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
         )
 
     question_type = _question_type(intent, indicator_code, warnings)
+
     if intent == "RANKING":
         if effective_end_year is None and effective_start_year is None:
             effective_start_year = effective_end_year = 2022
@@ -201,6 +212,7 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
     limit = _clamp(candidate.limit, 1, 50) if candidate.limit is not None else None
     if intent == "RANKING" and limit is None:
         limit = 10
+
     ranking_order = candidate.ranking_order if candidate.ranking_order in {"asc", "desc"} else None
     if intent == "RANKING" and ranking_order is None:
         ranking_order = "desc"
@@ -211,7 +223,7 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
         "indicator": indicator_code,
         "indicators": [indicator_code] if indicator_code else [],
         "countries": countries,
-        "country_groups": list(candidate.country_groups),
+        "country_groups": valid_groups,
         "start_year": start_year,
         "end_year": end_year,
         "effective_start_year": effective_start_year,
@@ -220,6 +232,7 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
         "ranking_order": ranking_order,
         "warnings": warnings,
     }
+
     return ValidationOutcome(
         ok=True,
         status="success",
@@ -282,16 +295,21 @@ def _validate_years(
     warnings: list[str] = []
     effective_start_year = start_year
     effective_end_year = end_year
+
     if effective_end_year is not None and effective_end_year > 2025:
         effective_end_year = 2025
         warnings.append("Dữ liệu hiện chỉ được xác minh đến năm 2025, hệ thống dùng năm 2025 làm mốc cuối.")
+
     if effective_start_year is not None and effective_start_year < 1980:
         effective_start_year = 1980
         warnings.append("Dữ liệu hiện được xác minh từ năm 1980, hệ thống dùng năm 1980 làm mốc đầu.")
+
     if start_year is not None and start_year > 2025:
         return start_year, end_year, effective_start_year, effective_end_year, warnings, "Khoảng thời gian yêu cầu nằm ngoài dữ liệu hiện có."
+
     if end_year is not None and end_year < 1980:
         return start_year, end_year, effective_start_year, effective_end_year, warnings, "Khoảng thời gian yêu cầu nằm ngoài dữ liệu hiện có."
+
     return start_year, end_year, effective_start_year, effective_end_year, warnings, None
 
 
@@ -299,10 +317,28 @@ def _clamp(value: int, min_value: int, max_value: int) -> int:
     return max(min_value, min(max_value, int(value)))
 
 
+def _normalize_country_groups(raw_groups: list[Any]) -> tuple[list[str], list[str]]:
+    valid: list[str] = []
+    invalid: list[str] = []
+
+    for value in raw_groups or []:
+        code = str(value or "").upper().strip()
+        if not code:
+            continue
+        if get_country_group(code):
+            if code not in valid:
+                valid.append(code)
+        elif code not in invalid:
+            invalid.append(code)
+
+    return valid, invalid
+
+
 def _normalize_country_codes(raw_countries: list[Any]) -> tuple[list[str], list[str]]:
     normalized_codes = [str(value or "").upper().strip() for value in raw_countries]
     valid_candidates = [code for code in normalized_codes if code in COUNTRIES]
     drop_nam = "NAM" in normalized_codes and any(code != "NAM" for code in valid_candidates)
+
     valid: list[str] = []
     invalid: list[str] = []
 

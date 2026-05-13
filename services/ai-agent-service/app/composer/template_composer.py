@@ -175,6 +175,43 @@ def compose_unsupported_answer(warnings: list[str] | None = None) -> str:
     )
 
 
+def compose_no_data_answer(
+    validation_reason: str | None = None,
+    warnings: list[str] | None = None,
+    validated_query: dict[str, Any] | None = None,
+) -> str:
+    query = validated_query or {}
+    indicator_code = query.get("indicator")
+    label = get_indicator_label(indicator_code)
+
+    start_year = query.get("start_year")
+    end_year = query.get("end_year")
+    period = format_year_range(start_year, end_year)
+
+    cleaned_warnings = []
+    for warning in warnings or []:
+        text = sanitize_user_facing_text(str(warning or "").strip())
+        if text and text not in cleaned_warnings:
+            cleaned_warnings.append(text)
+
+    if validation_reason:
+        cleaned_reason = sanitize_user_facing_text(validation_reason)
+    else:
+        cleaned_reason = ""
+
+    if cleaned_reason and "ngoài dữ liệu hiện có" in cleaned_reason.lower():
+        answer = f"Không có dữ liệu phù hợp cho {label} trong {period}. {cleaned_reason}"
+    elif cleaned_reason:
+        answer = f"Không có dữ liệu phù hợp cho {label} trong {period}. {cleaned_reason}"
+    else:
+        answer = f"Không tìm thấy dữ liệu phù hợp cho {label} trong {period}."
+
+    if cleaned_warnings:
+        answer = f"{answer} " + " ".join(cleaned_warnings)
+
+    return sanitize_user_facing_text(answer)
+
+
 def compose_compare_answer(
     indicator_code: str | None,
     country_codes: list[str],

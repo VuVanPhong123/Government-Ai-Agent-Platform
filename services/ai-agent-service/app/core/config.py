@@ -17,6 +17,16 @@ class Settings(BaseSettings):
     enable_hybrid_v2_fallback: bool = True
     hybrid_v2_debug: bool = True
 
+    enable_rule_first_router: bool = True
+    enable_front_llm_router: bool = True
+    enable_parser_agent: bool = True
+    enable_db_truth_validator: bool = True
+    enable_result_validator: bool = True
+    enable_deterministic_data_composer: bool = True
+    enable_gemini_numeric_composer: bool = False
+
+    canonical_catalog_version: str = "canonical_db_v1"
+
     enable_gemini: bool = False
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-3.1-flash-lite-preview"
@@ -34,7 +44,8 @@ class Settings(BaseSettings):
     parser_debug: bool = False
     parser_hybrid_allowed_intents: str = (
         "COMPARE_COUNTRIES,RANKING,TIME_SERIES,TREND_ANALYSIS,VALUE_LOOKUP,"
-        "COVERAGE,RANK_BY_CHANGE,COMPARE_INDICATORS,ANOMALY_DETECTION"
+        "COVERAGE,RANK_BY_CHANGE,COMPARE_INDICATORS,ANOMALY_DETECTION,"
+        "NEED_CLARIFICATION,UNSUPPORTED,OFF_TOPIC"
     )
 
     model_config = SettingsConfigDict(
