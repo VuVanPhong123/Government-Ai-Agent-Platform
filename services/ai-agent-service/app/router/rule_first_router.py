@@ -32,6 +32,8 @@ FOLLOW_UP_ANALYSIS_KEYWORDS = (
     "xu huong nay",
 )
 
+
+
 FOLLOW_UP_MODIFY_KEYWORDS = (
     "them",
     "doi giai doan",
@@ -56,6 +58,31 @@ FOLLOW_UP_MODIFY_KEYWORDS = (
     "thap nhat",
     "cao nhat",
     "doi thanh",
+)
+
+GENERAL_EXPLANATION_KEYWORDS = (
+    "la gi",
+    "là gì",
+    "nghia la gi",
+    "nghĩa là gì",
+    "y nghia",
+    "ý nghĩa",
+    "cach hieu",
+    "cách hiểu",
+    "dung de",
+    "dùng để",
+    "phan anh dieu gi",
+    "phản ánh điều gì",
+    "phan anh gi",
+    "phản ánh gì",
+    "cho biet dieu gi",
+    "cho biết điều gì",
+    "dung de danh gia",
+    "dùng để đánh giá",
+    "noi len dieu gi",
+    "nói lên điều gì",
+    "the hien dieu gi",
+    "thể hiện điều gì",
 )
 
 COVERAGE_KEYWORDS = (
@@ -131,7 +158,18 @@ def run_rule_first_router(
             needs_db=False,
             reason="Deterministic off-topic keyword matched.",
         )
-
+    if indicator_match and _contains_any(normalized, GENERAL_EXPLANATION_KEYWORDS):
+        return RuleRouteDraft(
+            matched=True,
+            route="GENERAL_EXPLANATION",
+            confidence=0.95,
+            needs_front_llm=False,
+            needs_parser_agent=False,
+            needs_db=False,
+            intent_hint="GENERAL_EXPLANATION",
+            draft_indicators=[indicator_match.indicator.code],
+            reason="General explanation keyword matched with supported indicator.",
+        )
     if unsupported_match:
         return RuleRouteDraft(
             matched=True,

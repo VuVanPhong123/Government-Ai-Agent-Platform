@@ -34,7 +34,7 @@ from app.conversation.context_store import summarize_rows, update_conversation_c
 from app.conversation.followup_merge import merge_followup_query
 from app.core.config import settings
 from app.executor.tool_executor import execute_query_plan
-from app.catalog.canonical_indicator_catalog import resolve_indicator_alias
+from app.catalog.canonical_indicator_catalog import normalize_catalog_text, resolve_indicator_alias
 from app.catalog.country_group_catalog import resolve_country_groups
 from app.parser.parser_service_client import call_parser_service
 from app.parser.parser_agent import run_parser_agent
@@ -219,9 +219,54 @@ def run_hybrid_v2_pipeline(
         if not validation.validated_query:
             return None
 
+        if validation.validated_query.get("intent") in {"DIRECT_ANSWER", "GENERAL_EXPLANATION"}:
+            return _direct_explanation_response(
+                payload=payload,
+                message=message,
+                rule_draft=rule_draft,
+                router_debug=_router_debug(
+                    validation.validated_query.get("route") or validation.validated_query.get("intent"),
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+            )
+
+        if validation.validated_query.get("intent") == "OFF_TOPIC":
+            return _off_topic_response(
+                payload=payload,
+                message=message,
+                rule_draft=rule_draft,
+                router_debug=_router_debug(
+                    "OFF_TOPIC",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+            )
+
         plan = build_plan_from_validated_query(validation.validated_query)
         if plan.tool_name == "none":
-            return None
+            return _unsupported_response(
+                payload=payload,
+                message=message,
+                unsupported_terms=["Dạng yêu cầu này hiện chưa được hỗ trợ"],
+                rule_draft=rule_draft,
+                candidate=candidate,
+                validation=validation,
+                router_debug=_router_debug(
+                    validation.validated_query.get("route") or "DATA_QUERY",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+            )
 
         executed = execute_query_plan(plan)
         result = executed["result"]
@@ -259,19 +304,43 @@ def _followup_analysis_response(
     rule_draft: Any,
     router_debug: dict[str, Any] | None = None,
 ) -> AiChatResponse:
+    summary = router_context.get("last_data_summary") or {}
     answer = _compose_followup_analysis_from_context(router_context)
+
     response = AiChatResponse(
         answer=sanitize_user_facing_text(answer),
         questionType="VALID_SIMPLE_QUERY",
         status="success",
-        data=[{"message": message, "route": "FOLLOW_UP_ANALYSIS", "previousDataSummary": summary}],
+        data=[
+            {
+                "message": message,
+                "route": "FOLLOW_UP_ANALYSIS",
+                "previousDataSummary": summary,
+            }
+        ],
         chart=AiAgentChartConfig(type="none"),
         warnings=[],
-        metadata=_metadata("template", ["rule_first_router", "conversation_context"], rule_draft=rule_draft),
+        metadata=_metadata(
+            "template",
+            ["rule_first_router", "conversation_context"],
+            rule_draft=rule_draft,
+        ),
         parsedQuery=previous_context.get("last_parsed_query") or None,
         parserDebug=None,
-        routerDebug=router_debug or {"route": "FOLLOW_UP_ANALYSIS", "pipeline": "hybrid_v2", "ruleFirst": asdict(rule_draft)},
+        routerDebug=router_debug
+        or {
+            "route": "FOLLOW_UP_ANALYSIS",
+            "pipeline": "hybrid_v2",
+            "ruleFirst": asdict(rule_draft),
+            "executed_front_router": False,
+            "executed_model_parser": False,
+            "executed_parser_agent": False,
+            "executed_db": False,
+            "needs_parser": False,
+            "needs_db": False,
+        },
     )
+
     update_conversation_context(
         payload.conversationId,
         {
@@ -282,6 +351,7 @@ def _followup_analysis_response(
             "last_question_type": response.questionType,
         },
     )
+
     return response
 
 def _compose_followup_analysis_from_context(router_context: dict[str, Any]) -> str:
@@ -433,7 +503,8 @@ def _direct_explanation_response(
 
 
 def _compose_direct_explanation_template(message: str) -> str:
-    normalized = message.lower()
+    normalized = normalize_catalog_text(message)
+    raw_lower = message.lower()
 
     if "gdp per capita" in normalized or "bình quân đầu người" in normalized or "binh quan dau nguoi" in normalized or "income per capita" in normalized:
         return (
@@ -484,8 +555,12 @@ def _compose_direct_explanation_template(message: str) -> str:
     if "lạm phát cpi" in normalized or "lam phat cpi" in normalized or "cpi" in normalized:
         return "Lạm phát CPI là mức tăng của chỉ số giá tiêu dùng, phản ánh thay đổi giá của rổ hàng hóa và dịch vụ tiêu dùng."
 
-    if "thất nghiệp" in normalized or "that nghiep" in normalized or "unemployment" in normalized:
-        return "Tỷ lệ thất nghiệp phản ánh phần lực lượng lao động đang không có việc làm nhưng có nhu cầu và sẵn sàng làm việc."
+    if "that nghiep" in normalized or "unemployment" in normalized or "thất nghiệp" in raw_lower:
+        return (
+            "Tỷ lệ thất nghiệp phản ánh phần lực lượng lao động đang không có việc làm "
+            "nhưng có nhu cầu và sẵn sàng làm việc. Chỉ số này thường được dùng để đánh giá "
+            "sức khỏe thị trường lao động và mức độ hấp thụ việc làm của nền kinh tế."
+        )
 
     if "tax revenue" in normalized or "thu thuế" in normalized or "thu thue" in normalized:
         return "Tax revenue/GDP là thu thuế so với GDP, thường dùng để đánh giá năng lực huy động nguồn thu thuế của một nền kinh tế."
@@ -849,21 +924,41 @@ def _debug_route_for_invalid(candidate: Any, validation: Any) -> str:
 
 
 def _looks_like_general_explanation(message: str) -> bool:
-    normalized = message.lower()
-    return any(
-        token in normalized
-        for token in (
-            "là gì",
-            "la gi",
-            "nghĩa là gì",
-            "nghia la gi",
-            "ý nghĩa",
-            "y nghia",
-            "cách hiểu",
-            "cach hieu",
-            "dùng để",
-            "dung de",
-        )
+    normalized = normalize_catalog_text(message)
+    raw_lower = message.lower()
+
+    direct_patterns = (
+        "la gi",
+        "nghia la gi",
+        "y nghia",
+        "cach hieu",
+        "dung de",
+        "phan anh dieu gi",
+        "phan anh gi",
+        "cho biet dieu gi",
+        "dung de danh gia",
+        "noi len dieu gi",
+        "the hien dieu gi",
+        "khac gi",
+    )
+
+    raw_patterns = (
+        "là gì",
+        "nghĩa là gì",
+        "ý nghĩa",
+        "cách hiểu",
+        "dùng để",
+        "phản ánh điều gì",
+        "phản ánh gì",
+        "cho biết điều gì",
+        "dùng để đánh giá",
+        "nói lên điều gì",
+        "thể hiện điều gì",
+        "khác gì",
+    )
+
+    return any(pattern in normalized for pattern in direct_patterns) or any(
+        pattern in raw_lower for pattern in raw_patterns
     )
 
 
