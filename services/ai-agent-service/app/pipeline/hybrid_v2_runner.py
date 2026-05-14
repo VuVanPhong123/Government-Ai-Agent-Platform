@@ -181,6 +181,10 @@ def run_hybrid_v2_pipeline(
             front_router_decision = _route_with_front_llm(message, router_context, rule_draft)
             executed_front_router = front_router_decision is not None
             front_draft = build_front_router_draft_from_existing_router(_decision_to_dict(front_router_decision), rule_draft)
+
+            if front_draft.rewritten_query:
+                effective_message = front_draft.rewritten_query
+
             candidate = run_parser_agent(
                 user_message=effective_message,
                 conversation_context=router_context,
@@ -678,7 +682,31 @@ def _compose_direct_explanation_template(message: str) -> str:
             "External debt/GNI là nợ nước ngoài so với tổng thu nhập quốc dân, thường dùng để nhìn rủi ro "
             "phụ thuộc vốn bên ngoài và khả năng trả nợ ngoại tệ. Hiện dữ liệu của hệ thống chưa có chỉ số này."
         )
+    if (
+        "tang truong gdp thuc" in normalized
+        or "real gdp growth" in normalized
+        or "rgdp growth" in normalized
+        or "gdp thuc yoy" in normalized
+    ):
+        return (
+            "Tăng trưởng GDP thực YoY là tốc độ tăng của GDP thực so với năm trước, "
+            "đã loại bớt ảnh hưởng của thay đổi giá. Chỉ số này thường dùng để đánh giá "
+            "nền kinh tế tăng trưởng thực chất nhanh hay chậm qua từng năm."
+        )
 
+    if "poverty headcount" in normalized or "ty le ngheo" in normalized or "tỷ lệ nghèo" in raw_lower:
+        return (
+            "Poverty headcount là tỷ lệ dân số sống dưới ngưỡng nghèo. "
+            "Chỉ số này thường dùng để đánh giá mức độ nghèo đói và khả năng bao phủ "
+            "của tăng trưởng, việc làm và chính sách an sinh đối với người dân."
+        )
+
+    if "reer deviation" in normalized or "do lech reer" in normalized or "độ lệch reer" in raw_lower:
+        return (
+            "REER deviation là độ lệch của tỷ giá hiệu dụng thực so với xu hướng hoặc mức tham chiếu. "
+            "Chỉ số này giúp nhận diện áp lực mất cân đối tỷ giá, khả năng đồng tiền bị định giá cao/thấp "
+            "và rủi ro cạnh tranh bên ngoài."
+        )
     if "fiscal balance" in normalized or "budget balance" in normalized or "cán cân ngân sách" in normalized or "can can ngan sach" in normalized:
         return (
             "Fiscal balance/GDP là cán cân ngân sách so với GDP. "
@@ -740,7 +768,7 @@ def _clarification_response(
         warnings=clean_questions,
         metadata=_metadata("template", ["rule_first_router"], rule_draft=rule_draft, candidate=candidate, validation=validation),
         parsedQuery=asdict(candidate) if candidate else None,
-        parserDebug=asdict(candidate) if candidate else None,
+        parserDebug=_parser_debug_from_candidate(candidate, router_debug),
         routerDebug=router_debug or {"route": "NEED_CLARIFICATION", "pipeline": "hybrid_v2", "ruleFirst": asdict(rule_draft)},
     )
     _update_basic(payload.conversationId, message, answer, "NEED_CLARIFICATION", "needs_clarification", response.questionType)
@@ -767,7 +795,7 @@ def _unsupported_response(
         warnings=[],
         metadata=_metadata("template", ["rule_first_router", "parser_agent", "query_validator"], rule_draft=rule_draft, candidate=candidate, validation=validation, unsupported_terms=unsupported_terms),
         parsedQuery=asdict(candidate),
-        parserDebug=asdict(candidate),
+        parserDebug=_parser_debug_from_candidate(candidate, router_debug),
         routerDebug=router_debug or {"route": "DATA_QUERY", "intent": "UNSUPPORTED", "pipeline": "hybrid_v2", "ruleFirst": asdict(rule_draft)},
     )
     _update_basic(payload.conversationId, message, answer, "UNSUPPORTED", "unsupported", response.questionType, parsed_query=asdict(candidate))
@@ -903,7 +931,7 @@ def _empty_result_no_data_response(
             validated_query=validated_query,
         ),
         parsedQuery=asdict(candidate),
-        parserDebug=asdict(candidate),
+        parserDebug=_parser_debug_from_candidate(candidate, router_debug),
         routerDebug={
             **router_debug,
             "route": validated_query.get("route"),
@@ -1040,7 +1068,7 @@ def _data_response(
         warnings=warnings,
         metadata=metadata,
         parsedQuery=asdict(candidate),
-        parserDebug=asdict(candidate),
+        parserDebug=_parser_debug_from_candidate(candidate, router_debug),
         routerDebug={
             **router_debug,
             "route": validated_query.get("route"),
@@ -1348,7 +1376,7 @@ def _router_debug(
 def _model_parsed_from_query(query: dict[str, Any]) -> dict[str, Any]:
     indicators = query.get("indicators") or ([query["indicator"]] if query.get("indicator") else [])
     return {
-        "intent": query.get("intent") or "RANKING",
+        "intent": query.get("intent") or _infer_intent_from_query(query),
         "indicators": indicators,
         "countries": query.get("countries") or [],
         "country_groups": query.get("country_groups") or [],
@@ -1359,6 +1387,25 @@ def _model_parsed_from_query(query: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _infer_intent_from_query(query: dict[str, Any]) -> str:
+    countries = list(query.get("countries") or [])
+    country_groups = list(query.get("country_groups") or [])
+
+    if query.get("limit") or query.get("ranking_order"):
+        return "RANKING"
+
+    if len(countries) >= 2:
+        return "COMPARE_COUNTRIES"
+
+    if country_groups and (query.get("limit") or query.get("ranking_order")):
+        return "RANKING"
+
+    if countries or country_groups:
+        return "TIME_SERIES"
+
+    return "VALUE_LOOKUP"
+
+
 def _dedupe_strings(values: list[Any]) -> list[str]:
     result: list[str] = []
     for value in values:
@@ -1366,6 +1413,24 @@ def _dedupe_strings(values: list[Any]) -> list[str]:
         if text and text not in result:
             result.append(text)
     return result
+
+
+def _parser_debug_from_candidate(candidate: Any | None, router_debug: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    if candidate is None:
+        return None
+
+    debug = {
+        "source": getattr(candidate, "source", "parser_agent"),
+        "confidence": getattr(candidate, "confidence", None),
+        "reason": getattr(candidate, "reason", ""),
+        "candidate_sources": getattr(candidate, "candidate_sources", {}),
+    }
+
+    model_debug = (router_debug or {}).get("parserModelDebug") or {}
+    if model_debug:
+        debug["modelParserDebug"] = model_debug
+
+    return debug
 
 
 def _metadata(

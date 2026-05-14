@@ -65,6 +65,23 @@ COUNTRY_GROUPS: dict[str, CountryGroup] = {
             "JPN",
         ),
     ),
+    "BRICS": CountryGroup(
+        code="BRICS",
+        name_vi="BRICS",
+        name_en="BRICS",
+        aliases=(
+            "BRICS",
+            "nhóm BRICS",
+            "nhom BRICS",
+        ),
+        countries=(
+            "BRA",
+            "RUS",
+            "IND",
+            "CHN",
+            "ZAF",
+        ),
+    ),
 }
 
 

@@ -125,11 +125,30 @@ DATA_QUERY_MARKERS = (
 
 OFF_TOPIC_MARKERS = (
     "thoi tiet",
+    "weather",
     "viet tho",
     "ke chuyen",
     "nau an",
+    "world cup",
+    "bong da",
+    "vo dich world cup",
+    "co phieu",
+    "chung khoan",
+    "tu van mua co phieu",
+    "mua co phieu",
+    "du bao",
+    "du doan",
+    "forecast",
+    "prediction",
+    "predict",
+    "arima",
+    "train model",
+    "huan luyen model",
+    "viet sql",
+    "xoa bang",
+    "delete table",
+    "drop table",
 )
-
 
 def run_rule_first_router(
     user_message: str,

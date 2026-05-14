@@ -73,11 +73,11 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
             reason="Requested indicator is not present in canonical DB-truth catalog.",
         )
 
-    if intent in {"OFF_TOPIC", "DIRECT_ANSWER", "GENERAL_EXPLANATION"}:
+    if intent in {"DIRECT_ANSWER", "GENERAL_EXPLANATION"}:
         return ValidationOutcome(
             ok=True,
             status="success",
-            question_type=intent,
+            question_type="VALID_SIMPLE_QUERY",
             validated_query={
                 "route": normalized_route,
                 "intent": intent,
@@ -93,7 +93,30 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
                 "ranking_order": None,
                 "warnings": [],
             },
-            reason="Non-data route validated.",
+            reason="Non-data explanation route validated.",
+        )
+
+    if intent == "OFF_TOPIC":
+        return ValidationOutcome(
+            ok=True,
+            status="off_topic",
+            question_type="OFF_TOPIC",
+            validated_query={
+                "route": normalized_route,
+                "intent": intent,
+                "indicator": None,
+                "indicators": [],
+                "countries": [],
+                "country_groups": [],
+                "start_year": None,
+                "end_year": None,
+                "effective_start_year": None,
+                "effective_end_year": None,
+                "limit": None,
+                "ranking_order": None,
+                "warnings": [],
+            },
+            reason="Off-topic route validated.",
         )
 
     if intent in DATA_QUERY_INTENTS and not candidate.indicators:

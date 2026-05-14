@@ -1056,6 +1056,7 @@ def _update_context_query_success(
     row_summary = summarize_rows(rows, settings.conversation_context_max_rows)
     chart_dict = chart.model_dump()
     chart_without_data = {key: value for key, value in chart_dict.items() if key != "data"}
+    resolved = metadata.get("resolved", {}) or {}
     update_conversation_context(
         conversation_id,
         {
@@ -1065,6 +1066,21 @@ def _update_context_query_success(
             "last_status": response.status,
             "last_question_type": response.questionType,
             "last_parsed_query": parse_result.parsed_query or {},
+            "last_validated_query": {
+                "route": router_decision.route,
+                "intent": (parse_result.parsed_query or {}).get("intent"),
+                "indicator": indicator_code,
+                "indicators": [indicator_code] if indicator_code else [],
+                "countries": country_codes,
+                "country_groups": [],
+                "start_year": resolved.get("start_year"),
+                "end_year": resolved.get("end_year"),
+                "effective_start_year": resolved.get("start_year"),
+                "effective_end_year": resolved.get("end_year"),
+                "limit": response.data[0].get("plan", {}).get("arguments", {}).get("limit") if response.data else None,
+                "ranking_order": response.data[0].get("plan", {}).get("arguments", {}).get("order") if response.data else None,
+                "warnings": [],
+            },
             "last_query_plan": plan_to_dict(parse_result.plan),
             "last_result_validation": {},
             "last_rows": row_summary["top_rows"],

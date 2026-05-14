@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     parser_debug: bool = False
     parser_hybrid_allowed_intents: str = (
         "COMPARE_COUNTRIES,RANKING,TIME_SERIES,TREND_ANALYSIS,VALUE_LOOKUP,"
-        "COVERAGE,RANK_BY_CHANGE,COMPARE_INDICATORS,ANOMALY_DETECTION,"
+        "COVERAGE,ANOMALY_DETECTION,"
         "NEED_CLARIFICATION,UNSUPPORTED,OFF_TOPIC"
     )
 

@@ -592,9 +592,42 @@ def _direct_answer_fallback(normalized: str) -> str:
     if "trade openness" in normalized or "do mo thuong mai" in normalized:
         return "Trade openness là tỷ lệ tổng thương mại so với GDP. Chỉ số này thường cho biết nền kinh tế phụ thuộc nhiều hay ít vào trao đổi hàng hóa và dịch vụ với bên ngoài."
     if "current account" in normalized or "can can vang lai" in normalized:
-        return "Current account/GDP là cán cân vãng lai so với GDP, phản ánh thặng dư hoặc thâm hụt giao dịch vãng lai so với quy mô nền kinh tế."
+        return (
+            "Current account/GDP là cán cân vãng lai so với GDP, phản ánh thặng dư hoặc thâm hụt "
+            "giao dịch vãng lai so với quy mô nền kinh tế. Hiện dữ liệu của hệ thống chưa có chỉ số này."
+        )
     if "external debt" in normalized or "no nuoc ngoai" in normalized:
-        return "External debt/GNI là nợ nước ngoài so với tổng thu nhập quốc dân, thường dùng để nhìn rủi ro phụ thuộc vốn bên ngoài và khả năng trả nợ ngoại tệ."
+        return (
+            "External debt/GNI là nợ nước ngoài so với tổng thu nhập quốc dân, thường dùng để nhìn rủi ro "
+            "phụ thuộc vốn bên ngoài và khả năng trả nợ ngoại tệ. Hiện dữ liệu của hệ thống chưa có chỉ số này."
+        )
+    
+    if (
+        "tang truong gdp thuc" in normalized
+        or "real gdp growth" in normalized
+        or "rgdp growth" in normalized
+        or "gdp thuc yoy" in normalized
+    ):
+        return (
+            "Tăng trưởng GDP thực YoY là tốc độ tăng của GDP thực so với năm trước, "
+            "đã loại bớt ảnh hưởng của thay đổi giá. Chỉ số này thường dùng để đánh giá "
+            "nền kinh tế tăng trưởng thực chất nhanh hay chậm qua từng năm."
+        )
+
+    if "poverty headcount" in normalized or "ty le ngheo" in normalized:
+        return (
+            "Poverty headcount là tỷ lệ dân số sống dưới ngưỡng nghèo. "
+            "Chỉ số này thường dùng để đánh giá mức độ nghèo đói và khả năng bao phủ "
+            "của tăng trưởng, việc làm và chính sách an sinh đối với người dân."
+        )
+
+    if "reer deviation" in normalized or "do lech reer" in normalized:
+        return (
+            "REER deviation là độ lệch của tỷ giá hiệu dụng thực so với xu hướng hoặc mức tham chiếu. "
+            "Chỉ số này giúp nhận diện áp lực mất cân đối tỷ giá, khả năng đồng tiền bị định giá cao/thấp "
+            "và rủi ro cạnh tranh bên ngoài."
+        )
+
     if "fiscal balance" in normalized or "budget balance" in normalized or "can can ngan sach" in normalized:
         return "Fiscal balance/GDP là cán cân ngân sách so với GDP. Giá trị dương thường là thặng dư ngân sách, còn giá trị âm thường là thâm hụt ngân sách."
     if "gfcf" in normalized or "gross fixed capital formation" in normalized or "dau tu co dinh" in normalized:

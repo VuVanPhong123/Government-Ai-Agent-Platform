@@ -35,6 +35,7 @@ def build_plan_from_validated_query(validated_query: dict[str, Any]) -> QueryPla
                 "year": year,
                 "limit": validated_query.get("limit") or 10,
                 "order": validated_query.get("ranking_order") or "desc",
+                "country_codes": countries,
             },
             warnings=warnings,
         )

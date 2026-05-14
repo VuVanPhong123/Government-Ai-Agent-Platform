@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from typing import Any
 
 from app.catalog.canonical_indicator_catalog import (
@@ -36,15 +37,33 @@ def route_with_front_llm_draft(
     )
 
     try:
-        text = generate_gemini_text(prompt, settings.gemini_router_model)
+        text = _generate_with_timeout(prompt)
         parsed = _parse_json_object(text)
         return _sanitize_front_router_result(parsed)
-    except (GeminiClientError, json.JSONDecodeError, ValueError) as error:
+    except (GeminiClientError, json.JSONDecodeError, ValueError, TimeoutError) as error:
         logger.warning("Front LLM router failed: %s", error)
         return None
     except Exception:
         logger.exception("Unexpected Front LLM router error")
         return None
+
+
+def _generate_with_timeout(prompt: str) -> str:
+    timeout_seconds = max(settings.gemini_router_timeout_ms, 1) / 1000
+
+    executor = ThreadPoolExecutor(max_workers=1)
+    future = executor.submit(
+        generate_gemini_text,
+        prompt,
+        settings.gemini_router_model,
+    )
+
+    try:
+        return future.result(timeout=timeout_seconds)
+    except FutureTimeoutError as error:
+        raise TimeoutError("Front LLM router timeout") from error
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
 
 def _parse_json_object(text: str) -> dict[str, Any]:

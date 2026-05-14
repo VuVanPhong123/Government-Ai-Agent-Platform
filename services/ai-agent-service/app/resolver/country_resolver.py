@@ -57,7 +57,7 @@ COUNTRIES: dict[str, CountryMeta] = {
     "IDN": _country("IDN", "Indonesia", "Indo"),
     "IRN": _country("IRN", "Iran"),
     "IRL": _country("IRL", "Ireland", "Ai Len"),
-    "ITA": _country("ITA", "Italy", "Italia", "Ý", "Y"),
+    "ITA": _country("ITA", "Italy", "Italia", "Ý"),
     "JAM": _country("JAM", "Jamaica"),
     "JPN": _country("JPN", "Japan", "Nhật Bản", "Nhat Ban"),
     "KAZ": _country("KAZ", "Kazakhstan"),

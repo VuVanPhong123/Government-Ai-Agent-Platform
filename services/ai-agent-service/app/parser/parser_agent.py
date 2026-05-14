@@ -87,11 +87,7 @@ def run_parser_agent(
         front_draft=front_draft,
         model_parsed=model_parsed,
     )
-    route = _first_text(
-        rule_draft.route if rule_draft else None,
-        front_draft.route if front_draft else None,
-        "DATA_QUERY",
-    )
+    route = _choose_route(rule_draft, front_draft)
 
     clarification_questions = _dedupe(
         [
@@ -129,6 +125,27 @@ def run_parser_agent(
             "model_parser": isinstance(model_parsed, dict),
         },
     )
+
+def _choose_route(
+    rule_draft: RuleRouteDraft | None,
+    front_draft: FrontRouterDraft | None,
+) -> str:
+    rule_route = rule_draft.route if rule_draft else None
+    front_route = front_draft.route if front_draft else None
+
+    if front_route in {"FOLLOW_UP_ANALYSIS", "FOLLOW_UP_MODIFY_QUERY"}:
+        return front_route
+
+    if rule_route in {"FOLLOW_UP_ANALYSIS", "FOLLOW_UP_MODIFY_QUERY"}:
+        return rule_route
+
+    if rule_route in {"UNSUPPORTED", "OFF_TOPIC", "NEED_CLARIFICATION"}:
+        return rule_route
+
+    if front_route in {"UNSUPPORTED", "OFF_TOPIC", "NEED_CLARIFICATION"}:
+        return front_route
+
+    return rule_route or front_route or "DATA_QUERY"
 
 def _normalize_model_countries(model_parsed: dict[str, Any], user_message: str) -> list[str]:
     raw_codes = _string_list(model_parsed.get("countries"))
@@ -219,9 +236,6 @@ def _normalize_model_indicators(model_parsed: dict[str, Any]) -> tuple[list[str]
         if unsupported:
             unsupported_terms.append(unsupported.label_vi)
             continue
-
-        # Ignore unknown model-generated indicator codes. The deterministic
-        # resolver/validator decide whether a valid DB-truth candidate exists.
 
     for raw in _string_list(model_parsed.get("unsupported_terms")):
         unsupported = detect_unsupported_indicator(str(raw))

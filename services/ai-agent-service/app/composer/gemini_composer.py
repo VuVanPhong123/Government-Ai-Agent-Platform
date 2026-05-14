@@ -36,8 +36,9 @@ def should_use_gemini(question_type: str, row_count: int, user_message: str = ""
         "VALID_ANOMALY_QUERY",
         "VALID_SIMPLE_QUERY",
     }
-    if question_type in numeric_data_question_types and row_count > 0:
-        return False
+
+    if question_type in numeric_data_question_types:
+        return bool(settings.enable_gemini_numeric_composer and row_count > 0)
 
     if question_type in {
         "OFF_TOPIC",
@@ -62,13 +63,7 @@ def should_use_gemini(question_type: str, row_count: int, user_message: str = ""
         "why",
         "analyze",
     )
-    if any(keyword in normalized_message for keyword in analysis_keywords):
-        return True
-
-    if question_type in {"VALID_RANKING_QUERY", "VALID_COMPARE_QUERY", "VALID_COVERAGE_QUERY"}:
-        return False
-
-    return question_type in {"VALID_TREND_QUERY", "VALID_ANOMALY_QUERY"}
+    return any(keyword in normalized_message for keyword in analysis_keywords)
 
 
 def compose_gemini_answer(

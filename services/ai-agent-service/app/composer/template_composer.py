@@ -328,10 +328,34 @@ def compose_coverage_answer(
             f"gồm {row.get('observations')} quan sát."
         )
 
-    lines = [f"Phạm vi dữ liệu {label} theo quốc gia:"]
+    years = []
+    observations = 0
+    for row in rows:
+        try:
+            if row.get("min_year") is not None:
+                years.append(int(row.get("min_year")))
+            if row.get("max_year") is not None:
+                years.append(int(row.get("max_year")))
+            observations += int(row.get("observations") or 0)
+        except (TypeError, ValueError):
+            continue
+
+    summary = f"Phạm vi dữ liệu {label} có {len(rows)} quốc gia"
+    if years:
+        summary += f", bao phủ khoảng {min(years)}-{max(years)}"
+    if observations:
+        summary += f", tổng cộng {observations} quan sát"
+    summary += "."
+
+    lines = [summary]
+    lines.append("Một số quốc gia tiêu biểu:")
     for row in rows[:10]:
         country = get_country_label(row)
         lines.append(f"- {country}: {row.get('min_year')}-{row.get('max_year')}, {row.get('observations')} quan sát")
+
+    if len(rows) > 10:
+        lines.append(f"Bảng bên dưới có đầy đủ {len(rows)} quốc gia được trả về.")
+
     return sanitize_user_facing_text("\n".join(lines))
 
 
