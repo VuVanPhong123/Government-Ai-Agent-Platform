@@ -30,6 +30,7 @@ COUNTRIES: dict[str, CountryMeta] = {
     "BOL": _country("BOL", "Bolivia"),
     "BWA": _country("BWA", "Botswana"),
     "BRA": _country("BRA", "Brazil", "Brasil"),
+    "BRN": _country("BRN", "Brunei", "Brunei Darussalam"),
     "KHM": _country("KHM", "Cambodia", "Campuchia", "Cam-pu-chia"),
     "CAN": _country("CAN", "Canada"),
     "TCD": _country("TCD", "Chad"),
@@ -56,7 +57,7 @@ COUNTRIES: dict[str, CountryMeta] = {
     "IDN": _country("IDN", "Indonesia", "Indo"),
     "IRN": _country("IRN", "Iran"),
     "IRL": _country("IRL", "Ireland", "Ai Len"),
-    "ITA": _country("ITA", "Italy", "Italia", "Ý", "Y"),
+    "ITA": _country("ITA", "Italy", "Italia", "Ý"),
     "JAM": _country("JAM", "Jamaica"),
     "JPN": _country("JPN", "Japan", "Nhật Bản", "Nhat Ban"),
     "KAZ": _country("KAZ", "Kazakhstan"),
@@ -90,6 +91,7 @@ COUNTRIES: dict[str, CountryMeta] = {
     "ROU": _country("ROU", "Romania"),
     "RUS": _country("RUS", "Russia", "Nga"),
     "SAU": _country("SAU", "Saudi Arabia"),
+    "SGP": _country("SGP", "Singapore", "Xin-ga-po", "Singapura"),
     "ZAF": _country("ZAF", "South Africa"),
     "KOR": _country("KOR", "South Korea", "Korea", "Hàn Quốc", "Han Quoc"),
     "ESP": _country("ESP", "Spain", "Tây Ban Nha", "Tay Ban Nha"),
@@ -124,12 +126,38 @@ def _contains_country_alias(normalized_text: str, normalized_alias: str) -> bool
     return re.search(rf"(^|\s){re.escape(normalized_alias)}($|\s)", normalized_text) is not None
 
 
+def _contains_iso3_token(raw_text: str, code: str) -> bool:
+    return re.search(rf"(?<![A-Za-z0-9]){re.escape(code)}(?![A-Za-z0-9])", raw_text) is not None
+
+
+def _alias_position(normalized_text: str, alias: str) -> int:
+    normalized_alias = normalize_text(alias)
+    if not normalized_alias:
+        return 10**9
+    match = re.search(rf"(^|\s){re.escape(normalized_alias)}($|\s)", normalized_text)
+    if match:
+        return match.start()
+    return 10**9
+
+
 def resolve_countries(message: str) -> list[CountryMatch]:
     normalized_message = normalize_text(message)
     matches: list[CountryMatch] = []
 
     for country in COUNTRIES.values():
-        aliases = (country.code, country.name, *country.aliases)
+        if _contains_iso3_token(message, country.code):
+            matches.append(CountryMatch(country=country, matched_alias=country.code))
+            continue
+
+        aliases = sorted(
+            {
+                alias
+                for alias in (country.name, *country.aliases)
+                if alias and alias != country.code
+            },
+            key=lambda item: len(normalize_text(item)),
+            reverse=True,
+        )
 
         for alias in aliases:
             normalized_alias = normalize_text(alias)
@@ -146,6 +174,7 @@ def resolve_countries(message: str) -> list[CountryMatch]:
             seen.add(match.country.code)
             unique_matches.append(match)
 
+    unique_matches.sort(key=lambda match: _alias_position(normalized_message, match.matched_alias))
     return unique_matches
 
 

@@ -12,6 +12,7 @@ QuestionType = Literal[
     "VALID_TREND_QUERY",
     "VALID_ANOMALY_QUERY",
     "VALID_COVERAGE_QUERY",
+    "NO_DATA",
     "UNSUPPORTED",
     "UNSUPPORTED_DATA_QUERY",
 ]
@@ -49,6 +50,14 @@ class AiAgentMetadata(BaseModel):
     countries: list[str] = Field(default_factory=list)
     years: list[int] = Field(default_factory=list)
     resolved: dict[str, Any] | None = None
+    validation: dict[str, Any] | None = None
+    resultValidation: dict[str, Any] | None = None
+    ruleFirst: dict[str, Any] | None = None
+    parserAgent: dict[str, Any] | None = None
+    unsupportedTerms: list[str] = Field(default_factory=list)
+    missingCountries: list[str] = Field(default_factory=list)
+    pipeline: str | None = None
+    fallbackUsed: bool | None = None
 
 
 class AiChatResponse(BaseModel):
@@ -59,6 +68,7 @@ class AiChatResponse(BaseModel):
     chart: AiAgentChartConfig = Field(default_factory=AiAgentChartConfig)
     parsedQuery: dict[str, Any] | None = None
     parserDebug: dict[str, Any] | None = None
+    routerDebug: dict[str, Any] | None = None
     clarificationQuestions: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     metadata: AiAgentMetadata = Field(default_factory=AiAgentMetadata)
