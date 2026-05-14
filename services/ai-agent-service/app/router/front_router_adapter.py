@@ -10,19 +10,22 @@ def build_front_router_draft_from_existing_router(
     data = router_result if isinstance(router_result, dict) else {}
 
     if data:
+        route = _optional_str(data.get("route"))
+        clarification_question = _optional_str(data.get("clarification_question"))
+        clarification_questions = _string_list(data.get("clarification_questions"))
+        if clarification_question and clarification_question not in clarification_questions:
+            clarification_questions.insert(0, clarification_question)
+        default_needs_parser = route in {None, "DATA_QUERY", "FOLLOW_UP_MODIFY_QUERY"}
+        default_needs_db = route in {None, "DATA_QUERY", "FOLLOW_UP_MODIFY_QUERY"}
+
         return FrontRouterDraft(
-            route=_optional_str(data.get("route")),
-            intent_hint=_optional_str(data.get("intent") or data.get("intent_hint")),
+            route=route,
+            answer=_optional_str(data.get("answer")),
             rewritten_query=_optional_str(data.get("rewritten_query")),
-            draft_indicators=_string_list(data.get("draft_indicators") or data.get("indicators")),
-            draft_countries=_string_list(data.get("draft_countries") or data.get("countries")),
-            draft_country_groups=_string_list(data.get("draft_country_groups") or data.get("country_groups")),
-            draft_start_year=_int_or_none(data.get("draft_start_year") or data.get("start_year")),
-            draft_end_year=_int_or_none(data.get("draft_end_year") or data.get("end_year")),
-            draft_limit=_int_or_none(data.get("draft_limit") or data.get("limit")),
-            draft_ranking_order=_optional_str(data.get("draft_ranking_order") or data.get("ranking_order")),
-            unsupported_terms=_string_list(data.get("unsupported_terms")),
-            clarification_questions=_string_list(data.get("clarification_questions")),
+            needs_parser=_bool_or_default(data.get("needs_parser"), default_needs_parser),
+            needs_db=_bool_or_default(data.get("needs_db"), default_needs_db),
+            clarification_question=clarification_question,
+            clarification_questions=clarification_questions,
             uses_previous_context=bool(data.get("uses_previous_context") or data.get("uses_previous_result")),
             confidence=_float_or_zero(data.get("confidence")),
             reason=_optional_str(data.get("reason")) or "",
@@ -34,6 +37,9 @@ def build_front_router_draft_from_existing_router(
     return FrontRouterDraft(
         route=rule_draft.route,
         intent_hint=rule_draft.intent_hint,
+        needs_parser=rule_draft.needs_parser_agent,
+        needs_db=rule_draft.needs_db,
+        clarification_question=rule_draft.clarification_questions[0] if rule_draft.clarification_questions else None,
         draft_indicators=list(rule_draft.draft_indicators),
         draft_countries=list(rule_draft.draft_countries),
         draft_country_groups=list(rule_draft.draft_country_groups),
@@ -80,3 +86,9 @@ def _float_or_zero(value: Any) -> float:
         return float(value)
     except (TypeError, ValueError):
         return 0.0
+
+
+def _bool_or_default(value: Any, default: bool) -> bool:
+    if value is None:
+        return default
+    return bool(value)

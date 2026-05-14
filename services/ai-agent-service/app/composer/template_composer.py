@@ -51,9 +51,59 @@ def _best_rows_by_value(rows: list[dict]) -> tuple[dict | None, dict | None]:
     numeric_rows = [row for row in rows if safe_number(_row_value(row)) is not None]
     if not numeric_rows:
         return None, None
-    highest = max(numeric_rows, key=lambda row: safe_number(_row_value(row)) or float("-inf"))
-    lowest = min(numeric_rows, key=lambda row: safe_number(_row_value(row)) or float("inf"))
+    highest = max(numeric_rows, key=lambda row: safe_number(_row_value(row)))
+    lowest = min(numeric_rows, key=lambda row: safe_number(_row_value(row)))
     return highest, lowest
+
+
+def _numeric_rows(items: list[dict]) -> list[dict]:
+    return [
+        row
+        for row in items
+        if isinstance(row, dict)
+        and safe_number(_row_value(row)) is not None
+        and _row_year(row) is not None
+    ]
+
+
+def _actual_period_from_rows(rows: list[dict]) -> tuple[int | None, int | None]:
+    years = [_row_year(row) for row in _numeric_rows(rows)]
+    years = [year for year in years if year is not None]
+    if not years:
+        return None, None
+    return min(years), max(years)
+
+
+def _period_gap_warning(result_validation: dict[str, Any] | None) -> str | None:
+    if not isinstance(result_validation, dict):
+        return None
+    requested_end = result_validation.get("requested_end_year")
+    actual_end = result_validation.get("actual_end_year") or result_validation.get("actual_max_year")
+    if requested_end is not None and actual_end is not None and int(actual_end) < int(requested_end):
+        return f"Dữ liệu hiện có trong kết quả đến năm {actual_end}, sớm hơn năm yêu cầu {requested_end}."
+    requested_start = result_validation.get("requested_start_year")
+    actual_start = result_validation.get("actual_start_year") or result_validation.get("actual_min_year")
+    if requested_start is not None and actual_start is not None and int(actual_start) > int(requested_start):
+        return f"Dữ liệu hiện có trong kết quả bắt đầu từ năm {actual_start}, muộn hơn năm yêu cầu {requested_start}."
+    return None
+
+
+def _dedupe_warning_texts(warnings: list[str]) -> list[str]:
+    cleaned: list[str] = []
+    semantic_seen: set[str] = set()
+    for warning in warnings:
+        text = sanitize_user_facing_text(str(warning or "").strip())
+        if not text:
+            continue
+        lowered = text.lower()
+        key = lowered
+        if "không tìm thấy dữ liệu phù hợp" in lowered or "không có dữ liệu phù hợp" in lowered:
+            key = "no_data"
+        if key in semantic_seen:
+            continue
+        semantic_seen.add(key)
+        cleaned.append(text)
+    return cleaned
 
 
 def compose_off_topic_answer() -> str:
@@ -188,28 +238,28 @@ def compose_no_data_answer(
     end_year = query.get("end_year")
     period = format_year_range(start_year, end_year)
 
-    cleaned_warnings = []
-    for warning in warnings or []:
-        text = sanitize_user_facing_text(str(warning or "").strip())
-        if text and text not in cleaned_warnings:
-            cleaned_warnings.append(text)
+    cleaned_warnings = _dedupe_warning_texts(warnings or [])
 
-    if validation_reason:
-        cleaned_reason = sanitize_user_facing_text(validation_reason)
-    else:
-        cleaned_reason = ""
+    cleaned_reason = sanitize_user_facing_text(validation_reason or "")
 
-    if cleaned_reason and "ngoài dữ liệu hiện có" in cleaned_reason.lower():
-        answer = f"Không có dữ liệu phù hợp cho {label} trong {period}. {cleaned_reason}"
-    elif cleaned_reason:
-        answer = f"Không có dữ liệu phù hợp cho {label} trong {period}. {cleaned_reason}"
-    else:
-        answer = f"Không tìm thấy dữ liệu phù hợp cho {label} trong {period}."
+    first = f"Không tìm thấy dữ liệu phù hợp cho {label} trong {period}."
+    second = "Bạn có thể thử đổi quốc gia, giai đoạn hoặc dùng coverage để kiểm tra phạm vi dữ liệu hiện có."
 
-    if cleaned_warnings:
-        answer = f"{answer} " + " ".join(cleaned_warnings)
+    if cleaned_reason and "không tìm thấy dữ liệu" not in cleaned_reason.lower() and "không có dữ liệu" not in cleaned_reason.lower():
+        second = cleaned_reason
+    elif cleaned_warnings:
+        useful_warning = next(
+            (
+                warning
+                for warning in cleaned_warnings
+                if "không tìm thấy dữ liệu" not in warning.lower() and "không có dữ liệu" not in warning.lower()
+            ),
+            "",
+        )
+        if useful_warning:
+            second = useful_warning
 
-    return sanitize_user_facing_text(answer)
+    return sanitize_user_facing_text(f"{first} {second}")
 
 
 def compose_compare_answer(
@@ -231,10 +281,11 @@ def compose_compare_answer(
     final_rows: list[dict] = []
 
     for country_label, items in _group_rows_by_country(rows):
-        if not items:
+        numeric_items = sorted(_numeric_rows(items), key=lambda row: _row_year(row) or 0)
+        if not numeric_items:
             continue
-        first = items[0]
-        last = items[-1]
+        first = numeric_items[0]
+        last = numeric_items[-1]
         final_rows.append(last)
         start_value = _row_value(first)
         end_value = _row_value(last)
@@ -244,6 +295,8 @@ def compose_compare_answer(
             f"{country_label}: {first.get('year')} là {format_value(start_value, unit)}, "
             f"đến {last.get('year')} là {format_value(end_value, unit)} → {direction}."
         )
+        if end_year is not None and _row_year(last) is not None and int(_row_year(last) or 0) < int(end_year):
+            lines.append(f"  Dữ liệu hiện có của {country_label} kết thúc ở năm {last.get('year')}.")
 
     missing_countries = _missing_country_labels(result_validation)
     is_partial = bool(result_validation and (result_validation.get("is_partial") or missing_countries))
@@ -259,6 +312,13 @@ def compose_compare_answer(
     elif is_partial and missing_countries:
         missing_text = ", ".join(missing_countries)
         lines.append(f"Do thiếu dữ liệu cho {missing_text}, hệ thống không kết luận đầy đủ cho toàn bộ nhóm yêu cầu.")
+
+    if not final_rows:
+        return f"Không tìm thấy dữ liệu số phù hợp cho {label} trong {period}."
+
+    gap_warning = _period_gap_warning(result_validation)
+    if gap_warning and gap_warning not in lines:
+        lines.append(gap_warning)
 
     lines.append("Biểu đồ và bảng bên dưới thể hiện chi tiết theo từng năm.")
     return sanitize_user_facing_text("\n".join(lines))
@@ -377,9 +437,12 @@ def compose_trend_answer(
     grouped = _group_rows_by_country(rows)
     country_text = f" của {grouped[0][0]}" if len(grouped) == 1 else ""
     lines = [f"Xu hướng {label}{country_text} giai đoạn {period}:"]
+    actual_start_year, actual_end_year = _actual_period_from_rows(rows)
+    if actual_start_year is not None and actual_end_year is not None:
+        lines.append(f"Dữ liệu thực tế trong kết quả bao phủ {actual_start_year}-{actual_end_year}.")
 
     for country_label, items in grouped[:5]:
-        numeric_items = [row for row in items if safe_number(_row_value(row)) is not None]
+        numeric_items = sorted(_numeric_rows(items), key=lambda row: _row_year(row) or 0)
         if not numeric_items:
             lines.append(f"- {country_label}: chưa đủ dữ liệu số để tóm tắt.")
             continue
@@ -423,7 +486,10 @@ def compose_anomaly_answer(
     period = format_year_range(start_year, end_year)
 
     if not rows:
-        return f"Không tìm thấy điểm bất thường rõ ràng cho {label} trong {period} với ngưỡng {threshold}."
+        return (
+            f"Không phát hiện điểm bất thường vượt ngưỡng {threshold} cho {label} trong {period}. "
+            "Điều này có nghĩa là không có điểm nào trong kết quả vượt ngưỡng bất thường, không phải là dữ liệu bị lỗi."
+        )
 
     lines = [f"Các điểm bất thường đáng chú ý của {label}:"]
     for index, row in enumerate(rows[:10], start=1):

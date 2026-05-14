@@ -67,7 +67,12 @@ def build_plan_from_validated_query(validated_query: dict[str, Any]) -> QueryPla
         )
 
     if intent in {"TIME_SERIES", "TREND_ANALYSIS", "VALUE_LOOKUP"}:
-        tool_name = "get_indicator_analytics_series" if indicator_has_analytics(indicator_code) and intent == "TREND_ANALYSIS" else "get_indicator_series"
+        use_analytics = (
+            indicator_has_analytics(indicator_code)
+            and intent == "TREND_ANALYSIS"
+            and indicator_code != "poverty_headcount"
+        )
+        tool_name = "get_indicator_analytics_series" if use_analytics else "get_indicator_series"
         return QueryPlan(
             question_type="VALID_TREND_QUERY",
             tool_name=tool_name,

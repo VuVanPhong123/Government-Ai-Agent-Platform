@@ -6,6 +6,8 @@ from app.catalog.canonical_indicator_catalog import (
     indicator_supports_anomaly,
     indicator_supports_trend,
     is_supported_indicator,
+    normalize_catalog_text,
+    resolve_indicator_alias,
 )
 from app.catalog.country_group_catalog import expand_country_groups, get_country_group
 from app.pipeline.schemas import ParsedQueryCandidate, ValidationOutcome
@@ -55,8 +57,9 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
     normalized_route = _normalize_route_for_intent(route, intent)
     unsupported_terms = list(candidate.unsupported_terms)
     warnings: list[str] = []
+    indicators = _normalize_indicators(candidate.indicators, unsupported_terms)
 
-    for indicator_code in candidate.indicators:
+    for indicator_code in indicators:
         unsupported = detect_unsupported_indicator(indicator_code)
         if unsupported:
             unsupported_terms.append(unsupported.label_vi)
@@ -119,10 +122,10 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
             reason="Off-topic route validated.",
         )
 
-    if intent in DATA_QUERY_INTENTS and not candidate.indicators:
+    if intent in DATA_QUERY_INTENTS and not indicators:
         return _needs_indicator()
 
-    for indicator_code in candidate.indicators:
+    for indicator_code in indicators:
         if not is_supported_indicator(indicator_code):
             return ValidationOutcome(
                 ok=False,
@@ -133,7 +136,7 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
                 reason=f"Indicator {indicator_code} is not supported by canonical catalog.",
             )
 
-    indicator_code = candidate.indicators[0] if candidate.indicators else None
+    indicator_code = indicators[0] if indicators else None
     indicator = get_indicator(indicator_code) if indicator_code else None
 
     valid_groups, invalid_groups = _normalize_country_groups(candidate.country_groups)
@@ -222,8 +225,15 @@ def validate_parsed_candidate(candidate: ParsedQueryCandidate) -> ValidationOutc
 
     if intent == "RANKING":
         if effective_end_year is None and effective_start_year is None:
-            effective_start_year = effective_end_year = 2022
-            warnings.append("Chưa xác định năm, hệ thống tạm dùng năm 2022.")
+            return ValidationOutcome(
+                ok=False,
+                status="needs_clarification",
+                question_type="NEED_CLARIFICATION",
+                validated_query=None,
+                warnings=warnings,
+                clarification_questions=["Bạn muốn xếp hạng theo năm nào?"],
+                reason="Ranking query requires an explicit or context-rewritten year.",
+            )
         elif effective_end_year is None:
             effective_end_year = effective_start_year
         elif effective_start_year is None:
@@ -276,6 +286,45 @@ def _needs_indicator() -> ValidationOutcome:
         clarification_questions=[question],
         reason="Data query requires indicator.",
     )
+
+
+def _normalize_indicators(raw_indicators: list[Any], unsupported_terms: list[str]) -> list[str]:
+    indicators: list[str] = []
+    for raw in raw_indicators or []:
+        text = str(raw or "").strip()
+        if not text:
+            continue
+
+        unsupported = detect_unsupported_indicator(text)
+        if unsupported:
+            unsupported_terms.append(unsupported.label_vi)
+            continue
+
+        normalized = normalize_catalog_text(text)
+        alias_override = {
+            "trade open pct gdp": "trade_pct_gdp",
+            "trade openness": "trade_pct_gdp",
+            "trade pct gdp": "trade_pct_gdp",
+            "trade to gdp": "trade_pct_gdp",
+            "gdp pc": "log_rGDP_pc_USD",
+            "gdp per capita": "log_rGDP_pc_USD",
+            "real gdp per capita": "log_rGDP_pc_USD",
+        }.get(normalized)
+        if alias_override:
+            _append_unique(indicators, alias_override)
+            continue
+
+        if is_supported_indicator(text):
+            _append_unique(indicators, text)
+            continue
+
+        alias_match = resolve_indicator_alias(text)
+        if alias_match and is_supported_indicator(alias_match.indicator.code):
+            _append_unique(indicators, alias_match.indicator.code)
+            continue
+
+        _append_unique(indicators, text)
+    return indicators
 
 
 def _question_type(intent: str, indicator_code: str | None, warnings: list[str]) -> str:
@@ -382,3 +431,9 @@ def _dedupe(values: list[Any]) -> list[str]:
         if text and text not in result:
             result.append(text)
     return result
+
+
+def _append_unique(items: list[str], value: str) -> None:
+    text = str(value or "").strip()
+    if text and text not in items:
+        items.append(text)

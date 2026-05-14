@@ -30,14 +30,19 @@ from app.composer.template_composer import (
     compose_unsupported_answer,
     sanitize_clarification_questions,
 )
-from app.conversation.context_store import summarize_rows, update_conversation_context
+from app.conversation.context_store import (
+    make_assistant_turn,
+    make_user_turn,
+    summarize_rows,
+    update_conversation_context,
+)
 from app.conversation.followup_merge import merge_followup_query
 from app.core.config import settings
 from app.executor.tool_executor import execute_query_plan
 from app.catalog.canonical_indicator_catalog import normalize_catalog_text, resolve_indicator_alias
 from app.catalog.country_group_catalog import resolve_country_groups
+from app.parser.normalization_guard import normalize_parser_output
 from app.parser.parser_service_client import call_parser_service
-from app.parser.parser_agent import run_parser_agent
 from app.planner.validated_plan_adapter import build_plan_from_validated_query
 from app.resolver.country_resolver import resolve_countries
 from app.router.front_router_adapter import build_front_router_draft_from_existing_router
@@ -70,48 +75,6 @@ def run_hybrid_v2_pipeline(
             "parserModelDebug": {},
         }
 
-        if (
-            rule_draft.route == "FOLLOW_UP_ANALYSIS"
-            and rule_draft.confidence >= 0.9
-            and rule_draft.uses_previous_context
-            and not rule_draft.needs_db
-            and not rule_draft.needs_parser_agent
-        ):
-            return _followup_analysis_response(
-                payload,
-                message,
-                previous_context,
-                router_context,
-                rule_draft,
-                _router_debug(
-                    "FOLLOW_UP_ANALYSIS",
-                    rule_draft,
-                    front_draft,
-                    front_router_decision,
-                    executed_front_router,
-                    parser_model_debug,
-                ),
-            )
-        if (
-            rule_draft.route == "NEED_CLARIFICATION"
-            and rule_draft.confidence >= 0.9
-            and rule_draft.clarification_questions
-            and not rule_draft.needs_front_llm
-        ):
-            return _clarification_response(
-                payload,
-                message,
-                rule_draft.clarification_questions,
-                rule_draft,
-                router_debug=_router_debug(
-                    "NEED_CLARIFICATION",
-                    rule_draft,
-                    front_draft,
-                    front_router_decision,
-                    executed_front_router,
-                    parser_model_debug,
-                ),
-            )
         if rule_draft.route == "OFF_TOPIC" and rule_draft.confidence >= 0.9:
             return _off_topic_response(
                 payload,
@@ -126,7 +89,7 @@ def run_hybrid_v2_pipeline(
                     parser_model_debug,
                 ),
             )
-        if _looks_like_general_explanation(message):
+        if _looks_like_general_explanation(message) or rule_draft.route == "GENERAL_EXPLANATION":
             return _direct_explanation_response(
                 payload=payload,
                 message=message,
@@ -147,71 +110,110 @@ def run_hybrid_v2_pipeline(
             router_result = _decision_to_dict(front_router_decision)
             front_draft = build_front_router_draft_from_existing_router(router_result, rule_draft)
 
-        effective_message = message
+        if front_draft.route == "GENERAL_EXPLANATION":
+            return _direct_explanation_response(
+                payload=payload,
+                message=message,
+                rule_draft=rule_draft,
+                router_debug=_router_debug(
+                    "GENERAL_EXPLANATION",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+                answer_override=front_draft.answer,
+            )
 
-        if rule_draft.route == "FOLLOW_UP_MODIFY_QUERY" and rule_draft.delta:
-            previous_query = previous_context.get("last_validated_query") or previous_context.get("last_parsed_query") or {}
-            merged_query = merge_followup_query(previous_query, rule_draft.delta)
-            model_parsed = _model_parsed_from_query(merged_query)
-            effective_message = f"{previous_context.get('last_user_message') or ''} {message}".strip()
-        elif rule_draft.route == "FOLLOW_UP_MODIFY_QUERY" and front_draft.rewritten_query:
-            effective_message = front_draft.rewritten_query
-
-        if model_parsed is None and _should_call_parser_model(effective_message, rule_draft, front_draft):
-            model_candidate, parser_model_debug = _call_parser_model_candidate(
-                effective_message,
+        if front_draft.route == "FOLLOW_UP_ANALYSIS":
+            return _followup_analysis_response(
+                payload,
                 message,
+                previous_context,
                 router_context,
                 rule_draft,
-                front_draft,
+                _router_debug(
+                    "FOLLOW_UP_ANALYSIS",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
             )
-            if model_candidate:
-                model_parsed = model_candidate
 
-        candidate = run_parser_agent(
-            user_message=effective_message,
-            conversation_context=router_context,
+        if front_draft.route == "NEED_CLARIFICATION":
+            questions = [front_draft.clarification_question] if front_draft.clarification_question else front_draft.clarification_questions
+            return _clarification_response(
+                payload,
+                message,
+                questions,
+                rule_draft,
+                router_debug=_router_debug(
+                    "NEED_CLARIFICATION",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+            )
+
+        if front_draft.route == "OFF_TOPIC":
+            return _off_topic_response(
+                payload,
+                message,
+                rule_draft,
+                _router_debug(
+                    "OFF_TOPIC",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+            )
+
+        if front_draft.route == "UNSUPPORTED":
+            return _front_unsupported_response(
+                payload=payload,
+                message=message,
+                rule_draft=rule_draft,
+                front_draft=front_draft,
+                router_debug=_router_debug(
+                    "UNSUPPORTED",
+                    rule_draft,
+                    front_draft,
+                    front_router_decision,
+                    executed_front_router,
+                    parser_model_debug,
+                ),
+            )
+
+        standalone_query = _standalone_query_from_front_or_rule(
+            message=message,
+            previous_context=previous_context,
             rule_draft=rule_draft,
             front_draft=front_draft,
-            model_parsed=model_parsed,
+        )
+
+        if front_draft.needs_parser or rule_draft.needs_parser_agent:
+            model_parsed, parser_model_debug = _call_parser_model_candidate(
+                standalone_query=standalone_query,
+                original_message=message,
+                rule_draft=rule_draft,
+                front_draft=front_draft,
+            )
+
+        candidate = normalize_parser_output(
+            parsed=model_parsed,
+            standalone_query=standalone_query,
+            route=front_draft.route or rule_draft.route or "DATA_QUERY",
+            front_draft=front_draft,
+            rule_draft=rule_draft,
         )
         validation = validate_parsed_candidate(candidate)
-
-        if validation.status == "needs_clarification" and not executed_front_router and rule_draft.confidence < 0.9:
-            front_router_decision = _route_with_front_llm(message, router_context, rule_draft)
-            executed_front_router = front_router_decision is not None
-            front_draft = build_front_router_draft_from_existing_router(_decision_to_dict(front_router_decision), rule_draft)
-
-            if front_draft.rewritten_query:
-                effective_message = front_draft.rewritten_query
-
-            candidate = run_parser_agent(
-                user_message=effective_message,
-                conversation_context=router_context,
-                rule_draft=rule_draft,
-                front_draft=front_draft,
-                model_parsed=model_parsed,
-            )
-            validation = validate_parsed_candidate(candidate)
-
-        if validation.status == "needs_clarification" and not parser_model_debug["executed_model_parser"]:
-            model_candidate, parser_model_debug = _call_parser_model_candidate(
-                effective_message,
-                message,
-                router_context,
-                rule_draft,
-                front_draft,
-            )
-            if model_candidate:
-                model_parsed = model_candidate
-            candidate = run_parser_agent(
-                user_message=effective_message,
-                conversation_context=router_context,
-                rule_draft=rule_draft,
-                front_draft=front_draft,
-                model_parsed=model_parsed,
-            )
-            validation = validate_parsed_candidate(candidate)
 
         router_debug = _router_debug(
             validation.validated_query.get("route") if validation.validated_query else _debug_route_for_invalid(candidate, validation),
@@ -247,6 +249,7 @@ def run_hybrid_v2_pipeline(
                     executed_front_router,
                     parser_model_debug,
                 ),
+                answer_override=front_draft.answer,
             )
 
         if validation.validated_query.get("intent") == "OFF_TOPIC":
@@ -364,6 +367,10 @@ def _followup_analysis_response(
             "last_route": "FOLLOW_UP_ANALYSIS",
             "last_status": "success",
             "last_question_type": response.questionType,
+            "append_recent_turns": [
+                make_user_turn(message),
+                make_assistant_turn(response.answer, "success", response.questionType, "FOLLOW_UP_ANALYSIS"),
+            ],
         },
     )
 
@@ -459,8 +466,8 @@ def _compose_followup_analysis_from_context(router_context: dict[str, Any], mess
             )
 
     if len(final_rows) >= 2:
-        highest = max(final_rows, key=lambda row: safe_number(_context_row_value(row)) or float("-inf"))
-        lowest = min(final_rows, key=lambda row: safe_number(_context_row_value(row)) or float("inf"))
+        highest = max(final_rows, key=lambda row: safe_number(_context_row_value(row)))
+        lowest = min(final_rows, key=lambda row: safe_number(_context_row_value(row)))
 
         high_country = get_country_label(highest)
         low_country = get_country_label(lowest)
@@ -631,8 +638,9 @@ def _direct_explanation_response(
     message: str,
     rule_draft: Any,
     router_debug: dict[str, Any] | None = None,
+    answer_override: str | None = None,
 ) -> AiChatResponse:
-    answer = _compose_direct_explanation_template(message)
+    answer = _safe_direct_answer(answer_override) or _compose_direct_explanation_template(message)
     response = AiChatResponse(
         answer=sanitize_user_facing_text(answer),
         questionType="VALID_SIMPLE_QUERY",
@@ -650,8 +658,32 @@ def _direct_explanation_response(
         parserDebug=None,
         routerDebug=router_debug or {"route": "GENERAL_EXPLANATION", "pipeline": "hybrid_v2"},
     )
-    _update_basic(payload.conversationId, message, response.answer, "GENERAL_EXPLANATION", "success", response.questionType)
+    _update_basic(
+        payload.conversationId,
+        message,
+        response.answer,
+        "GENERAL_EXPLANATION",
+        "success",
+        response.questionType,
+        extra_patch={
+            "last_general_explanation": {
+                "topic": message,
+                "summary": response.answer,
+            },
+        },
+    )
     return response
+
+
+def _safe_direct_answer(answer: str | None) -> str | None:
+    text = sanitize_user_facing_text(str(answer or "").strip())
+    if len(text) < 20:
+        return None
+    lowered = text.lower()
+    forbidden = ("router", "parser", "database", " db", "sql", "tool", "gemini", "ngrok")
+    if any(token in lowered for token in forbidden):
+        return None
+    return text
 
 
 def _compose_direct_explanation_template(message: str) -> str:
@@ -793,12 +825,37 @@ def _unsupported_response(
         data=[{"message": message, "route": "UNSUPPORTED", "unsupportedTerms": unsupported_terms}],
         chart=AiAgentChartConfig(type="none"),
         warnings=[],
-        metadata=_metadata("template", ["rule_first_router", "parser_agent", "query_validator"], rule_draft=rule_draft, candidate=candidate, validation=validation, unsupported_terms=unsupported_terms),
+        metadata=_metadata("template", ["rule_first_router", "normalization_guard", "query_validator"], rule_draft=rule_draft, candidate=candidate, validation=validation, unsupported_terms=unsupported_terms),
         parsedQuery=asdict(candidate),
         parserDebug=_parser_debug_from_candidate(candidate, router_debug),
         routerDebug=router_debug or {"route": "DATA_QUERY", "intent": "UNSUPPORTED", "pipeline": "hybrid_v2", "ruleFirst": asdict(rule_draft)},
     )
     _update_basic(payload.conversationId, message, answer, "UNSUPPORTED", "unsupported", response.questionType, parsed_query=asdict(candidate))
+    return response
+
+
+def _front_unsupported_response(
+    payload: AiChatRequest,
+    message: str,
+    rule_draft: Any,
+    front_draft: Any,
+    router_debug: dict[str, Any] | None = None,
+) -> AiChatResponse:
+    warning = front_draft.reason or "Yêu cầu này hiện chưa được hỗ trợ trong dữ liệu hiện có."
+    answer = compose_unsupported_answer([warning])
+    response = AiChatResponse(
+        answer=answer,
+        questionType="UNSUPPORTED_DATA_QUERY",
+        status="unsupported",
+        data=[{"message": message, "route": "UNSUPPORTED"}],
+        chart=AiAgentChartConfig(type="none"),
+        warnings=[],
+        metadata=_metadata("template", ["rule_first_router", "front_llm_router"], rule_draft=rule_draft),
+        parsedQuery=None,
+        parserDebug=None,
+        routerDebug=router_debug or {"route": "UNSUPPORTED", "pipeline": "hybrid_v2", "ruleFirst": asdict(rule_draft)},
+    )
+    _update_basic(payload.conversationId, message, answer, "UNSUPPORTED", "unsupported", response.questionType)
     return response
 
 
@@ -921,7 +978,7 @@ def _empty_result_no_data_response(
         warnings=warnings,
         metadata=_metadata(
             "template",
-            ["rule_first_router", "parser_agent", "query_validator", "validated_plan_adapter", plan.tool_name, "result_validator"],
+            ["rule_first_router", "parser_model_service", "normalization_guard", "query_validator", "validated_plan_adapter", plan.tool_name, "result_validator"],
             rule_draft=rule_draft,
             candidate=candidate,
             validation=validation,
@@ -935,10 +992,10 @@ def _empty_result_no_data_response(
         routerDebug={
             **router_debug,
             "route": validated_query.get("route"),
-            "executed_parser_agent": True,
+            "executed_parser_agent": False,
             "executed_db": True,
             "status": "no_data",
-            "needs_parser": bool(rule_draft.needs_parser_agent),
+            "needs_parser": True,
             "needs_db": bool(rule_draft.needs_db),
         },
     )
@@ -957,6 +1014,10 @@ def _empty_result_no_data_response(
             "last_rows": [],
             "last_chart": {},
             "last_result_validation": result_validation,
+            "append_recent_turns": [
+                make_user_turn(message),
+                make_assistant_turn(response.answer, "no_data", response.questionType, validated_query.get("route") or "DATA_QUERY"),
+            ],
             "last_data_summary": {
                 "indicator": validated_query.get("indicator"),
                 "countries": validated_query.get("countries") or [],
@@ -999,7 +1060,10 @@ def _data_response(
     warnings = _dedupe_strings([*validation.warnings, *plan.warnings, *result_validation.get("warnings", [])])
     question_type = plan.question_type
 
-    if result_validation.get("is_empty"):
+    if result_validation.get("is_empty") and not (
+        question_type == "VALID_ANOMALY_QUERY"
+        and result_validation.get("empty_result_kind") == "no_anomaly_detected"
+    ):
         return _empty_result_no_data_response(
             payload=payload,
             message=message,
@@ -1027,9 +1091,10 @@ def _data_response(
         chart = AiAgentChartConfig(type="table" if rows else "none", title=f"Phạm vi dữ liệu {get_indicator_label(indicator_code)}", data=rows)
         data_item = {"indicator": indicator_code, "rows": rows}
     elif question_type == "VALID_ANOMALY_QUERY":
-        answer = compose_anomaly_answer(indicator_code, countries, start_year, end_year, rows)
+        threshold = plan.arguments.get("threshold", 0.75)
+        answer = compose_anomaly_answer(indicator_code, countries, start_year, end_year, rows, threshold=threshold)
         chart = AiAgentChartConfig(type="bar" if rows else "none", title=f"Điểm bất thường của {get_indicator_label(indicator_code)}", xKey="year", yKeys=["anomaly_score"], data=build_anomaly_bar_chart_data(rows))
-        data_item = {"indicator": indicator_code, "countries": countries, "rows": rows}
+        data_item = {"indicator": indicator_code, "countries": countries, "threshold": threshold, "rows": rows}
     else:
         is_analytics = plan.tool_name == "get_indicator_analytics_series"
         answer = compose_trend_answer(indicator_code, countries, start_year, end_year, rows, is_analytics)
@@ -1041,7 +1106,7 @@ def _data_response(
     answer = append_result_warnings(sanitize_user_facing_text(answer), warnings)
     metadata = _metadata(
         "template",
-        ["rule_first_router", "parser_agent", "query_validator", "validated_plan_adapter", tool_name, "result_validator"],
+        ["rule_first_router", "parser_model_service", "normalization_guard", "query_validator", "validated_plan_adapter", tool_name, "result_validator"],
         rule_draft=rule_draft,
         candidate=candidate,
         validation=validation,
@@ -1072,9 +1137,9 @@ def _data_response(
         routerDebug={
             **router_debug,
             "route": validated_query.get("route"),
-            "executed_parser_agent": True,
+            "executed_parser_agent": False,
             "executed_db": True,
-            "needs_parser": bool(rule_draft.needs_parser_agent),
+            "needs_parser": True,
             "needs_db": bool(rule_draft.needs_db),
         },
     )
@@ -1208,6 +1273,65 @@ def _should_call_parser_model(message: str, rule_draft: Any, front_draft: Any) -
     return _has_complex_slots(message) and min(rule_draft.confidence, front_draft.confidence) < 0.9
 
 
+def _standalone_query_from_front_or_rule(
+    *,
+    message: str,
+    previous_context: dict[str, Any],
+    rule_draft: Any,
+    front_draft: Any,
+) -> str:
+    if front_draft and front_draft.rewritten_query:
+        return front_draft.rewritten_query
+
+    if rule_draft.route == "FOLLOW_UP_MODIFY_QUERY" and rule_draft.delta:
+        previous_query = (
+            previous_context.get("last_data_query")
+            or previous_context.get("last_validated_query")
+            or previous_context.get("last_parsed_query")
+            or {}
+        )
+        merged_query = merge_followup_query(previous_query, rule_draft.delta)
+        return _query_dict_to_standalone_text(merged_query) or message
+
+    return message
+
+
+def _query_dict_to_standalone_text(query: dict[str, Any]) -> str:
+    if not isinstance(query, dict) or not query:
+        return ""
+
+    intent = query.get("intent") or _infer_intent_from_query(query)
+    indicator = query.get("indicator") or (query.get("indicators") or [None])[0]
+    countries = list(query.get("countries") or [])
+    groups = list(query.get("country_groups") or [])
+    start_year = query.get("start_year") or query.get("effective_start_year")
+    end_year = query.get("end_year") or query.get("effective_end_year")
+    limit = query.get("limit")
+    order = query.get("ranking_order") or query.get("order")
+
+    subjects = [*countries, *groups]
+    subject_text = ", ".join(subjects)
+    period_text = ""
+    if start_year and end_year:
+        period_text = f" từ {start_year} đến {end_year}"
+    elif end_year or start_year:
+        period_text = f" năm {end_year or start_year}"
+
+    if intent == "COMPARE_COUNTRIES":
+        return f"So sánh {indicator} của {subject_text}{period_text}".strip()
+    if intent == "RANKING":
+        order_text = "thấp nhất" if order == "asc" else "cao nhất"
+        limit_text = f"Top {limit or 10} nước"
+        return f"{limit_text} có {indicator} {order_text}{period_text}".strip()
+    if intent == "COVERAGE":
+        return f"Coverage dữ liệu {indicator} của {subject_text}".strip()
+    if intent == "ANOMALY_DETECTION":
+        target = f" của {subject_text}" if subject_text else ""
+        return f"Phát hiện bất thường {indicator}{target}{period_text}".strip()
+    target = f" của {subject_text}" if subject_text else ""
+    return f"Xu hướng {indicator}{target}{period_text}".strip()
+
+
 def _has_enough_deterministic_slots(message: str, rule_draft: Any, front_draft: Any) -> bool:
     resolver_indicator = resolve_indicator_alias(message)
     resolver_countries = [match.country.code for match in resolve_countries(message)]
@@ -1265,19 +1389,21 @@ def _has_complex_slots(message: str) -> bool:
 
 
 def _call_parser_model_candidate(
-    effective_message: str,
+    *,
+    standalone_query: str,
     original_message: str,
-    router_context: dict[str, Any],
     rule_draft: Any,
     front_draft: Any,
 ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
     parser_response = call_parser_service(
-        effective_message,
+        standalone_query,
         context={
-            "conversation": router_context,
-            "rule_draft": asdict(rule_draft),
-            "front_draft": asdict(front_draft),
             "original_user_message": original_message,
+            "standalone_query": standalone_query,
+            "rule_route": getattr(rule_draft, "route", None),
+            "rule_intent_hint": getattr(rule_draft, "intent_hint", None),
+            "front_route": getattr(front_draft, "route", None),
+            "front_uses_previous_context": getattr(front_draft, "uses_previous_context", False),
         },
     )
 
@@ -1368,8 +1494,8 @@ def _router_debug(
         "parserModelDebug": parser_model_debug.get("parserModelDebug") or {},
         "executed_parser_agent": False,
         "executed_db": False,
-        "needs_parser": bool(rule_draft.needs_parser_agent),
-        "needs_db": bool(rule_draft.needs_db),
+        "needs_parser": bool(getattr(front_draft, "needs_parser", False) or rule_draft.needs_parser_agent),
+        "needs_db": bool(getattr(front_draft, "needs_db", False) or rule_draft.needs_db),
     }
 
 
@@ -1420,7 +1546,7 @@ def _parser_debug_from_candidate(candidate: Any | None, router_debug: dict[str, 
         return None
 
     debug = {
-        "source": getattr(candidate, "source", "parser_agent"),
+        "source": getattr(candidate, "source", "normalization_guard"),
         "confidence": getattr(candidate, "confidence", None),
         "reason": getattr(candidate, "reason", ""),
         "candidate_sources": getattr(candidate, "candidate_sources", {}),
@@ -1499,6 +1625,7 @@ def _update_basic(
     status: str,
     question_type: str,
     parsed_query: dict[str, Any] | None = None,
+    extra_patch: dict[str, Any] | None = None,
 ) -> None:
     patch = {
         "last_user_message": message,
@@ -1506,9 +1633,15 @@ def _update_basic(
         "last_route": route,
         "last_status": status,
         "last_question_type": question_type,
+        "append_recent_turns": [
+            make_user_turn(message),
+            make_assistant_turn(answer, status, question_type, route),
+        ],
     }
     if parsed_query is not None:
         patch["last_parsed_query"] = parsed_query
+    if extra_patch:
+        patch.update(extra_patch)
     update_conversation_context(conversation_id, patch)
 
 
@@ -1525,6 +1658,25 @@ def _update_query_success(
 ) -> None:
     row_summary = summarize_rows(rows, settings.conversation_context_max_rows)
     chart_dict = chart.model_dump()
+    chart_without_data = {key: value for key, value in chart_dict.items() if key != "data"}
+    last_data_query = {
+        "intent": validated_query.get("intent"),
+        "indicator": validated_query.get("indicator"),
+        "indicators": validated_query.get("indicators") or [],
+        "countries": validated_query.get("countries") or [],
+        "country_groups": validated_query.get("country_groups") or [],
+        "start_year": validated_query.get("effective_start_year"),
+        "end_year": validated_query.get("effective_end_year"),
+        "limit": validated_query.get("limit"),
+        "ranking_order": validated_query.get("ranking_order"),
+    }
+    last_result_summary = {
+        "row_count": result_validation.get("row_count", row_summary["row_count"]),
+        "actual_start_year": result_validation.get("actual_start_year") or result_validation.get("actual_min_year"),
+        "actual_end_year": result_validation.get("actual_end_year") or result_validation.get("actual_max_year"),
+        "countries_present": result_validation.get("available_countries") or [],
+        "countries_missing": result_validation.get("missing_countries") or [],
+    }
     update_conversation_context(
         conversation_id,
         {
@@ -1534,10 +1686,13 @@ def _update_query_success(
             "last_status": response.status,
             "last_question_type": response.questionType,
             "last_parsed_query": asdict(candidate),
+            "last_data_query": last_data_query,
             "last_validated_query": validated_query,
             "last_query_plan": _plan_to_dict(plan),
             "last_rows": row_summary["top_rows"],
-            "last_chart": {key: value for key, value in chart_dict.items() if key != "data"},
+            "last_chart": chart_without_data,
+            "last_result_summary": last_result_summary,
+            "last_chart_summary": chart_without_data,
             "last_result_validation": result_validation,
             "last_data_summary": {
                 "indicator": validated_query.get("indicator"),
@@ -1550,5 +1705,9 @@ def _update_query_success(
                 "row_count": row_summary["row_count"],
                 "top_rows": row_summary["top_rows"],
             },
+            "append_recent_turns": [
+                make_user_turn(message),
+                make_assistant_turn(response.answer, response.status, response.questionType, validated_query.get("route") or "DATA_QUERY"),
+            ],
         },
     )

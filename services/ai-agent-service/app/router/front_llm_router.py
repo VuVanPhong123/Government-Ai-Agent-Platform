@@ -4,16 +4,9 @@ import re
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from typing import Any
 
-from app.catalog.canonical_indicator_catalog import (
-    detect_unsupported_indicator,
-    is_supported_indicator,
-    resolve_indicator_alias,
-)
-from app.catalog.country_group_catalog import get_country_group
 from app.core.config import settings
 from app.llm.gemini_client import GeminiClientError, generate_gemini_text, is_gemini_enabled
-from app.resolver.country_resolver import COUNTRIES
-from app.router.front_router_prompt import ALLOWED_FRONT_INTENTS, ALLOWED_FRONT_ROUTES, build_front_router_prompt
+from app.router.front_router_prompt import ALLOWED_FRONT_ROUTES, build_front_router_prompt
 
 
 logger = logging.getLogger(__name__)
@@ -76,83 +69,50 @@ def _parse_json_object(text: str) -> dict[str, Any]:
 
 def _sanitize_front_router_result(data: dict[str, Any]) -> dict[str, Any]:
     route = str(data.get("route") or "").upper().strip()
+    if route in {"DIRECT_ANSWER"}:
+        route = "GENERAL_EXPLANATION"
+    if route in {"FOLLOW_UP_MODIFY_QUERY", "FOLLOW_UP_MODIFY"}:
+        route = "DATA_QUERY"
     if route not in ALLOWED_FRONT_ROUTES:
         route = "DATA_QUERY"
 
-    intent_hint = _optional_upper(data.get("intent_hint"))
-    if intent_hint and intent_hint not in ALLOWED_FRONT_INTENTS:
-        intent_hint = None
-
-    draft_indicators, unsupported_terms_from_indicators = _normalize_indicators(data.get("draft_indicators"))
-    unsupported_terms = _dedupe([
-        *_string_list(data.get("unsupported_terms")),
-        *unsupported_terms_from_indicators,
-    ])
-
-    draft_countries = _normalize_countries(data.get("draft_countries"))
-    draft_country_groups = _normalize_country_groups(data.get("draft_country_groups"))
-
-    clarification_questions = _dedupe(_string_list(data.get("clarification_questions")))
-
-    return {
+    result = {
         "route": route,
-        "intent_hint": intent_hint,
+        "answer": _optional_str(data.get("answer")),
         "rewritten_query": _optional_str(data.get("rewritten_query")),
-        "draft_indicators": draft_indicators,
-        "draft_countries": draft_countries,
-        "draft_country_groups": draft_country_groups,
-        "draft_start_year": _int_or_none(data.get("draft_start_year")),
-        "draft_end_year": _int_or_none(data.get("draft_end_year")),
-        "draft_limit": _clamp_int(data.get("draft_limit"), 1, 50),
-        "draft_ranking_order": _ranking_order(data.get("draft_ranking_order")),
-        "unsupported_terms": unsupported_terms,
-        "clarification_questions": clarification_questions,
+        "needs_parser": bool(data.get("needs_parser")),
+        "needs_db": bool(data.get("needs_db")),
+        "clarification_question": _optional_str(data.get("clarification_question")),
         "uses_previous_context": bool(data.get("uses_previous_context")),
         "confidence": _clamp_float(data.get("confidence"), 0.0, 1.0),
         "reason": _optional_str(data.get("reason")) or "",
     }
 
+    if route == "GENERAL_EXPLANATION":
+        result["needs_parser"] = False
+        result["needs_db"] = False
+        result["rewritten_query"] = None
+    elif route == "DATA_QUERY":
+        result["needs_parser"] = True
+        result["needs_db"] = True
+        result["answer"] = None
+    elif route == "FOLLOW_UP_ANALYSIS":
+        result["needs_parser"] = False
+        result["needs_db"] = False
+        result["rewritten_query"] = None
+    elif route == "NEED_CLARIFICATION":
+        result["needs_parser"] = False
+        result["needs_db"] = False
+        result["rewritten_query"] = None
+        result["clarification_question"] = (
+            result["clarification_question"]
+            or "Bạn muốn phân tích chỉ số, quốc gia và giai đoạn nào?"
+        )
+    elif route in {"UNSUPPORTED", "OFF_TOPIC"}:
+        result["needs_parser"] = False
+        result["needs_db"] = False
+        result["rewritten_query"] = None
 
-def _normalize_indicators(value: Any) -> tuple[list[str], list[str]]:
-    indicators: list[str] = []
-    unsupported_terms: list[str] = []
-
-    for raw in _string_list(value):
-        text = str(raw).strip()
-        if not text:
-            continue
-
-        if is_supported_indicator(text):
-            indicators.append(text)
-            continue
-
-        alias_match = resolve_indicator_alias(text)
-        if alias_match and is_supported_indicator(alias_match.indicator.code):
-            indicators.append(alias_match.indicator.code)
-            continue
-
-        unsupported = detect_unsupported_indicator(text)
-        if unsupported:
-            unsupported_terms.append(unsupported.label_vi)
-
-    return _dedupe(indicators), _dedupe(unsupported_terms)
-
-
-def _normalize_countries(value: Any) -> list[str]:
-    result: list[str] = []
-    for raw in _string_list(value):
-        code = str(raw).upper().strip()
-        if code in COUNTRIES and code not in result:
-            result.append(code)
-    return result
-
-
-def _normalize_country_groups(value: Any) -> list[str]:
-    result: list[str] = []
-    for raw in _string_list(value):
-        code = str(raw).upper().strip()
-        if get_country_group(code) and code not in result:
-            result.append(code)
     return result
 
 

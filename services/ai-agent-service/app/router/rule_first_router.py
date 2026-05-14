@@ -57,6 +57,8 @@ MODIFY_MARKERS = (
 
 DEFINITION_MARKERS = (
     "la gi",
+    "la chi so gi",
+    "chi so gi",
     "nghia la gi",
     "y nghia",
     "cach hieu",
@@ -68,6 +70,9 @@ DEFINITION_MARKERS = (
     "noi len dieu gi",
     "the hien dieu gi",
     "khac gi",
+    "what is",
+    "definition",
+    "define",
 )
 
 COVERAGE_MARKERS = (
@@ -338,20 +343,6 @@ def run_rule_first_router(
                 needs_front_llm=False,
                 reason="Compare marker matched with indicator and compare slots.",
             )
-        if not indicator_match and not has_previous_query:
-            return RuleRouteDraft(
-                matched=True,
-                route="NEED_CLARIFICATION",
-                confidence=0.9,
-                needs_front_llm=False,
-                needs_parser_agent=False,
-                needs_db=False,
-                clarification_reason="missing_indicator",
-                clarification_questions=[
-                    "Bạn muốn phân tích chỉ số nào? Ví dụ: nợ công/GDP, lạm phát CPI, thất nghiệp, tăng trưởng GDP thực."
-                ],
-                reason="Compare query is missing indicator and has no previous query context.",
-            )
         return _safe_low_confidence_draft(
             indicator_match=indicator_match,
             countries=countries,
@@ -359,12 +350,24 @@ def run_rule_first_router(
             years=years,
             limit=limit,
             ranking_order=ranking_order,
-            confidence=0.7,
+            confidence=0.65,
             intent_hint="COMPARE_COUNTRIES",
             reason="Compare marker lacks enough deterministic slots; defer to Front LLM / Parser Agent.",
         )
 
     if indicator_match and has_ranking_marker:
+        if not years:
+            return _safe_low_confidence_draft(
+                indicator_match=indicator_match,
+                countries=countries,
+                country_groups=country_groups,
+                years=years,
+                limit=limit,
+                ranking_order=ranking_order,
+                confidence=0.65,
+                intent_hint="RANKING",
+                reason="Ranking marker lacks an explicit year; defer to Front LLM for context rewrite or clarification.",
+            )
         return _build_data_draft(
             intent_hint="RANKING",
             indicator_match=indicator_match,
@@ -445,8 +448,9 @@ def run_rule_first_router(
 
 def _has_previous_result(context: dict[str, Any]) -> bool:
     return bool(
-        context.get("last_answer")
+        context.get("last_data_query")
         or context.get("last_rows")
+        or context.get("last_result_summary")
         or context.get("last_data_summary")
         or context.get("last_result_validation")
     )
@@ -454,7 +458,8 @@ def _has_previous_result(context: dict[str, Any]) -> bool:
 
 def _has_previous_query(context: dict[str, Any]) -> bool:
     return bool(
-        context.get("last_parsed_query")
+        context.get("last_data_query")
+        or context.get("last_parsed_query")
         or context.get("last_validated_query")
         or context.get("last_query_plan")
     )
