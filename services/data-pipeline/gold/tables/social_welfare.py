@@ -21,14 +21,14 @@ _INDICATOR_MAP = {
     "trade_gdp":               "trade_pct_gdp",
 }
 
-
+_NO_INTERP = ["poverty_headcount", "poverty_change_5yr"]
 def build(silver: pd.DataFrame) -> pd.DataFrame:
     df = pivot_indicators(silver, _INDICATOR_MAP)
 
     groups = get_group_join(silver)[["country_code", "year", "income_group", "development_group"]]
     df = df.merge(groups, on=["country_code", "year"], how="left")
 
-    df = interpolate_numeric(df)
+    df = interpolate_numeric(df, skip_cols=_NO_INTERP)
     df = add_completeness(df)
     return df.sort_values(["country_code", "year"]).reset_index(drop=True)
 

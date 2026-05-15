@@ -13,9 +13,28 @@ _INCOME_GROUP_MAP = {
 }
 
 NO_INTERPOLATE = {
-    "sov_debt_crisis", "currency_crisis", "banking_crisis", "income_group",
-    "crisis_any", "flag_score", "SovDebtCrisis", "CurrencyCrisis",
-    "BankingCrisis", "crisis_composite",
+    # Raw/source indicator names
+    "sov_debt_crisis",
+    "currency_crisis",
+    "banking_crisis",
+    "poverty_headcount_ratio",
+    "poverty_change_5yr",
+    "rgdp_growth_yoy",
+
+    # Gold/output indicator names
+    "SovDebtCrisis",
+    "CurrencyCrisis",
+    "BankingCrisis",
+    "crisis_any",
+    "crisis_composite",
+    "poverty_headcount",
+    "rGDP_growth_YoY",
+
+    # Dimensions / technical columns
+    "income_group",
+    "development_group",
+    "flag_score",
+    "decade",
 }
 
 
