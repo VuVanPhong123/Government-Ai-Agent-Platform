@@ -4,23 +4,22 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
 from sklearn.cluster import KMeans
 from sqlalchemy import text
+
 from src.core.database import engine
 from src.core.logger import logger
-
-INDICATORS_FOR_CLUSTER = [
-    "agri_va_share", "manuf_va_share", "GFCF_to_GDP",
-    "GNI_to_GDP", "poverty_headcount", "urban_pop_pct", "unemployment_total"
-]
+from src.generated.indicator_contract import (
+    INDICATORS_FOR_CLUSTER,
+    PUBLIC_INDICATORS,
+)
 
 def find_table_for_indicator(indicator: str) -> str:
-    mapping = {
-        "gold_social_welfare": ["poverty_headcount", "urban_pop_pct", "unemployment_total"],
-        "gold_structural_composition": ["agri_va_share", "manuf_va_share", "GFCF_to_GDP", "GNI_to_GDP"]
-    }
-    for table, indicators in mapping.items():
-        if indicator in indicators:
-            return table
-    raise ValueError(f"Table not found for indicator: {indicator}")
+    indicator_meta = PUBLIC_INDICATORS.get(indicator)
+    gold_table = indicator_meta.get("gold_table") if indicator_meta else None
+
+    if not gold_table:
+        raise ValueError(f"Table not found for indicator: {indicator}")
+
+    return str(gold_table)
 
 def get_clustering_data(target_year: int, lookback: int = 3) -> pd.DataFrame:
     queries = []
