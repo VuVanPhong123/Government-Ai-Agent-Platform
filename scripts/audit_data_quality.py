@@ -187,6 +187,115 @@ def write_json(path: Path, payload: dict[str, Any], indent: int = 2) -> None:
     )
 
 
+def resolve_repo_path(raw_path: str | None) -> Path | None:
+    if not raw_path:
+        return None
+
+    path = Path(raw_path).expanduser()
+    if path.is_absolute():
+        return path
+
+    return ROOT / path
+
+
+def format_path_for_report(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def audit_optional_runtime_path(
+    state: AuditState,
+    check_name: str,
+    label: str,
+    path: Path | None,
+    expected_kind: str,
+) -> None:
+    if path is None:
+        state.add_skipped(
+            check_name,
+            f"{label} runtime path was not provided.",
+            {
+                "expected_kind": expected_kind,
+                "next_step": "Pass the path via CLI when concrete pipeline output exists.",
+            },
+        )
+        return
+
+    if not path.exists():
+        state.add_error(
+            check_name,
+            f"{label} runtime path does not exist.",
+            {
+                "path": format_path_for_report(path),
+                "expected_kind": expected_kind,
+            },
+        )
+        return
+
+    if expected_kind == "file" and not path.is_file():
+        state.add_error(
+            check_name,
+            f"{label} runtime path must be a file.",
+            {
+                "path": format_path_for_report(path),
+                "expected_kind": expected_kind,
+                "actual_is_dir": path.is_dir(),
+            },
+        )
+        return
+
+    if expected_kind == "directory" and not path.is_dir():
+        state.add_error(
+            check_name,
+            f"{label} runtime path must be a directory.",
+            {
+                "path": format_path_for_report(path),
+                "expected_kind": expected_kind,
+                "actual_is_file": path.is_file(),
+            },
+        )
+        return
+
+    state.add_info(
+        check_name,
+        f"{label} runtime path exists.",
+        {
+            "path": format_path_for_report(path),
+            "expected_kind": expected_kind,
+        },
+    )
+
+
+def audit_runtime_data_paths(
+    state: AuditState,
+    silver_path: Path | None,
+    gold_dir: Path | None,
+    analytics_dir: Path | None,
+) -> None:
+    audit_optional_runtime_path(
+        state,
+        "silver_runtime_path_available",
+        "Silver",
+        silver_path,
+        "path",
+    )
+    audit_optional_runtime_path(
+        state,
+        "gold_runtime_path_available",
+        "Gold",
+        gold_dir,
+        "directory",
+    )
+    audit_optional_runtime_path(
+        state,
+        "analytics_runtime_path_available",
+        "Analytics",
+        analytics_dir,
+        "directory",
+    )
+
 def normalize_indicator_entry(entry: dict[str, Any]) -> dict[str, Any]:
     normalized = dict(entry)
 
@@ -1609,8 +1718,19 @@ def finalize_mismatch_report(state: AuditState) -> dict[str, Any]:
     return state.mismatch_report
 
 
-def run_audit() -> tuple[dict[str, Any], dict[str, Any]]:
+def run_audit(
+    silver_path: Path | None = None,
+    gold_dir: Path | None = None,
+    analytics_dir: Path | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     state = AuditState()
+
+    audit_runtime_data_paths(
+        state,
+        silver_path=silver_path,
+        gold_dir=gold_dir,
+        analytics_dir=analytics_dir,
+    )
 
     indicator_contract, table_contract, rules = audit_required_files(state)
 
@@ -1680,20 +1800,66 @@ def main() -> int:
         default=2,
         help="JSON indent for generated reports. Default: 2.",
     )
+    parser.add_argument(
+        "--silver-path",
+        default=None,
+        help=(
+            "Optional local path to concrete Silver output file or directory. "
+            "Content checks are wired in a later step."
+        ),
+    )
+    parser.add_argument(
+        "--gold-dir",
+        default=None,
+        help=(
+            "Optional local directory containing concrete Gold outputs. "
+            "Content checks are wired in a later step."
+        ),
+    )
+    parser.add_argument(
+        "--analytics-dir",
+        default=None,
+        help=(
+            "Optional local directory containing concrete Analytics outputs. "
+            "Content checks are wired in a later step."
+        ),
+    )
+    parser.add_argument(
+        "--data-quality-report",
+        default=str(DATA_QUALITY_REPORT_PATH),
+        help="Path to data quality report JSON.",
+    )
+    parser.add_argument(
+        "--indicator-mismatch-report",
+        default=str(INDICATOR_MISMATCH_REPORT_PATH),
+        help="Path to indicator mismatch report JSON.",
+    )
     args = parser.parse_args()
 
-    data_quality_report, mismatch_report = run_audit()
+    silver_path = resolve_repo_path(args.silver_path)
+    gold_dir = resolve_repo_path(args.gold_dir)
+    analytics_dir = resolve_repo_path(args.analytics_dir)
+    data_quality_report_path = resolve_repo_path(args.data_quality_report) or DATA_QUALITY_REPORT_PATH
+    indicator_mismatch_report_path = (
+        resolve_repo_path(args.indicator_mismatch_report) or INDICATOR_MISMATCH_REPORT_PATH
+    )
 
-    write_json(DATA_QUALITY_REPORT_PATH, data_quality_report, indent=args.json_indent)
-    write_json(INDICATOR_MISMATCH_REPORT_PATH, mismatch_report, indent=args.json_indent)
+    data_quality_report, mismatch_report = run_audit(
+        silver_path=silver_path,
+        gold_dir=gold_dir,
+        analytics_dir=analytics_dir,
+    )
+
+    write_json(data_quality_report_path, data_quality_report, indent=args.json_indent)
+    write_json(indicator_mismatch_report_path, mismatch_report, indent=args.json_indent)
 
     print("")
     print("=== Data Quality Audit ===")
     print(f"Status: {data_quality_report['status']}")
     print("")
     print("Reports:")
-    print(f"  wrote: {DATA_QUALITY_REPORT_PATH.relative_to(ROOT)}")
-    print(f"  wrote: {INDICATOR_MISMATCH_REPORT_PATH.relative_to(ROOT)}")
+    print(f"  wrote: {format_path_for_report(data_quality_report_path)}")
+    print(f"  wrote: {format_path_for_report(indicator_mismatch_report_path)}")
     print("")
     print("Summary:")
     print(f"  checks:   {data_quality_report['summary']['checks']}")
