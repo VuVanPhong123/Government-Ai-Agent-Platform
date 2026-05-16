@@ -16,7 +16,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_clusters` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_crisis_risk` (
   `country_code` STRING NOT NULL,
@@ -39,7 +42,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_crisis_risk` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_fiscal_monetary` (
   `country_code` STRING NOT NULL,
@@ -90,7 +96,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_fiscal_monetary` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_growth_dynamics` (
   `country_code` STRING NOT NULL,
@@ -134,7 +143,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_growth_dynamics` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_social_welfare` (
   `country_code` STRING NOT NULL,
@@ -178,7 +190,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_social_welfare` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_structural_composition` (
   `country_code` STRING NOT NULL,
@@ -222,7 +237,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_analytics.analytics_gold_structural_compositi
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_ops.data_quality_results` (
   `run_id` STRING NOT NULL,
@@ -233,7 +251,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_ops.data_quality_results` (
   `message` STRING,
   `details` JSON,
   `created_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY `run_date`
+CLUSTER BY `status`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_crisis_risk` (
   `country_code` STRING NOT NULL,
@@ -255,7 +276,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_crisis_risk` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_fiscal_monetary` (
   `country_code` STRING NOT NULL,
@@ -281,7 +305,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_fiscal_monetary` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_growth_dynamics` (
   `country_code` STRING NOT NULL,
@@ -300,7 +327,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_growth_dynamics` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_social_welfare` (
   `country_code` STRING NOT NULL,
@@ -327,7 +357,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_social_welfare` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_structural_composition` (
   `country_code` STRING NOT NULL,
@@ -353,7 +386,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_gold.gold_structural_composition` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_ops.indicator_contract_versions` (
   `contract_version` STRING NOT NULL,
@@ -361,7 +397,8 @@ CREATE TABLE IF NOT EXISTS `gov_ai_ops.indicator_contract_versions` (
   `sha256` STRING,
   `source_uri` STRING,
   `created_at` TIMESTAMP NOT NULL
-);
+)
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_ops.job_logs` (
   `run_id` STRING NOT NULL,
@@ -372,7 +409,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_ops.job_logs` (
   `finished_at` TIMESTAMP,
   `duration_seconds` FLOAT64,
   `error_message` STRING
-);
+)
+PARTITION BY `run_date`
+CLUSTER BY `status`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_ops.pipeline_runs` (
   `run_id` STRING NOT NULL,
@@ -386,7 +426,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_ops.pipeline_runs` (
   `started_at` TIMESTAMP NOT NULL,
   `finished_at` TIMESTAMP,
   `error_message` STRING
-);
+)
+PARTITION BY `run_date`
+CLUSTER BY `status`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_silver.silver_indicators` (
   `country_code` STRING NOT NULL,
@@ -398,7 +441,10 @@ CREATE TABLE IF NOT EXISTS `gov_ai_silver.silver_indicators` (
   `run_id` STRING NOT NULL,
   `run_date` DATE NOT NULL,
   `loaded_at` TIMESTAMP NOT NULL
-);
+)
+PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))
+CLUSTER BY `country_code`, `indicator`, `source`
+;
 
 CREATE TABLE IF NOT EXISTS `gov_ai_ops.source_snapshots` (
   `run_id` STRING NOT NULL,
@@ -411,4 +457,7 @@ CREATE TABLE IF NOT EXISTS `gov_ai_ops.source_snapshots` (
   `status` STRING NOT NULL,
   `created_at` TIMESTAMP NOT NULL,
   `error_message` STRING
-);
+)
+PARTITION BY `run_date`
+CLUSTER BY `status`
+;

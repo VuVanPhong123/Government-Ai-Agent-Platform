@@ -1046,6 +1046,83 @@ def get_bigquery_datasets(raw_table_contract: dict[str, Any]) -> list[str]:
     return values or defaults
 
 
+def render_bigquery_partition_sql(
+    table_spec: dict[str, Any],
+    columns: dict[str, dict[str, Any]],
+) -> str | None:
+    partition = table_spec.get("partition")
+
+    if isinstance(partition, dict):
+        partition_type = str(partition.get("type") or "").strip().lower()
+        column = str(partition.get("column") or "").strip()
+
+        if column and column in columns and partition_type == "integer_range":
+            start = int(partition.get("start", 1980))
+            end = int(partition.get("end", 2031))
+            interval = int(partition.get("interval", 1))
+            inclusive_end = end - interval
+            return (
+                f"PARTITION BY RANGE_BUCKET(`{column}`, "
+                f"GENERATE_ARRAY({start}, {inclusive_end}, {interval}))"
+            )
+
+        if column and column in columns and partition_type == "date":
+            return f"PARTITION BY `{column}`"
+
+    if "year" in columns:
+        return "PARTITION BY RANGE_BUCKET(`year`, GENERATE_ARRAY(1980, 2030, 1))"
+
+    if "run_date" in columns:
+        return "PARTITION BY `run_date`"
+
+    return None
+
+
+def render_bigquery_cluster_sql(
+    table_spec: dict[str, Any],
+    columns: dict[str, dict[str, Any]],
+) -> str | None:
+    raw_cluster = table_spec.get("cluster")
+    cluster_columns: list[str] = []
+
+    if isinstance(raw_cluster, list):
+        cluster_columns = [
+            str(column)
+            for column in raw_cluster
+            if str(column) in columns
+        ]
+
+    if not cluster_columns:
+        for column in ("country_code", "indicator", "source", "status"):
+            if column in columns:
+                cluster_columns.append(column)
+
+    cluster_columns = cluster_columns[:4]
+
+    if not cluster_columns:
+        return None
+
+    rendered = ", ".join(f"`{column}`" for column in cluster_columns)
+    return f"CLUSTER BY {rendered}"
+
+
+def render_bigquery_table_options(
+    table_spec: dict[str, Any],
+    columns: dict[str, dict[str, Any]],
+) -> list[str]:
+    options: list[str] = []
+
+    partition_sql = render_bigquery_partition_sql(table_spec, columns)
+    if partition_sql:
+        options.append(partition_sql)
+
+    cluster_sql = render_bigquery_cluster_sql(table_spec, columns)
+    if cluster_sql:
+        options.append(cluster_sql)
+
+    return options
+
+
 def build_analytics_tables(
     payload: dict[str, Any],
 ) -> dict[str, dict[str, Any]]:
@@ -1137,9 +1214,16 @@ def render_bigquery_sql(
             for column_name, column_spec in columns.items()
         ]
 
+        table_options = render_bigquery_table_options(table_spec, columns)
+
         lines.append(f"CREATE TABLE IF NOT EXISTS `{dataset}.{table_name}` (")
         lines.append(",\n".join(column_lines))
-        lines.append(");")
+        lines.append(")")
+
+        if table_options:
+            lines.extend(table_options)
+
+        lines.append(";")
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"
