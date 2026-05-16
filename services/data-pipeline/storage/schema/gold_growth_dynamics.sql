@@ -12,5 +12,8 @@ CREATE TABLE gold_growth_dynamics (
     income_group            TEXT,
     development_group       TEXT,
     completeness_score      DOUBLE PRECISION,
+    run_id                  TEXT,
+    run_date                DATE,
+    loaded_at               TIMESTAMP,
     PRIMARY KEY (country_code, year)
 );

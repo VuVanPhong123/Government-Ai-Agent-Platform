@@ -1,8 +1,10 @@
+from datetime import datetime, timezone
+
 import numpy as np
 import pandas as pd
 
 from gold.io import KEY_COLS
-
+from config.settings import settings
 PRECEDENCE = ("gmd", "wdi", "macro")
 
 _INCOME_GROUP_MAP = {
@@ -102,3 +104,13 @@ def add_completeness(df: pd.DataFrame) -> pd.DataFrame:
 def safe_div(num: pd.Series, den: pd.Series) -> pd.Series:
     d = den.replace(0, np.nan)
     return num.where(d.notna()) / d
+def current_loaded_at() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def add_run_metadata(df: pd.DataFrame, loaded_at: datetime | None = None) -> pd.DataFrame:
+    result = df.copy()
+    result["run_id"] = settings.run_id
+    result["run_date"] = pd.to_datetime(settings.run_date).date()
+    result["loaded_at"] = loaded_at or current_loaded_at()
+    return result

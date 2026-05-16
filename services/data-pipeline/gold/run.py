@@ -5,6 +5,7 @@ from typing import Callable
 import pandas as pd
 from gold.io import load_silver
 from gold.loaders.postgres_loader import load_to_postgres
+from gold.transforms import add_run_metadata, current_loaded_at
 from gold.tables import (
     growth_dynamics,
     structural_composition,
@@ -60,10 +61,11 @@ def main(table: str = "all", silver_path: str = None) -> None:
     print(f"Silver rows: {len(silver):,}")
 
     runners = _ALL_TABLES if table == "all" else {table: _ALL_TABLES[table]}
+    loaded_at = current_loaded_at()
 
     for name, spec in runners.items():
         print(f"\nBuilding {name}...")
-        gold_df = spec.build(silver)
+        gold_df = add_run_metadata(spec.build(silver), loaded_at=loaded_at)
         load_to_postgres(
             gold_df,
             spec.table_name,
