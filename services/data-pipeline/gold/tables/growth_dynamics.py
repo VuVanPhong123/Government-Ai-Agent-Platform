@@ -1,6 +1,5 @@
 import pandas as pd
 
-from gold.io import load_to_postgres
 from gold.transforms import pivot_indicators, get_group_join, interpolate_numeric, add_completeness
 
 _INDICATOR_MAP = {
@@ -27,7 +26,3 @@ def build(silver: pd.DataFrame) -> pd.DataFrame:
     df = interpolate_numeric(df, skip_cols=_NO_INTERP)
     df = add_completeness(df)
     return df.sort_values(["country_code", "year"]).reset_index(drop=True)
-
-
-def run(silver: pd.DataFrame, engine) -> None:
-    load_to_postgres(build(silver), "gold_growth_dynamics", engine)

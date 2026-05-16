@@ -1,6 +1,10 @@
 import argparse
+from dataclasses import dataclass
+from typing import Callable
 
+import pandas as pd
 from gold.io import load_silver
+from gold.loaders.postgres_loader import load_to_postgres
 from gold.tables import (
     growth_dynamics,
     structural_composition,
@@ -11,12 +15,36 @@ from gold.tables import (
 from storage.connect import get_engine
 from storage.schema_loader import create_all_tables
 
+
+@dataclass(frozen=True)
+class GoldTableSpec:
+    table_name: str
+    build: Callable[[pd.DataFrame], pd.DataFrame]
+    crisis_check: bool = False
+
+
 _ALL_TABLES = {
-    "growth_dynamics":       growth_dynamics,
-    "structural_composition": structural_composition,
-    "fiscal_monetary":       fiscal_monetary,
-    "crisis_risk":           crisis_risk,
-    "social_welfare":        social_welfare,
+    "growth_dynamics": GoldTableSpec(
+        table_name="gold_growth_dynamics",
+        build=growth_dynamics.build,
+    ),
+    "structural_composition": GoldTableSpec(
+        table_name="gold_structural_composition",
+        build=structural_composition.build,
+    ),
+    "fiscal_monetary": GoldTableSpec(
+        table_name="gold_fiscal_monetary",
+        build=fiscal_monetary.build,
+    ),
+    "crisis_risk": GoldTableSpec(
+        table_name="gold_crisis_risk",
+        build=crisis_risk.build,
+        crisis_check=True,
+    ),
+    "social_welfare": GoldTableSpec(
+        table_name="gold_social_welfare",
+        build=social_welfare.build,
+    ),
 }
 
 
@@ -33,9 +61,15 @@ def main(table: str = "all", silver_path: str = None) -> None:
 
     runners = _ALL_TABLES if table == "all" else {table: _ALL_TABLES[table]}
 
-    for name, module in runners.items():
+    for name, spec in runners.items():
         print(f"\nBuilding {name}...")
-        module.run(silver, engine)
+        gold_df = spec.build(silver)
+        load_to_postgres(
+            gold_df,
+            spec.table_name,
+            engine,
+            crisis_check=spec.crisis_check,
+        )
 
     print("\nAll gold tables loaded into Postgres.")
 

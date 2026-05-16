@@ -2,8 +2,6 @@ import glob
 import os
 
 import pandas as pd
-from sqlalchemy import text
-from sqlalchemy.engine import Engine
 
 _SILVER_DIR = os.path.join("data", "processed_data", "processed.csv")
 
@@ -41,14 +39,3 @@ def validate(df: pd.DataFrame, table: str, crisis_check: bool = False) -> None:
     if crisis_check and "crisis_composite" in df.columns:
         assert df["crisis_composite"].dropna().isin([0, 1, 2, 3]).all(), \
             "crisis_composite out of {0,1,2,3}"
-
-
-def load_to_postgres(
-    df: pd.DataFrame,
-    table: str,
-    engine: Engine,
-    crisis_check: bool = False,
-) -> None:
-    validate(df, table, crisis_check)
-    df.to_sql(table, engine, if_exists="append", index=False, method="multi", chunksize=500)
-    print(f"  loaded → postgres table: {table}")
