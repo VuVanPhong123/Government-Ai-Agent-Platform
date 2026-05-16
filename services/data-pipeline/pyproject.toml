@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "government-ai-platform"
@@ -24,6 +24,11 @@ dev = [
     "ruff>=0.4",
     "mypy>=1.10",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["config*", "gold*", "pipeline*", "storage*", "utils*"]
+exclude = ["tests*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
