@@ -7,12 +7,14 @@ from pathlib import Path
 from config.source_registry import (
     SourceRegistryEntry,
     load_source_registry,
+    normalize_registry_sources,
+    normalize_source_name,
     render_source_input_required_block,
 )
 
 
 def load_registry(path: str | Path | None = None) -> dict[str, SourceRegistryEntry]:
-    return load_source_registry(path)
+    return normalize_registry_sources(load_source_registry(path))
 
 
 def select_sources(
@@ -25,9 +27,10 @@ def select_sources(
 
     selected: list[SourceRegistryEntry] = []
     for source_name in requested:
-        if source_name not in registry:
+        canonical_name = normalize_source_name(source_name)
+        if canonical_name not in registry:
             raise KeyError(f"Unknown source requested: {source_name}")
-        selected.append(registry[source_name])
+        selected.append(registry[canonical_name])
     return selected
 
 
@@ -72,7 +75,8 @@ def load_previous_source_manifest(path: str | Path | None) -> dict[str, dict]:
     source_manifest = payload.get("source_manifest", payload)
     previous: dict[str, dict] = {}
     for item in source_manifest.get("sources", []):
-        previous[item["source_name"]] = item
+        source_name = normalize_source_name(item["source_name"])
+        previous[source_name] = {**item, "source_name": source_name}
     return previous
 
 

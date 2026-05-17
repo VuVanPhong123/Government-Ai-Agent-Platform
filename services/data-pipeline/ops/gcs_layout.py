@@ -76,7 +76,7 @@ def analytics_prefix(run_date: str, bucket: str | None = None) -> str:
 def source_manifest_path(run_date: str, bucket: str | None = None) -> str:
     date_value = validate_run_date(run_date)
     return _with_bucket(
-        f"manifests/source_manifest/run_date={date_value}/manifest.json",
+        f"manifests/source_manifest/run_date={date_value}/source_manifest.json",
         bucket,
     )
 
@@ -84,7 +84,7 @@ def source_manifest_path(run_date: str, bucket: str | None = None) -> str:
 def pipeline_manifest_path(run_date: str, bucket: str | None = None) -> str:
     date_value = validate_run_date(run_date)
     return _with_bucket(
-        f"manifests/pipeline_manifest/run_date={date_value}/manifest.json",
+        f"manifests/pipeline_manifest/run_date={date_value}/pipeline_manifest.json",
         bucket,
     )
 
@@ -112,4 +112,3 @@ def build_layout(run_date: str, sources: list[str] | tuple[str, ...], bucket: st
         "pipeline_manifest": pipeline_manifest_path(date_value, bucket),
         "data_quality_report": data_quality_report_path(date_value, bucket),
     }
-

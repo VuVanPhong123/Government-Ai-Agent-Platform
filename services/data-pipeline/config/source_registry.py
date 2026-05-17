@@ -10,6 +10,7 @@ from config.settings import settings
 
 SUPPORTED_SOURCE_TYPES = {"api", "csv_url", "gcs_uri", "local_path"}
 SUPPORTED_OUTPUT_FORMATS = {"csv", "parquet", "json"}
+SOURCE_NAME_ALIASES = {"macro": "fao_macro"}
 
 _FIELD_LABELS = {
     "api_url": "api_url",
@@ -33,6 +34,11 @@ def _unique_preserve_order(values: list[str]) -> list[str]:
             ordered.append(value)
             seen.add(value)
     return ordered
+
+
+def normalize_source_name(source_name: str) -> str:
+    clean = _clean_text(source_name)
+    return SOURCE_NAME_ALIASES.get(clean, clean)
 
 
 @dataclass(frozen=True)
@@ -207,6 +213,33 @@ def load_source_registry(path: str | Path | None = None) -> dict[str, SourceRegi
         registry[entry.source_name] = entry
 
     return registry
+
+
+def normalize_registry_sources(registry: dict[str, SourceRegistryEntry]) -> dict[str, SourceRegistryEntry]:
+    normalized: dict[str, SourceRegistryEntry] = {}
+    for source_name, entry in registry.items():
+        canonical_name = normalize_source_name(source_name)
+        if canonical_name in normalized and canonical_name != source_name:
+            continue
+        if canonical_name == entry.source_name:
+            normalized[canonical_name] = entry
+            continue
+        normalized[canonical_name] = SourceRegistryEntry(
+            source_name=canonical_name,
+            source_type=entry.source_type,
+            enabled=entry.enabled,
+            description=entry.description,
+            license_note=entry.license_note,
+            base_url=entry.base_url,
+            api_url=entry.api_url,
+            csv_url=entry.csv_url,
+            gcs_uri=entry.gcs_uri,
+            local_path=entry.local_path,
+            indicator_mapping=entry.indicator_mapping,
+            output_format=entry.output_format,
+            raw=dict(entry.raw),
+        )
+    return normalized
 
 
 def source_input_required_question(source_name: str, missing_field: str) -> str:
