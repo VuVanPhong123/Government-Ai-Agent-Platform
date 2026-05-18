@@ -490,7 +490,7 @@ def build_plan(
         ],
         "manual_review_required": [
             "services/analytics-worker/Dockerfile is missing in this repo, so the analytics image URI is template-only until a real build artifact exists.",
-            "Repeated --source inputs, snapshot output paths, and later workflow wiring still need a manual deployment wrapper in the next chunk.",
+            "Repeated --source inputs, snapshot output paths, and later workflow wiring still need a manual deployment wrapper in the next release step.",
             "Gold build uses target=postgres and will write to live tables once executed; confirm Postgres secret wiring first.",
             "Analytics batch uses target=postgres and will write to live analytics tables once executed; confirm DATABASE_URL secret wiring and whether a future bigquery target is needed.",
         ],

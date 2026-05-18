@@ -1590,12 +1590,12 @@ def audit_analytics_contract_static(
             "analytics_cluster_cloud_metadata_deferred_static",
             (
                 f"analytics_clusters is missing cloud metadata column {column}. "
-                "This is static/deferred in Phase 2 if cloud metadata is not applied yet."
+                "This is static/deferred in live warehouse validation if cloud metadata is not applied yet."
             ),
             {
                 "table": ANALYTICS_CLUSTER_TABLE,
                 "column": column,
-                "enabled_after_phase": 6,
+                "required_when": "cloud_metadata_available",
             },
         )
 
@@ -1663,7 +1663,7 @@ def audit_bigquery_postgres_rules_deferred(
         state.add_skipped(
             "bigquery_rules_static_deferred",
             (
-                "BigQuery live dataset/table validation is deferred in Phase 2. "
+                "BigQuery live dataset/table validation is deferred in live warehouse validation. "
                 "Only config presence is checked now."
             ),
             {"rules": sorted(bigquery_rules.keys())},
@@ -1678,7 +1678,7 @@ def audit_bigquery_postgres_rules_deferred(
         state.add_skipped(
             "postgres_sync_rules_static_deferred",
             (
-                "PostgreSQL sync validation is deferred in Phase 2. "
+                "PostgreSQL sync validation is deferred in live warehouse validation. "
                 "No BigQuery/PostgreSQL live connection is attempted."
             ),
             {"rules": sorted(postgres_sync_rules.keys())},
@@ -1786,7 +1786,7 @@ def run_audit(
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Audit data quality contract/rules alignment and write Phase 2 reports."
+            "Audit data quality contract/rules alignment and write live warehouse validation reports."
         )
     )
     parser.add_argument(

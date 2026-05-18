@@ -86,7 +86,7 @@ def _write_contract(repo_root: Path) -> Path:
 
 
 def _build_parquet_fixture(base_dir: Path) -> tuple[Path, Path]:
-    run_dir = base_dir / "phase10a_silver_local"
+    run_dir = base_dir / "silver_local_output"
     silver_dir = run_dir / "silver_indicators"
     silver_dir.mkdir(parents=True, exist_ok=True)
     frame = pd.DataFrame(
@@ -98,7 +98,7 @@ def _build_parquet_fixture(base_dir: Path) -> tuple[Path, Path]:
                 "indicator": "gdp",
                 "value": 100.0,
                 "source": "wdi",
-                "run_id": "phase10a-local-smoke",
+                "run_id": "local-silver-smoke",
                 "run_date": "2026-05-18",
                 "loaded_at": "2026-05-18T00:00:00+00:00",
             },
@@ -109,7 +109,7 @@ def _build_parquet_fixture(base_dir: Path) -> tuple[Path, Path]:
                 "indicator": "infl",
                 "value": 7.5,
                 "source": "macro",
-                "run_id": "phase10a-local-smoke",
+                "run_id": "local-silver-smoke",
                 "run_date": "2026-05-18",
                 "loaded_at": "2026-05-18T00:00:00+00:00",
             },
@@ -119,7 +119,7 @@ def _build_parquet_fixture(base_dir: Path) -> tuple[Path, Path]:
     manifest_path = _write_manifest(
         run_dir,
         output_format="parquet",
-        run_id="phase10a-local-smoke",
+        run_id="local-silver-smoke",
         run_date="2026-05-18",
         silver_output_path=silver_dir,
         row_count=2,
@@ -131,7 +131,7 @@ def _build_parquet_fixture(base_dir: Path) -> tuple[Path, Path]:
 
 
 def _build_csv_fixture(base_dir: Path) -> tuple[Path, Path]:
-    run_dir = base_dir / "phase10a_silver_fixture"
+    run_dir = base_dir / "silver_fixture_output"
     silver_dir = run_dir / "silver_indicators"
     silver_dir.mkdir(parents=True, exist_ok=True)
     frame = pd.DataFrame(
@@ -143,7 +143,7 @@ def _build_csv_fixture(base_dir: Path) -> tuple[Path, Path]:
                 "indicator": "gdp",
                 "value": 100.0,
                 "source": "wdi",
-                "run_id": "phase10a-fixture",
+                "run_id": "silver-fixture",
                 "run_date": "2026-05-18",
                 "loaded_at": "2026-05-18T00:00:00+00:00",
             },
@@ -154,7 +154,7 @@ def _build_csv_fixture(base_dir: Path) -> tuple[Path, Path]:
                 "indicator": "infl",
                 "value": 7.5,
                 "source": "gmd",
-                "run_id": "phase10a-fixture",
+                "run_id": "silver-fixture",
                 "run_date": "2026-05-18",
                 "loaded_at": "2026-05-18T00:00:00+00:00",
             },
@@ -164,7 +164,7 @@ def _build_csv_fixture(base_dir: Path) -> tuple[Path, Path]:
     manifest_path = _write_manifest(
         run_dir,
         output_format="csv",
-        run_id="phase10a-fixture",
+        run_id="silver-fixture",
         run_date="2026-05-18",
         silver_output_path=silver_dir,
         row_count=2,
@@ -190,7 +190,7 @@ def test_resolve_artifacts_auto_detect(tmp_path: Path) -> None:
     assert artifacts.local_silver_path == silver_dir.resolve()
     assert artifacts.local_manifest_path == manifest_path.resolve()
     assert artifacts.source_format == "parquet"
-    assert artifacts.manifest["run_id"] == "phase10a-local-smoke"
+    assert artifacts.manifest["run_id"] == "local-silver-smoke"
 
 
 def test_build_plan_from_parquet_fixture(tmp_path: Path) -> None:
@@ -256,7 +256,7 @@ def test_missing_artifacts_reports_checked_paths(tmp_path: Path) -> None:
 
     message = str(excinfo.value)
     assert "No local Silver output/manifest could be auto-detected." in message
-    assert "phase10a_silver_local" in message
+    assert "silver_local_output" in message
     assert "python -m jobs.build_silver" in message
 
 

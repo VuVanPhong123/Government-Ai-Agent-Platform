@@ -22,7 +22,7 @@ from sources.gcs_upload import (
     cloud_write_approved,
     enrich_manifests_for_upload,
     execute_upload_plan,
-    phase9c_runtime_dir,
+    gcs_upload_runtime_dir,
     summarize_upload_plan,
     write_json as write_json_file,
 )
@@ -204,7 +204,7 @@ def _persist_upload_artifacts(
         dry_run=args.dry_run,
         cloud_approved=approved,
     )
-    runtime_dir = phase9c_runtime_dir()
+    runtime_dir = gcs_upload_runtime_dir()
     upload_plan_path = runtime_dir / "upload_plan.json"
     write_json_file(upload_plan_path, upload_plan)
 

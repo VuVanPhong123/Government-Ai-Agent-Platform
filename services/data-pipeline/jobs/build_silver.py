@@ -21,7 +21,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--wdi-path", default=None)
     parser.add_argument("--gmd-path", default=None)
     parser.add_argument("--fao-macro-path", default=None)
-    parser.add_argument("--output-dir", default="../../tmp/phase10a_silver_local")
+    parser.add_argument("--output-dir", default="../../tmp/silver_local_output")
     parser.add_argument("--output-format", default="parquet", choices=["parquet", "csv"])
     parser.add_argument("--run-id", default=settings.run_id)
     parser.add_argument("--run-date", default=settings.run_date)
@@ -134,7 +134,7 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     silver_output_path = output_dir / "silver_indicators"
 
-    with TemporaryDirectory(prefix="phase10a_fixture_") as fixture_dir:
+    with TemporaryDirectory(prefix="silver_fixture_") as fixture_dir:
         if args.fixture:
             input_paths = _build_fixture_sources(Path(fixture_dir))
         else:

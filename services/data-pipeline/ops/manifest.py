@@ -14,14 +14,14 @@ from ops.gcs_layout import (
 )
 
 
-HASH_CHUNK_SIZE = 1024 * 1024
+HASH_READ_BLOCK_SIZE = 1024 * 1024
 
 
 def sha256_file(path: str | Path) -> str:
     digest = hashlib.sha256()
     with Path(path).open("rb") as file_obj:
-        for chunk in iter(lambda: file_obj.read(HASH_CHUNK_SIZE), b""):
-            digest.update(chunk)
+        for read_block in iter(lambda: file_obj.read(HASH_READ_BLOCK_SIZE), b""):
+            digest.update(read_block)
     return digest.hexdigest()
 
 

@@ -54,10 +54,10 @@ def _contract_path(repo_root: Path) -> Path:
     return repo_root / "contracts" / "table_contract.yaml"
 
 
-def _default_phase10a_candidates(repo_root: Path) -> list[Path]:
+def _default_silver_candidates(repo_root: Path) -> list[Path]:
     return [
-        repo_root / "tmp" / "phase10a_silver_local",
-        repo_root / "tmp" / "phase10a_silver_fixture",
+        repo_root / "tmp" / "silver_local_output",
+        repo_root / "tmp" / "silver_fixture_output",
     ]
 
 
@@ -119,7 +119,7 @@ def _candidate_output_paths(raw_path: str | Path, *, repo_root: Path) -> list[Pa
     if candidate.is_dir() or candidate.suffix == "":
         candidates.append(candidate / "silver_indicators")
 
-    if candidate == repo_root / "tmp" / "phase10a_silver_local":
+    if candidate == repo_root / "tmp" / "silver_local_output":
         candidates.append(candidate / "silver_indicators")
 
     unique: list[Path] = []
@@ -158,10 +158,10 @@ def _select_artifacts_from_explicit_paths(
             raise FileNotFoundError(
                 "No local Silver manifest found.\n"
                 f"Checked:\n- {manifest_path}\n"
-                "Run Phase 10A-local again:\n"
+                "Run local Silver build again:\n"
                 "cd services/data-pipeline && python -m jobs.build_silver "
-                "--source all --run-id phase10a-local-smoke --run-date 2026-05-18 "
-                "--output-dir ../../tmp/phase10a_silver_local --output-format parquet "
+                "--source all --run-id local-silver-smoke --run-date 2026-05-18 "
+                "--output-dir ../../tmp/silver_local_output --output-format parquet "
                 "--spark-master local[*]"
             )
         manifest = _load_manifest(manifest_path)
@@ -175,10 +175,10 @@ def _select_artifacts_from_explicit_paths(
             raise FileNotFoundError(
                 "No local Silver output found for the provided manifest.\n"
                 f"Checked:\n{checked_text}\n"
-                "Run Phase 10A-local again:\n"
+                "Run local Silver build again:\n"
                 "cd services/data-pipeline && python -m jobs.build_silver "
-                "--source all --run-id phase10a-local-smoke --run-date 2026-05-18 "
-                "--output-dir ../../tmp/phase10a_silver_local --output-format parquet "
+                "--source all --run-id local-silver-smoke --run-date 2026-05-18 "
+                "--output-dir ../../tmp/silver_local_output --output-format parquet "
                 "--spark-master local[*]"
             )
     elif silver_output_dir:
@@ -193,10 +193,10 @@ def _select_artifacts_from_explicit_paths(
             raise FileNotFoundError(
                 "No local Silver output found.\n"
                 f"Checked:\n{checked_text}\n"
-                "Run Phase 10A-local again:\n"
+                "Run local Silver build again:\n"
                 "cd services/data-pipeline && python -m jobs.build_silver "
-                "--source all --run-id phase10a-local-smoke --run-date 2026-05-18 "
-                "--output-dir ../../tmp/phase10a_silver_local --output-format parquet "
+                "--source all --run-id local-silver-smoke --run-date 2026-05-18 "
+                "--output-dir ../../tmp/silver_local_output --output-format parquet "
                 "--spark-master local[*]"
             )
         manifest_path = local_silver_path.parent / "silver_manifest.json"
@@ -234,7 +234,7 @@ def _select_artifacts_from_explicit_paths(
 def _select_artifacts_from_defaults(repo_root: Path) -> SilverArtifacts:
     checked: list[str] = []
 
-    for run_dir in _default_phase10a_candidates(repo_root):
+    for run_dir in _default_silver_candidates(repo_root):
         manifest_path = run_dir / "silver_manifest.json"
         local_silver_path = run_dir / "silver_indicators"
         checked.extend([str(manifest_path), str(local_silver_path)])
@@ -253,10 +253,10 @@ def _select_artifacts_from_defaults(repo_root: Path) -> SilverArtifacts:
     raise FileNotFoundError(
         "No local Silver output/manifest could be auto-detected.\n"
         f"Checked:\n{checked_text}\n"
-        "Run Phase 10A-local again:\n"
+        "Run local Silver build again:\n"
         "cd services/data-pipeline && python -m jobs.build_silver "
-        "--source all --run-id phase10a-local-smoke --run-date 2026-05-18 "
-        "--output-dir ../../tmp/phase10a_silver_local --output-format parquet "
+        "--source all --run-id local-silver-smoke --run-date 2026-05-18 "
+        "--output-dir ../../tmp/silver_local_output --output-format parquet "
         "--spark-master local[*]"
     )
 
@@ -340,7 +340,7 @@ def _source_counts_from_manifest(manifest: dict[str, Any]) -> dict[str, int] | N
     return None
 
 
-def _expected_next_phase10c_command(
+def _expected_next_load_command(
     *,
     silver_output_path: Path,
     silver_manifest_path: Path,
@@ -570,7 +570,7 @@ def build_silver_load_plan(
     )
 
     source_counts = manifest_source_counts or computed_source_counts
-    exact_next_command = _expected_next_phase10c_command(
+    exact_next_command = _expected_next_load_command(
         silver_output_path=artifacts.local_silver_path,
         silver_manifest_path=artifacts.local_manifest_path,
         project_id=project_id,
@@ -621,9 +621,9 @@ def build_silver_load_plan(
         "job_started": False,
         "run_id": manifest_run_id or run_id,
         "run_date": manifest_run_date or run_date,
-        "phase10c_next_command": exact_next_command,
-        "phase10c_requires_env": "BIGQUERY_WRITE_APPROVED=true",
-        "phase10c_enabled": False,
+        "next_load_command": exact_next_command,
+        "required_approval_env": "BIGQUERY_WRITE_APPROVED=true",
+        "write_enabled": False,
         "artifacts_detection_mode": artifacts.detection_mode,
         "artifacts_checked_paths": list(artifacts.checked_paths),
     }
@@ -641,7 +641,7 @@ def write_load_plan_artifacts(plan: dict[str, Any], output_dir: str | Path) -> d
         encoding="utf-8",
     )
     summary_lines = [
-        "Phase 10B BigQuery Silver load dry-run",
+        "BigQuery Silver BigQuery Silver load dry-run",
         f"Target table: {plan['table_id']}",
         f"Local Silver: {plan['local_silver_path']}",
         f"Manifest: {plan['local_manifest_path']}",
@@ -656,8 +656,8 @@ def write_load_plan_artifacts(plan: dict[str, Any], output_dir: str | Path) -> d
         f"dry_run={plan['dry_run']}",
         f"bigquery_write_approved={plan['bigquery_write_approved']}",
         f"job_started={plan['job_started']}",
-        "Phase 10C is disabled unless BIGQUERY_WRITE_APPROVED=true.",
-        f"Next command: {plan['phase10c_next_command']}",
+        "BigQuery write is disabled unless BIGQUERY_WRITE_APPROVED=true.",
+        f"Next command: {plan['next_load_command']}",
     ]
     summary_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
     return {"load_plan": plan_path, "summary": summary_path}
@@ -674,7 +674,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--table", default=TARGET_TABLE)
     parser.add_argument("--location", default=TARGET_LOCATION)
     parser.add_argument("--write-disposition", default=DEFAULT_WRITE_DISPOSITION)
-    parser.add_argument("--output-dir", default="../../tmp/phase10b_bigquery_silver_plan")
+    parser.add_argument("--output-dir", default="../../tmp/bigquery_silver_load_plan")
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--run-date", default=None)
     return parser.parse_args()

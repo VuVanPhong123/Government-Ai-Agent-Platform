@@ -130,7 +130,6 @@ class BigQueryAnalyticsAdapter:
             return None
 
         raise RuntimeError(
-            "Real BigQuery analytics execution is not enabled in Phase 6. "
-            "Use --dry-run or run a later chunk after credentials, project, "
-            "location, and side effects are explicitly confirmed."
+            "Real BigQuery analytics execution is not enabled for this dry-run adapter. "
+            "Use --dry-run until credentials, project, location, and side effects are explicitly confirmed."
         )

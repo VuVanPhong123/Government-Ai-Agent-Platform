@@ -43,7 +43,7 @@ def test_build_silver_fixture_csv(tmp_path: Path) -> None:
             "--source",
             "all",
             "--run-id",
-            "phase10a-fixture-test",
+            "silver-fixture-test",
             "--run-date",
             "2026-05-18",
             "--output-dir",

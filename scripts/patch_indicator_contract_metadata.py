@@ -23,16 +23,16 @@ from app.catalog.canonical_indicator_catalog import list_indicators  # noqa: E40
 
 HEADER = """# Unified indicator contract for Government AI Agent Platform
 # Root keys are indicator/technical-column codes.
-# Runtime services should not read this YAML directly; generated artifacts will be created in the next phase.
+# Runtime services should not read this YAML directly; generated artifacts will be created in the next release step.
 #
 # NOTE:
 # imputation_policy is the desired contract behavior.
-# Current pipeline must be aligned in the next pipeline/audit phase so poverty_headcount,
+# Current pipeline must be aligned in the next pipeline/audit release step so poverty_headcount,
 # poverty_change_5yr and crisis flags are not interpolated.
 #
 # MIGRATION NOTE:
 # This patch script temporarily imports the old AI catalog only to migrate metadata into this contract.
-# After this phase, generators must read from indicator_contract.yaml, not from the old AI catalog.
+# After this release step, generators must read from indicator_contract.yaml, not from the old AI catalog.
 
 """
 

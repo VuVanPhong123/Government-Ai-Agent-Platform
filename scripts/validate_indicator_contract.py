@@ -102,7 +102,7 @@ ALLOWED_NULL_POLICIES = {
 
 
 # Snapshot from current analytics-worker TABLES_INDICATORS.
-# This is validation-only. Generator in the next phase must read from indicator_contract.yaml.
+# This is validation-only. Generator in the next release step must read from indicator_contract.yaml.
 EXPECTED_ANALYTICS_BY_GOLD_TABLE = {
     "gold_growth_dynamics": {
         "rGDP_growth_YoY",

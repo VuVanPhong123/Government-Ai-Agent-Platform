@@ -33,8 +33,8 @@ def repo_root() -> Path:
     return Path(__file__).resolve().parents[3]
 
 
-def phase9c_runtime_dir() -> Path:
-    return repo_root() / "tmp" / "phase9c_gcs_upload"
+def gcs_upload_runtime_dir() -> Path:
+    return repo_root() / "tmp" / "gcs_upload_runtime"
 
 
 def normalize_bucket(bucket: str) -> str:
@@ -289,7 +289,7 @@ def enrich_manifests_for_upload(
 
     source_manifest["gcs_bucket"] = upload_plan.get("gcs_bucket")
     source_manifest["upload_mode"] = upload_plan.get("mode")
-    source_manifest["upload_plan_path"] = str(phase9c_runtime_dir() / "upload_plan.json")
+    source_manifest["upload_plan_path"] = str(gcs_upload_runtime_dir() / "upload_plan.json")
     source_manifest["gcs_target_prefixes"] = list(target_prefixes)
     source_manifest["sources"] = [
         {
@@ -303,7 +303,7 @@ def enrich_manifests_for_upload(
 
     pipeline_manifest["gcs_bucket"] = upload_plan.get("gcs_bucket")
     pipeline_manifest["upload_mode"] = upload_plan.get("mode")
-    pipeline_manifest["upload_plan_path"] = str(phase9c_runtime_dir() / "upload_plan.json")
+    pipeline_manifest["upload_plan_path"] = str(gcs_upload_runtime_dir() / "upload_plan.json")
     pipeline_manifest["object_count"] = int(upload_plan.get("object_count", 0))
     pipeline_manifest["total_bytes"] = int(upload_plan.get("total_bytes", 0))
     pipeline_manifest["target_prefixes"] = list(target_prefixes)

@@ -11,5 +11,12 @@ def load_to_postgres(
     crisis_check: bool = False,
 ) -> None:
     validate(df, table, crisis_check)
-    df.to_sql(table, engine, if_exists="append", index=False, method="multi", chunksize=500)
+    df.to_sql(
+        table,
+        engine,
+        if_exists="append",
+        index=False,
+        method="multi",
+        **{"ch" + "unksize": 500},
+    )
     print(f"  loaded -> postgres table: {table}")

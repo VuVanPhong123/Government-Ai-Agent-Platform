@@ -10,7 +10,7 @@ from sources.gcs_upload import build_gcs_uri, build_upload_plan, execute_upload_
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 PIPELINE_DIR = REPO_ROOT / "services" / "data-pipeline"
-UPLOAD_PLAN_PATH = REPO_ROOT / "tmp" / "phase9c_gcs_upload" / "upload_plan.json"
+UPLOAD_PLAN_PATH = REPO_ROOT / "tmp" / "gcs_upload_runtime" / "upload_plan.json"
 
 
 def _write_text(path: Path, text: str) -> None:
@@ -67,7 +67,7 @@ def test_upload_plan_contains_expected_bronze_and_manifest_targets(tmp_path: Pat
     plan = build_upload_plan(
         output_dir=output_dir,
         bucket="western-pivot-452008-a6-gov-ai-economic-data",
-        run_id="phase9c-gcs-plan",
+        run_id="gcs-upload-plan",
         run_date="2026-05-18",
         dry_run=True,
         cloud_approved=False,
@@ -104,7 +104,7 @@ def test_cloud_write_approved_false_blocks_execution(tmp_path: Path, monkeypatch
     plan = build_upload_plan(
         output_dir=output_dir,
         bucket="western-pivot-452008-a6-gov-ai-economic-data",
-        run_id="phase9c-gcs-plan",
+        run_id="gcs-upload-plan",
         run_date="2026-05-18",
         dry_run=False,
     )
@@ -122,7 +122,7 @@ def test_ingest_sources_dry_run_generates_upload_plan_json(tmp_path: Path) -> No
             "--source",
             "all",
             "--run-id",
-            "phase9c-gcs-plan",
+            "gcs-upload-plan",
             "--run-date",
             "2026-05-18",
             "--output-dir",

@@ -37,7 +37,7 @@ silver_rules:
       - run_id
       - run_date
       - loaded_at
-    enabled_after_phase: 3
+    required_when: cloud_metadata_available
 
   no_duplicate_country_year_indicator_source:
     severity: error
@@ -94,7 +94,7 @@ gold_rules:
       - run_id
       - run_date
       - loaded_at
-    enabled_after_phase: 4
+    required_when: cloud_metadata_available
 
   no_duplicate_country_year:
     severity: error
@@ -188,7 +188,7 @@ analytics_rules:
       - run_id
       - run_date
       - loaded_at
-    enabled_after_phase: 6
+    required_when: cloud_metadata_available
 
   no_duplicate_country_year:
     severity: error
