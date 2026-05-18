@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AnalyticsController } from './analytics.controller';
 import { AnalyticsService } from './analytics.service';
@@ -9,16 +9,26 @@ import { AnalyticsGoldCrisisRisk } from '../entities/analytics-gold-crisis-risk.
 import { GoldGrowthDynamics } from '../entities/gold-growth-dynamics.entity';
 import { BigQueryModule } from '../bigquery/bigquery.module';
 
+function createAnalyticsTypeOrmFeatureModule(): DynamicModule | undefined {
+  if (process.env.BACKEND_DATA_SOURCE === 'bigquery') {
+    return undefined;
+  }
+
+  return TypeOrmModule.forFeature([
+    AnalyticsClusters,
+    AnalyticsGoldGrowthDynamics,
+    AnalyticsGoldFiscalMonetary,
+    AnalyticsGoldCrisisRisk,
+    GoldGrowthDynamics,
+  ]);
+}
+
+const analyticsTypeOrmFeatureModule = createAnalyticsTypeOrmFeatureModule();
+
 @Module({
   imports: [
     BigQueryModule,
-    TypeOrmModule.forFeature([
-      AnalyticsClusters,
-      AnalyticsGoldGrowthDynamics,
-      AnalyticsGoldFiscalMonetary,
-      AnalyticsGoldCrisisRisk,
-      GoldGrowthDynamics,
-    ]),
+    ...(analyticsTypeOrmFeatureModule ? [analyticsTypeOrmFeatureModule] : []),
   ],
   controllers: [AnalyticsController],
   providers: [AnalyticsService],

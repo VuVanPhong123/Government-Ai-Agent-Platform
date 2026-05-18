@@ -92,6 +92,7 @@ export class BigQueryService {
       params.indicator !== null &&
       params.indicator.trim() !== '';
     const normalizedIndicator = this.normalizeIndicator(params.indicator);
+    const normalizedCountryCode = this.normalizeCountryCode(params.countryCode);
     const threshold = this.clampNumber(params.threshold, 0, 1, 0.75);
     const limit = this.clampNumber(params.limit, 1, MAX_LIMIT, 15);
     const offset = this.clampNumber(params.offset, 0, Number.MAX_SAFE_INTEGER, 0);
@@ -104,6 +105,9 @@ export class BigQueryService {
     }
 
     const anomalyBranches: string[] = [];
+    const countryFilterSql = normalizedCountryCode
+      ? 'AND a.country_code = @countryCode'
+      : '';
     if (!normalizedIndicator || normalizedIndicator === 'growth') {
       anomalyBranches.push(`
         SELECT
@@ -117,7 +121,7 @@ export class BigQueryService {
         LEFT JOIN \`western-pivot-452008-a6.gov_ai_gold.gold_growth_dynamics\` g
           ON g.country_code = a.country_code AND g.year = a.year
         WHERE a.rGDP_growth_YoY_anomaly_score BETWEEN @threshold AND 1
-          AND (@countryCode IS NULL OR a.country_code = @countryCode)
+          ${countryFilterSql}
       `);
     }
 
@@ -134,7 +138,7 @@ export class BigQueryService {
         LEFT JOIN \`western-pivot-452008-a6.gov_ai_gold.gold_growth_dynamics\` g
           ON g.country_code = a.country_code AND g.year = a.year
         WHERE a.govdebt_GDP_anomaly_score BETWEEN @threshold AND 1
-          AND (@countryCode IS NULL OR a.country_code = @countryCode)
+          ${countryFilterSql}
       `);
     }
 
@@ -151,7 +155,7 @@ export class BigQueryService {
         LEFT JOIN \`western-pivot-452008-a6.gov_ai_gold.gold_growth_dynamics\` g
           ON g.country_code = a.country_code AND g.year = a.year
         WHERE a.REER_deviation_anomaly_score BETWEEN @threshold AND 1
-          AND (@countryCode IS NULL OR a.country_code = @countryCode)
+          ${countryFilterSql}
       `);
     }
 
@@ -205,14 +209,18 @@ export class BigQueryService {
       OFFSET @offset
     `;
 
-    const rows = await this.executeQuery<
-      BigQueryAnomalyItem & { total_count: number | string | null }
-    >(sql, {
-      countryCode: params.countryCode || null,
+    const queryParams: Record<string, unknown> = {
       threshold,
       limit,
       offset,
-    });
+    };
+    if (normalizedCountryCode) {
+      queryParams.countryCode = normalizedCountryCode;
+    }
+
+    const rows = await this.executeQuery<
+      BigQueryAnomalyItem & { total_count: number | string | null }
+    >(sql, queryParams);
 
     const totalCount =
       rows.length > 0 ? Number(rows[0].total_count || 0) : 0;
@@ -305,5 +313,14 @@ export class BigQueryService {
       return 'reer';
     }
     return undefined;
+  }
+
+  private normalizeCountryCode(countryCode?: string): string | undefined {
+    if (!countryCode) {
+      return undefined;
+    }
+
+    const normalized = countryCode.trim().toUpperCase();
+    return normalized === '' ? undefined : normalized;
   }
 }

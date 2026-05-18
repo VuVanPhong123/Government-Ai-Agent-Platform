@@ -41,6 +41,7 @@ from app.core.config import settings
 from app.executor.tool_executor import execute_query_plan
 from app.catalog.canonical_indicator_catalog import normalize_catalog_text, resolve_indicator_alias
 from app.catalog.country_group_catalog import resolve_country_groups
+from app.parser.indicator_guard import validate_indicator_codes
 from app.parser.normalization_guard import normalize_parser_output
 from app.parser.parser_service_client import call_parser_service
 from app.planner.validated_plan_adapter import build_plan_from_validated_query
@@ -73,6 +74,8 @@ def run_hybrid_v2_pipeline(
             "executed_model_parser": False,
             "parserServiceAvailable": False,
             "parserModelDebug": {},
+            "blocked_by_indicator_guard": False,
+            "blocked_indicators": [],
         }
 
         if rule_draft.route == "GENERAL_EXPLANATION" and not rule_draft.needs_front_llm:
@@ -191,6 +194,25 @@ def run_hybrid_v2_pipeline(
                 rule_draft=rule_draft,
                 front_draft=front_draft,
             )
+            if parser_model_debug.get("blocked_by_indicator_guard"):
+                blocked_indicators = list(parser_model_debug.get("blocked_indicators") or [])
+                warning = "Parser trả chỉ số kỹ thuật/không hợp lệ nên hệ thống dừng truy vấn dữ liệu."
+                if blocked_indicators:
+                    warning = f"{warning} Chỉ số: {', '.join(blocked_indicators)}."
+                return _clarification_response(
+                    payload=payload,
+                    message=message,
+                    questions=[warning],
+                    rule_draft=rule_draft,
+                    router_debug=_router_debug(
+                        "NEED_CLARIFICATION",
+                        rule_draft,
+                        front_draft,
+                        front_router_decision,
+                        executed_front_router,
+                        parser_model_debug,
+                    ),
+                )
 
         candidate = normalize_parser_output(
             parsed=model_parsed,
@@ -1381,12 +1403,24 @@ def _call_parser_model_candidate(
 
     parsed = parser_response.get("parsed") if isinstance(parser_response, dict) else None
     parser_debug = _parser_model_debug(parser_response)
+    indicator_validation = validate_indicator_codes(parsed)
+    blocked_indicators = sorted(
+        set(indicator_validation["forbidden_indicators"])
+        | set(indicator_validation["unknown_indicators"])
+    )
 
     debug = {
         "executed_model_parser": True,
         "parserServiceAvailable": isinstance(parser_response, dict),
         "parserModelDebug": parser_debug,
+        "blocked_by_indicator_guard": bool(blocked_indicators),
+        "blocked_indicators": blocked_indicators,
     }
+
+    if blocked_indicators:
+        parser_debug["fallback_reason"] = "invalid_indicator_in_parser_response"
+        parser_debug["indicator_guard"] = indicator_validation
+        return None, debug
 
     if _parser_response_is_safe(parser_response) and isinstance(parsed, dict):
         return parsed, debug
@@ -1400,6 +1434,9 @@ def _parser_response_is_safe(parser_response: Any) -> bool:
 
     parsed = parser_response.get("parsed")
     if not isinstance(parsed, dict):
+        return False
+    indicator_validation = validate_indicator_codes(parsed)
+    if not indicator_validation["valid"]:
         return False
 
     schema_pass = bool(
@@ -1434,6 +1471,7 @@ def _parser_model_debug(parser_response: Any) -> dict[str, Any]:
         }
 
     parsed = parser_response.get("parsed") if isinstance(parser_response.get("parsed"), dict) else {}
+    indicator_validation = validate_indicator_codes(parsed)
     return {
         "safe_to_execute": parser_response.get("safe_to_execute"),
         "catalog_pass": parser_response.get("catalog_pass"),
@@ -1442,6 +1480,7 @@ def _parser_model_debug(parser_response: Any) -> dict[str, Any]:
         "fallback_reason": parser_response.get("fallback_reason"),
         "latency_ms": parser_response.get("latency_ms"),
         "intent": parsed.get("intent"),
+        "indicator_guard": indicator_validation,
     }
 
 

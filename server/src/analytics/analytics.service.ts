@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Repository, Between } from 'typeorm';
@@ -23,16 +23,21 @@ export class AnalyticsService {
   constructor(
     private readonly configService: ConfigService,
     private readonly bigQueryService: BigQueryService,
+    @Optional()
     @InjectRepository(AnalyticsClusters)
-    private clustersRepo: Repository<AnalyticsClusters>,
+    private clustersRepo?: Repository<AnalyticsClusters>,
+    @Optional()
     @InjectRepository(AnalyticsGoldGrowthDynamics)
-    private growthAnalyticsRepo: Repository<AnalyticsGoldGrowthDynamics>,
+    private growthAnalyticsRepo?: Repository<AnalyticsGoldGrowthDynamics>,
+    @Optional()
     @InjectRepository(AnalyticsGoldFiscalMonetary)
-    private fiscalAnalyticsRepo: Repository<AnalyticsGoldFiscalMonetary>,
+    private fiscalAnalyticsRepo?: Repository<AnalyticsGoldFiscalMonetary>,
+    @Optional()
     @InjectRepository(AnalyticsGoldCrisisRisk)
-    private riskAnalyticsRepo: Repository<AnalyticsGoldCrisisRisk>,
+    private riskAnalyticsRepo?: Repository<AnalyticsGoldCrisisRisk>,
+    @Optional()
     @InjectRepository(GoldGrowthDynamics)
-    private growthRepo: Repository<GoldGrowthDynamics>,
+    private growthRepo?: Repository<GoldGrowthDynamics>,
   ) {}
 
   async getClusters(year: number) {
@@ -40,7 +45,7 @@ export class AnalyticsService {
       return this.bigQueryService.getClusters(year);
     }
 
-    return this.clustersRepo.find({
+    return this.getClustersRepo().find({
       where: { year },
       order: { country_code: 'ASC' },
     });
@@ -65,15 +70,15 @@ export class AnalyticsService {
 
     const whereBase = { ...(countryCode && { country_code: countryCode }) };
 
-    const [growthAnomalies] = await this.growthAnalyticsRepo.findAndCount({
+    const [growthAnomalies] = await this.getGrowthAnalyticsRepo().findAndCount({
       where: { ...whereBase, rGDP_growth_YoY_anomaly_score: Between(threshold, 1) },
       select: ['country_code', 'year', 'rGDP_growth_YoY_actual', 'rGDP_growth_YoY_anomaly_score'],
     });
-    const [debtAnomalies] = await this.fiscalAnalyticsRepo.findAndCount({
+    const [debtAnomalies] = await this.getFiscalAnalyticsRepo().findAndCount({
       where: { ...whereBase, govdebt_GDP_anomaly_score: Between(threshold, 1) },
       select: ['country_code', 'year', 'govdebt_GDP_actual', 'govdebt_GDP_anomaly_score'],
     });
-    const [reerAnomalies] = await this.riskAnalyticsRepo.findAndCount({
+    const [reerAnomalies] = await this.getRiskAnalyticsRepo().findAndCount({
       where: { ...whereBase, REER_deviation_anomaly_score: Between(threshold, 1) },
       select: ['country_code', 'year', 'REER_deviation_actual', 'REER_deviation_anomaly_score'],
     });
@@ -89,7 +94,7 @@ export class AnalyticsService {
       reerAnomalies.forEach(a => anomalySources.push({ country_code: a.country_code, year: a.year, indicator: 'REER_deviation', actual_value: a.REER_deviation_actual, anomaly_score: a.REER_deviation_anomaly_score }));
     }
 
-    const countryNames = await this.growthRepo
+    const countryNames = await this.getGrowthRepo()
       .createQueryBuilder('g')
       .select(['g.country_code', 'g.country'])
       .distinct(true)
@@ -122,5 +127,50 @@ export class AnalyticsService {
 
   private isBigQueryMode(): boolean {
     return this.configService.get<string>('BACKEND_DATA_SOURCE') === 'bigquery';
+  }
+
+  private getClustersRepo(): Repository<AnalyticsClusters> {
+    if (!this.clustersRepo) {
+      throw new InternalServerErrorException(
+        'PostgreSQL repository unavailable: AnalyticsClusters repository is not configured.',
+      );
+    }
+    return this.clustersRepo;
+  }
+
+  private getGrowthAnalyticsRepo(): Repository<AnalyticsGoldGrowthDynamics> {
+    if (!this.growthAnalyticsRepo) {
+      throw new InternalServerErrorException(
+        'PostgreSQL repository unavailable: AnalyticsGoldGrowthDynamics repository is not configured.',
+      );
+    }
+    return this.growthAnalyticsRepo;
+  }
+
+  private getFiscalAnalyticsRepo(): Repository<AnalyticsGoldFiscalMonetary> {
+    if (!this.fiscalAnalyticsRepo) {
+      throw new InternalServerErrorException(
+        'PostgreSQL repository unavailable: AnalyticsGoldFiscalMonetary repository is not configured.',
+      );
+    }
+    return this.fiscalAnalyticsRepo;
+  }
+
+  private getRiskAnalyticsRepo(): Repository<AnalyticsGoldCrisisRisk> {
+    if (!this.riskAnalyticsRepo) {
+      throw new InternalServerErrorException(
+        'PostgreSQL repository unavailable: AnalyticsGoldCrisisRisk repository is not configured.',
+      );
+    }
+    return this.riskAnalyticsRepo;
+  }
+
+  private getGrowthRepo(): Repository<GoldGrowthDynamics> {
+    if (!this.growthRepo) {
+      throw new InternalServerErrorException(
+        'PostgreSQL repository unavailable: GoldGrowthDynamics repository is not configured.',
+      );
+    }
+    return this.growthRepo;
   }
 }

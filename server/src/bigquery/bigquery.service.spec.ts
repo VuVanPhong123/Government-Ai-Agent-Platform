@@ -72,6 +72,77 @@ describe('BigQueryService', () => {
     expect(queryMock).not.toHaveBeenCalled();
   });
 
+  it('getAnomalies without countryCode should not pass null/undefined params', async () => {
+    cacheService.get.mockReturnValueOnce(undefined);
+    queryMock.mockResolvedValueOnce([
+      [
+        {
+          country_code: 'VNM',
+          year: 2022,
+          indicator: 'rGDP_growth_YoY',
+          actual_value: 4.2,
+          anomaly_score: 0.91,
+          country_name: 'Viet Nam',
+          total_count: 1,
+        },
+      ],
+    ]);
+
+    const result = await service.getAnomalies({
+      threshold: 0.75,
+      limit: 5,
+      offset: 0,
+    });
+
+    expect(result.meta).toEqual({ total_count: 1, limit: 5, offset: 0 });
+    expect(result.items).toHaveLength(1);
+    expect(queryMock).toHaveBeenCalledTimes(1);
+
+    const queryOptions = queryMock.mock.calls[0][0];
+    expect(queryOptions.query).not.toContain('@countryCode IS NULL');
+    expect(queryOptions.params).toEqual({
+      threshold: 0.75,
+      limit: 5,
+      offset: 0,
+    });
+    expect(Object.values(queryOptions.params)).not.toContain(null);
+    expect(Object.values(queryOptions.params)).not.toContain(undefined);
+  });
+
+  it('getAnomalies with countryCode should include countryCode param and filter', async () => {
+    cacheService.get.mockReturnValueOnce(undefined);
+    queryMock.mockResolvedValueOnce([
+      [
+        {
+          country_code: 'VNM',
+          year: 2022,
+          indicator: 'govdebt_GDP',
+          actual_value: 39.1,
+          anomaly_score: 0.89,
+          country_name: 'Viet Nam',
+          total_count: 1,
+        },
+      ],
+    ]);
+
+    await service.getAnomalies({
+      countryCode: 'vnm',
+      threshold: 0.75,
+      limit: 5,
+      offset: 0,
+    });
+
+    expect(queryMock).toHaveBeenCalledTimes(1);
+    const queryOptions = queryMock.mock.calls[0][0];
+    expect(queryOptions.query).toContain('AND a.country_code = @countryCode');
+    expect(queryOptions.params).toMatchObject({
+      countryCode: 'VNM',
+      threshold: 0.75,
+      limit: 5,
+      offset: 0,
+    });
+  });
+
   it('should reject unsafe queries', () => {
     expect(() =>
       (service as any).validateQuerySafety('SELECT * FROM `a.b.c`'),
@@ -84,4 +155,3 @@ describe('BigQueryService', () => {
     ).toThrow('is not whitelisted');
   });
 });
-

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
@@ -16,12 +16,15 @@ export class CountriesService {
   constructor(
     private readonly configService: ConfigService,
     private readonly bigQueryService: BigQueryService,
+    @Optional()
     @InjectRepository(GoldGrowthDynamics)
-    private growthRepo: Repository<GoldGrowthDynamics>,
+    private growthRepo?: Repository<GoldGrowthDynamics>,
+    @Optional()
     @InjectRepository(AnalyticsGoldGrowthDynamics)
-    private anGrowthRepo: Repository<AnalyticsGoldGrowthDynamics>,
+    private anGrowthRepo?: Repository<AnalyticsGoldGrowthDynamics>,
+    @Optional()
     @InjectRepository(AnalyticsClusters)
-    private clustersRepo: Repository<AnalyticsClusters>,
+    private clustersRepo?: Repository<AnalyticsClusters>,
   ) { }
   async getCountryAnomalies(countryCode: string, threshold: number = 0.75) {
     const analyticsPayload = await this.getFullCountryAnalytics(countryCode);
@@ -67,7 +70,8 @@ export class CountriesService {
       return this.bigQueryService.listCountries();
     }
 
-    const results = await this.growthRepo
+    const growthRepo = this.getGrowthRepo();
+    const results = await growthRepo
       .createQueryBuilder('g')
       .select([
         'g.country_code as country_code',
@@ -85,7 +89,8 @@ export class CountriesService {
   }
 
   async getFullCountryAnalytics(countryCode: string) {
-    const qb = this.growthRepo.createQueryBuilder('g');
+    const growthRepo = this.getGrowthRepo();
+    const qb = growthRepo.createQueryBuilder('g');
     const rows = await qb
       .select([
         'g.country_code as country_code', 'g.year as year',
@@ -125,16 +130,19 @@ export class CountriesService {
     };
   }
   async getClusterBenchmark(countryCode: string, indicator: string, year?: number | null) {
-    const currentCluster = await this.clustersRepo.findOne({
+    const clustersRepo = this.getClustersRepo();
+    const growthRepo = this.getGrowthRepo();
+
+    const currentCluster = await clustersRepo.findOne({
       where: { country_code: countryCode, year: year ?? undefined },
       order: { year: 'DESC' }
     });
     if (!currentCluster) throw new Error('Không tìm thấy cụm cho quốc gia này');
 
-    const members = await this.clustersRepo.find({ where: { cluster_id: currentCluster.cluster_id, year: currentCluster.year } });
+    const members = await clustersRepo.find({ where: { cluster_id: currentCluster.cluster_id, year: currentCluster.year } });
     const memberCodes = members.map(m => m.country_code);
 
-    const qb = this.growthRepo.createQueryBuilder('g')
+    const qb = growthRepo.createQueryBuilder('g')
       .select(['g.country_code as country_code', 'g.country as country_name', 'g.year as year'])
       .where('g.country_code IN (:...codes)', { codes: memberCodes })
       .where('g.year = :year', { year: currentCluster.year });
@@ -150,5 +158,23 @@ export class CountriesService {
     const raw = await qb.getRawMany();
     const avg = raw.length > 0 ? raw.reduce((s, r) => s + (Number(r.value) || 0), 0) / raw.length : 0;
     return { cluster_id: currentCluster.cluster_id, indicator, year: currentCluster.year, average: avg, members: raw };
+  }
+
+  private getGrowthRepo(): Repository<GoldGrowthDynamics> {
+    if (!this.growthRepo) {
+      throw new InternalServerErrorException(
+        'PostgreSQL repository unavailable: GoldGrowthDynamics repository is not configured.',
+      );
+    }
+    return this.growthRepo;
+  }
+
+  private getClustersRepo(): Repository<AnalyticsClusters> {
+    if (!this.clustersRepo) {
+      throw new InternalServerErrorException(
+        'PostgreSQL repository unavailable: AnalyticsClusters repository is not configured.',
+      );
+    }
+    return this.clustersRepo;
   }
 }
