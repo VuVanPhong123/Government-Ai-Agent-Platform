@@ -1,15 +1,24 @@
 export interface Country {
   country_code: string;
   country_name: string;
+  country?: string | null;
   region?: string | null;
 }
 
 export interface Indicator {
   code: string;
   name: string;
+  name_vi?: string | null;
+  name_en?: string | null;
   category: string;
   unit: string;
-  table: string;
+  table?: string | null;
+  supports_compare?: boolean;
+  supports_ranking?: boolean;
+  supports_trend?: boolean;
+  supports_anomaly?: boolean;
+  supports_coverage?: boolean;
+  description_vi?: string | null;
 }
 
 export interface AnomalyItem {
@@ -24,9 +33,36 @@ export interface AnomalyItem {
 export interface ClusterItem {
   year: number;
   country_code: string;
-  country?: string;
+  country?: string | null;
   cluster_id: number;
   latest_valid_year?: number;
+}
+
+export interface CountryAnalyticsMeta {
+  country_code: string;
+  data_completeness?: number | null;
+  flag_score?: number | null;
+  latest_year?: number | null;
+}
+
+export interface CountryAnalyticsResponse {
+  meta: CountryAnalyticsMeta;
+  data: CountryAnalyticsRow[];
+}
+
+export interface ClusterBenchmarkMember {
+  country_code: string;
+  country_name?: string | null;
+  year?: number | null;
+  value: number | null;
+}
+
+export interface ClusterBenchmark {
+  cluster_id: number;
+  indicator: string;
+  year: number;
+  average: number;
+  members: ClusterBenchmarkMember[];
 }
 
 export interface CountryAnalyticsRow {

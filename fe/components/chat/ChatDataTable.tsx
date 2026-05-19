@@ -1,4 +1,5 @@
 import type { AiChatResponse } from '@/lib/types/aiChat';
+import { formatCellValue } from '@/lib/utils/format';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -19,27 +20,7 @@ function getRows(response?: AiChatResponse) {
 }
 
 function formatCell(column: string, value: unknown) {
-  if (value == null) {
-    return '-';
-  }
-
-  if (typeof value === 'number') {
-    const normalizedColumn = column.toLowerCase();
-    if (normalizedColumn === 'year' || normalizedColumn.endsWith('_year')) {
-      return String(value);
-    }
-    return Number.isFinite(value) ? value.toLocaleString('vi-VN', { maximumFractionDigits: 2 }) : '-';
-  }
-
-  if (typeof value === 'string' || typeof value === 'boolean') {
-    return String(value);
-  }
-
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
+  return formatCellValue(column, value);
 }
 
 export default function ChatDataTable({ response }: { response?: AiChatResponse }) {

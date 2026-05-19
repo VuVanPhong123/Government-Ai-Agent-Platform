@@ -10,11 +10,11 @@ export const countriesApi = {
 
 export const indicatorsApi = {
   getAll: () => apiClient.get('/api/v1/indicators'),
-  getByCategory: (category: string) => apiClient.get(`/api/v1/indicators?category=${category}`),
+  getByCategory: (category: string) => apiClient.get('/api/v1/indicators', { params: { category } }),
 };
 
 export const analyticsApi = {
-  getClusters: (year: number) => apiClient.get(`/api/v1/analytics/clusters?year=${year}`),
+  getClusters: (year: number) => apiClient.get('/api/v1/analytics/clusters', { params: { year } }),
   getAnomalies: (params?: { country?: string; indicator?: string; threshold?: number; limit?: number; offset?: number }) =>
     apiClient.get('/api/v1/analytics/anomalies', { params }),
 };

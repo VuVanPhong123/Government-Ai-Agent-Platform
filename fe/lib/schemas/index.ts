@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 export const countrySchema = z.object({
   country_code: z.string(),
-  country_name: z.string(),
+  country_name: z.string().optional(),
+  country: z.string().optional(),
   region: z.string().nullable().optional(),
 });
 
@@ -18,17 +19,25 @@ export const anomalySchema = z.object({
 export const clusterSchema = z.object({
   year: z.number(),
   country_code: z.string(),
-  country: z.string().optional(),
+  country: z.string().nullable().optional(),
   cluster_id: z.number(),
   latest_valid_year: z.number().optional(),
 });
 
 export const indicatorSchema = z.object({
   code: z.string(),
-  name: z.string(),
-  category: z.string(),
-  unit: z.string(),
-  table: z.string(),
+  name: z.string().optional(),
+  name_vi: z.string().nullable().optional(),
+  name_en: z.string().nullable().optional(),
+  category: z.string().optional(),
+  unit: z.string().optional(),
+  table: z.string().nullable().optional(),
+  supports_compare: z.boolean().optional(),
+  supports_ranking: z.boolean().optional(),
+  supports_trend: z.boolean().optional(),
+  supports_anomaly: z.boolean().optional(),
+  supports_coverage: z.boolean().optional(),
+  description_vi: z.string().nullable().optional(),
 });
 
 export const parseArray = <T>(schema: z.ZodType<T>, data: unknown): T[] => {
@@ -52,4 +61,11 @@ export const countryAnalyticsRowSchema = z.object({
   actual_reer_deviation: z.number().nullable().optional(),
   anomaly_reer_deviation: z.number().nullable().optional(),
   cluster_id: z.number().nullable().optional(),
+});
+
+export const countryAnalyticsMetaSchema = z.object({
+  country_code: z.string(),
+  data_completeness: z.number().nullable().optional(),
+  flag_score: z.number().nullable().optional(),
+  latest_year: z.number().nullable().optional(),
 });

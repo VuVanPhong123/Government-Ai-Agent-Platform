@@ -4,8 +4,8 @@ import { anomalySchema } from '@/lib/schemas';
 import { z } from 'zod';
 
 const anomalyResponseSchema = z.object({
-  items: z.array(anomalySchema),
-  meta: z.object({ total_count: z.number(), limit: z.number(), offset: z.number() }),
+  items: z.array(anomalySchema).optional(),
+  meta: z.object({ total_count: z.number().optional(), limit: z.number().optional(), offset: z.number().optional() }).optional(),
 });
 
 export const useAnomalies = ({
@@ -15,18 +15,32 @@ export const useAnomalies = ({
     queryKey: ['anomalies', country, indicator, threshold, limit, offset],
     queryFn: async () => {
       const { data } = await analyticsApi.getAnomalies({ country, indicator, threshold, limit, offset });
-      return anomalyResponseSchema.parse(data);
+      const wrapped = anomalyResponseSchema.safeParse(data);
+      if (wrapped.success) {
+        return {
+          items: wrapped.data.items || [],
+          meta: wrapped.data.meta || {},
+        };
+      }
+      const direct = z.array(anomalySchema).safeParse(data);
+      if (direct.success) {
+        return {
+          items: direct.data,
+          meta: { total_count: direct.data.length, limit, offset },
+        };
+      }
+      throw new Error('Dữ liệu bất thường không hợp lệ từ API.');
     },
     staleTime: 30 * 1000,
   });
 
   const { data, isLoading, isError, error } = queryResult;
   return {
-    data: data?.items,
-    total: data?.meta.total_count,
+    data: data?.items || [],
+    total: data?.meta.total_count ?? data?.items?.length ?? 0,
     isLoading,
     isError,
     error: error as Error | null,
-    isEmpty: !isLoading && !isError && (!data || data.items.length === 0),
+    isEmpty: !isLoading && !isError && (!data || !data.items || data.items.length === 0),
   };
 };

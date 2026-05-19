@@ -3,11 +3,14 @@ import { countriesApi } from '@/lib/api/endpoints';
 import { useIndicators } from './useIndicators';
 import { analyticsResponseSchema } from './useCountries';
 import { CountryAnalyticsRow, CompareGroupedData } from '@/lib/types';
+import { countryAnalyticsRowSchema } from '@/lib/schemas';
+import { z } from 'zod';
 
 const INDICATOR_KEY_MAP: Record<string, keyof CountryAnalyticsRow> = {
   rGDP_growth_YoY: 'actual_growth',
   govdebt_GDP: 'actual_debt',
   REER_deviation: 'actual_reer_deviation',
+  actual_reer_deviation: 'actual_reer_deviation',
   inflation_cpi: 'actual_inflation',
   poverty_headcount: 'actual_poverty',
   unemployment_total: 'actual_unemployment',
@@ -24,8 +27,10 @@ export const useCompare = (countryCodes: string[], indicator: string) => {
       queryKey: ['compare', code, indicator],
       queryFn: async () => {
         const { data } = await countriesApi.getFullAnalytics(code);
-        const parsed = analyticsResponseSchema.parse(data);
-        return parsed.data.map(item => ({
+        const parsed = analyticsResponseSchema.safeParse(data);
+        const fallback = z.array(countryAnalyticsRowSchema).safeParse(data);
+        const rows = parsed.success ? parsed.data.data : fallback.success ? fallback.data : [];
+        return rows.map(item => ({
           year: item.year,
           value: (item[actualKey] as number | null | undefined) ?? null,
           country_code: code,
@@ -50,5 +55,15 @@ export const useCompare = (countryCodes: string[], indicator: string) => {
 
   const meta = indicators?.find(i => i.code === indicator);
 
-  return { data: grouped, isLoading, error, indicatorName: meta?.name || indicator, indicatorUnit: meta?.unit || '' };
+  Object.keys(grouped).forEach((code) => {
+    grouped[code] = grouped[code].slice().sort((a, b) => a.year - b.year);
+  });
+
+  return {
+    data: grouped,
+    isLoading,
+    error,
+    indicatorName: meta?.name || indicator,
+    indicatorUnit: meta?.unit || '',
+  };
 };
