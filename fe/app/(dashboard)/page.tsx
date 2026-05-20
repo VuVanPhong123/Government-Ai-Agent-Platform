@@ -108,11 +108,11 @@ export default function DashboardPage() {
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <SectionCard title="Nhóm chỉ số chính">
           <ul className="space-y-2 text-sm text-slate-700">
-            <li>Tăng trưởng và quy mô nền kinh tế.</li>
-            <li>Tài khóa và tiền tệ.</li>
-            <li>Rủi ro khủng hoảng và ổn định vĩ mô.</li>
-            <li>Phúc lợi xã hội và thị trường lao động.</li>
-            <li>Cơ cấu kinh tế và chuyển dịch ngành.</li>
+            <li>Tăng trưởng và quy mô nền kinh tế(growth_dynamics)</li>
+            <li>Tài khóa và tiền tệ(fiscal_monetary)</li>
+            <li>Rủi ro khủng hoảng và ổn định vĩ mô(crisis_risk)</li>
+            <li>Phúc lợi xã hội và thị trường lao động(social_welfare)</li>
+            <li>Cơ cấu kinh tế và chuyển dịch ngành(structural_composition)</li>
           </ul>
         </SectionCard>
         <SectionCard title="Năng lực phân tích">

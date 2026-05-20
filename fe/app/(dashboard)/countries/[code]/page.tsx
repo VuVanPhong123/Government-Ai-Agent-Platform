@@ -8,6 +8,7 @@ import {
   Legend,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -27,7 +28,8 @@ import {
   useCountryIndicators,
   useClusterBenchmark,
 } from '@/lib/hooks/useCountries';
-import { formatIndicatorValue, formatNullable, formatNumber, formatYear } from '@/lib/utils/format';
+import { getIndicatorCategoryLabel } from '@/lib/indicatorCategories';
+import { formatCompactNumber, formatIndicatorValue, formatNullable, formatNumber, formatYear } from '@/lib/utils/format';
 
 const KPI_CODES = [
   'rGDP_growth_YoY',
@@ -37,10 +39,14 @@ const KPI_CODES = [
   'poverty_headcount',
 ];
 const TABLE_PAGE_SIZE = 20;
+const DEFAULT_PRIMARY_INDICATOR = 'govdebt_GDP';
 
 type SeriesPoint = {
   year: number;
   value: number | null;
+  trend: number | null;
+  anomaly_score: number | null;
+  is_anomaly: boolean;
 };
 
 function resolveCompletenessPercent(meta?: {
@@ -89,7 +95,13 @@ export default function CountryDetailPage() {
         unit: row.unit || '',
         points: [],
       };
-      current.points.push({ year: row.year, value: row.value });
+      current.points.push({
+        year: row.year,
+        value: row.value,
+        trend: row.trend_value ?? null,
+        anomaly_score: row.anomaly_score ?? null,
+        is_anomaly: row.is_anomaly === true,
+      });
       grouped.set(row.indicator, current);
     });
     return Array.from(grouped.values())
@@ -108,7 +120,7 @@ export default function CountryDetailPage() {
     };
   }, [rows]);
 
-  const [selectedIndicatorState, setSelectedIndicator] = useState<string>('');
+  const [selectedIndicatorState, setSelectedIndicator] = useState<string>(DEFAULT_PRIMARY_INDICATOR);
   const [fromYearState, setFromYear] = useState<number | null>(null);
   const [toYearState, setToYear] = useState<number | null>(null);
   const [tableSearch, setTableSearch] = useState('');
@@ -117,6 +129,8 @@ export default function CountryDetailPage() {
   const selectedIndicator =
     selectedIndicatorState && indicatorSeries.some(item => item.indicator === selectedIndicatorState)
       ? selectedIndicatorState
+      : indicatorSeries.some(item => item.indicator === DEFAULT_PRIMARY_INDICATOR)
+        ? DEFAULT_PRIMARY_INDICATOR
       : (indicatorSeries[0]?.indicator ?? '');
   const fromYear = fromYearState ?? yearBounds.min;
   const toYear = toYearState ?? yearBounds.max;
@@ -174,7 +188,8 @@ export default function CountryDetailPage() {
       return (
         row.indicator.toLowerCase().includes(keyword) ||
         row.indicator_name.toLowerCase().includes(keyword) ||
-        row.category.toLowerCase().includes(keyword)
+        row.category.toLowerCase().includes(keyword) ||
+        getIndicatorCategoryLabel(row.category).toLowerCase().includes(keyword)
       );
     });
     return filtered.sort((a, b) => {
@@ -234,7 +249,17 @@ export default function CountryDetailPage() {
     return result.sort((a, b) => b.year - a.year).slice(0, 15);
   }, [analyticsQuery.data?.data]);
 
-  const benchmarkQuery = useClusterBenchmark(code, 'govdebt_GDP', latestYear ?? undefined);
+  const benchmarkQuery = useClusterBenchmark(code, DEFAULT_PRIMARY_INDICATOR, latestYear ?? undefined);
+
+  const anomalyMarkerYears = Array.from(
+    new Set(
+      filteredSeriesPoints
+        .filter(point => point.is_anomaly || (point.anomaly_score ?? 0) >= 0.75)
+        .map(point => point.year),
+    ),
+  ).sort((a, b) => a - b);
+
+  const hasTrendInSeries = filteredSeriesPoints.some(point => point.trend != null);
 
   if (analyticsQuery.isLoading || countriesQuery.isLoading || indicatorsQuery.isLoading) {
     return (
@@ -400,7 +425,7 @@ export default function CountryDetailPage() {
             {selectedSeries ? (
               <>
                 <p className="font-medium text-slate-800">{selectedSeries.indicator_name}</p>
-                <p>Category: {selectedSeries.category}</p>
+                <p>Nhóm: {getIndicatorCategoryLabel(selectedSeries.category)}</p>
                 <p>Unit: {selectedSeries.unit || 'N/A'}</p>
                 <p>Code: {selectedSeries.indicator}</p>
               </>
@@ -420,10 +445,10 @@ export default function CountryDetailPage() {
         ) : (
           <div className="h-[320px] min-w-0 w-full">
             <ResponsiveContainer width="100%" height={320}>
-              <LineChart data={filteredSeriesPoints}>
+              <LineChart data={filteredSeriesPoints} margin={{ left: 16, right: 24, top: 16, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="year" />
-                <YAxis />
+                <YAxis width={88} tickFormatter={(value) => formatCompactNumber(typeof value === 'number' ? value : Number(value))} />
                 <Tooltip
                   formatter={value =>
                     formatIndicatorValue(
@@ -438,7 +463,13 @@ export default function CountryDetailPage() {
                   labelFormatter={label => `Năm ${formatYear(label as number)}`}
                 />
                 <Legend />
-                <Line type="monotone" dataKey="value" name={selectedSeries?.indicator_name || 'Giá trị'} stroke="#1d4ed8" strokeWidth={2} dot={false} connectNulls />
+                <Line type="monotone" dataKey="value" name="Giá trị thực tế" stroke="#1d4ed8" strokeWidth={2} dot={false} connectNulls />
+                {hasTrendInSeries ? (
+                  <Line type="monotone" dataKey="trend" name="Xu hướng" stroke="#475569" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls />
+                ) : null}
+                {anomalyMarkerYears.map(year => (
+                  <ReferenceLine key={`anomaly-${year}`} x={year} stroke="#b45309" strokeDasharray="4 4" label={{ value: 'Điểm bất thường', position: 'top', fill: '#92400e', fontSize: 11 }} />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -478,7 +509,7 @@ export default function CountryDetailPage() {
                     {item.indicator_name}
                     <p className="text-xs text-slate-500">{item.indicator}</p>
                   </td>
-                  <td className="px-3 py-2">{item.category}</td>
+                  <td className="px-3 py-2">{getIndicatorCategoryLabel(item.category)}</td>
                   <td className="px-3 py-2 text-right">
                     {item.value == null ? 'Chưa có dữ liệu phù hợp' : formatIndicatorValue(item.value, item.unit)}
                   </td>
@@ -501,7 +532,7 @@ export default function CountryDetailPage() {
         <div className="space-y-4">
           {groupedIndicators.map(([category, items]) => (
             <article key={category} className="rounded-md border border-slate-200 bg-slate-50 p-3">
-              <h3 className="text-sm font-semibold text-slate-900">{category}</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{getIndicatorCategoryLabel(category)}</h3>
               <div className="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-2">
                 {items.map(item => {
                   const latest = item.points.slice().reverse().find(point => point.value != null);
@@ -570,6 +601,7 @@ export default function CountryDetailPage() {
                   <th className="px-3 py-2 text-left font-semibold">Chỉ số</th>
                   <th className="px-3 py-2 text-right font-semibold">Giá trị</th>
                   <th className="px-3 py-2 text-right font-semibold">Điểm bất thường thống kê</th>
+                  <th className="px-3 py-2 text-right font-semibold">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
@@ -582,6 +614,14 @@ export default function CountryDetailPage() {
                     </td>
                     <td className="px-3 py-2 text-right">{formatIndicatorValue(item.value, item.unit)}</td>
                     <td className="px-3 py-2 text-right">{formatNumber(item.score, 3)}</td>
+                    <td className="px-3 py-2 text-right">
+                      <Link
+                        href={`/chat?q=${encodeURIComponent(`Phân tích bất thường của chỉ số ${item.indicatorLabel} tại ${countryName} (${code}) năm ${formatYear(item.year)}. Giá trị là ${item.value ?? 'N/A'} ${item.unit || ''}, điểm bất thường là ${formatNumber(item.score, 3)}. Hãy giải thích ý nghĩa kinh tế, các nguyên nhân có thể và những điểm cần kiểm tra thêm dựa trên dữ liệu hiện có.`)}`}
+                        className="rounded-md border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      >
+                        Phân tích
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

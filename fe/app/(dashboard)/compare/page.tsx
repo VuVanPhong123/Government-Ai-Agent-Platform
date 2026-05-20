@@ -25,7 +25,7 @@ import { useCompare } from '@/lib/hooks/useCompare';
 import { useUrlState } from '@/lib/hooks/useUrlState';
 import { formatIndicatorValue, formatYear } from '@/lib/utils/format';
 
-const DEFAULT_COUNTRIES = ['VNM', 'THA'];
+const DEFAULT_COUNTRIES = ['USA', 'AUS'];
 const DEFAULT_INDICATOR = 'govdebt_GDP';
 const DEFAULT_FROM = 2010;
 const DEFAULT_TO = 2023;

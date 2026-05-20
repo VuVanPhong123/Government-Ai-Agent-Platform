@@ -8,6 +8,7 @@ import TableShell from '@/components/ui/TableShell';
 import StateBlock from '@/components/ui/StateBlock';
 import { TableSkeleton } from '@/components/ui/Skeletons';
 import { useIndicators } from '@/lib/hooks/useIndicators';
+import { getIndicatorCategoryLabel } from '@/lib/indicatorCategories';
 
 export default function IndicatorsPage() {
   const { data, isLoading, isError, error } = useIndicators();
@@ -56,7 +57,7 @@ export default function IndicatorsPage() {
             <option value="">Tất cả nhóm</option>
             {categories.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {getIndicatorCategoryLabel(item)}
               </option>
             ))}
           </select>
@@ -109,7 +110,7 @@ export default function IndicatorsPage() {
                     {item.description_vi ? <p className="mt-1 text-xs text-slate-600">{item.description_vi}</p> : null}
                   </td>
                   <td className="px-4 py-3">{item.unit || 'Chưa công bố'}</td>
-                  <td className="px-4 py-3">{item.category || 'Khác'}</td>
+                  <td className="px-4 py-3">{getIndicatorCategoryLabel(item.category)}</td>
                   <td className="px-4 py-3 text-xs text-slate-700">
                     {[
                       item.supports_compare ? 'So sánh' : null,

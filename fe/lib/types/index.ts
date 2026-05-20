@@ -114,6 +114,9 @@ export interface CountryIndicatorRow {
   category: string;
   unit: string;
   value: number | null;
+  trend_value?: number | null;
+  anomaly_score?: number | null;
+  is_anomaly?: boolean | null;
   source_table: string;
 }
 

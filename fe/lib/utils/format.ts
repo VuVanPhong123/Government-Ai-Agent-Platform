@@ -39,6 +39,14 @@ export const formatCurrencyCurrentUSD = (
   return `${formatNumber(value, decimals)} US$`;
 };
 
+export const formatCompactNumber = (value: number | null | undefined): string => {
+  if (value === null || value === undefined || Number.isNaN(value)) return 'N/A';
+  return new Intl.NumberFormat('en', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(value);
+};
+
 export const formatBinary = (value: number | null | undefined): string => {
   if (value === null || value === undefined || Number.isNaN(value)) return 'N/A';
   return value >= 1 ? 'Có' : 'Không';

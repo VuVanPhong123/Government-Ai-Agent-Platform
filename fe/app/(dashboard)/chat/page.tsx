@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
-import { Loader2, MessageSquareText, Plus } from 'lucide-react';
+import { Loader2, MessageSquareText } from 'lucide-react';
 import ChatInput from '@/components/chat/ChatInput';
 import ChatMessage from '@/components/chat/ChatMessage';
 import { useAiChat } from '@/lib/hooks/useAiChat';
@@ -175,17 +175,6 @@ function ChatPageContent() {
       </div>
 
       <section className="flex min-h-[700px] flex-col overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
-        <div className="sticky top-0 z-10 flex justify-end border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
-          <button
-            type="button"
-            onClick={handleNewChat}
-            className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
-            <Plus className="h-4 w-4" />
-            New chat
-          </button>
-        </div>
-
         <div className="flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4">
           {messages.length === 0 ? (
             <div className="flex h-full items-center justify-center">
@@ -193,7 +182,7 @@ function ChatPageContent() {
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded bg-slate-100 text-slate-600">
                   <MessageSquareText className="h-5 w-5" />
                 </div>
-                <h2 className="text-base font-semibold text-slate-900">Bắt đầu trao đổi với trợ lý</h2>
+                <h2 className="text-base font-semibold text-slate-900">Báº¯t Ä‘áº§u trao Ä‘á»•i vá»›i trá»£ lÃ½</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   Khuyến nghị bắt đầu bằng câu hỏi đầy đủ quốc gia, chỉ số và giai đoạn năm để tăng độ chính xác.
                 </p>
@@ -207,16 +196,8 @@ function ChatPageContent() {
 
           {chatMutation.isPending ? (
             <div className="flex justify-start">
-              <div className="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-                <div className="mb-2 flex items-center gap-2 font-medium text-slate-700">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Đang xử lý yêu cầu phân tích
-                </div>
-                <ul className="space-y-1 text-xs text-slate-600">
-                  <li>Đang phân tích câu hỏi</li>
-                  <li>Đang truy xuất dữ liệu phù hợp</li>
-                  <li>Đang tổng hợp kết quả</li>
-                </ul>
+              <div className="rounded-md border border-slate-200 bg-white p-3">
+                <Loader2 className="h-5 w-5 animate-spin text-slate-600" aria-label="Đang xử lý" />
               </div>
             </div>
           ) : null}
@@ -257,6 +238,7 @@ function ChatPageContent() {
           isLoading={chatMutation.isPending}
           onChange={setInput}
           onSubmit={handleSubmit}
+          onNewChat={handleNewChat}
         />
       </section>
     </div>
