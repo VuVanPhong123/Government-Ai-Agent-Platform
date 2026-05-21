@@ -31,12 +31,12 @@ from app.composer.template_composer import (
     sanitize_clarification_questions,
 )
 from app.conversation.context_store import (
+    build_front_llm_context,
     make_assistant_turn,
     make_user_turn,
     summarize_rows,
     update_conversation_context,
 )
-from app.conversation.followup_merge import merge_followup_query
 from app.core.config import settings
 from app.executor.tool_executor import execute_query_plan
 from app.catalog.canonical_indicator_catalog import normalize_catalog_text, resolve_indicator_alias
@@ -65,7 +65,7 @@ def run_hybrid_v2_pipeline(
     router_decision: Any | None = None,
 ) -> AiChatResponse | None:
     try:
-        rule_draft = run_rule_first_router(message, router_context)
+        rule_draft = run_rule_first_router(message)
         front_draft = build_front_router_draft_from_existing_router(None, rule_draft)
         front_router_decision = None
         executed_front_router = False
@@ -94,7 +94,8 @@ def run_hybrid_v2_pipeline(
             )
 
         if _should_execute_front_router(rule_draft):
-            front_router_decision = router_decision or _route_with_front_llm(message, router_context, rule_draft)
+            front_llm_context = build_front_llm_context(previous_context)
+            front_router_decision = router_decision or _route_with_front_llm(message, front_llm_context, rule_draft)
             executed_front_router = front_router_decision is not None
             router_result = _decision_to_dict(front_router_decision)
             front_draft = build_front_router_draft_from_existing_router(router_result, rule_draft)
@@ -182,7 +183,6 @@ def run_hybrid_v2_pipeline(
 
         standalone_query = _standalone_query_from_front_or_rule(
             message=message,
-            previous_context=previous_context,
             rule_draft=rule_draft,
             front_draft=front_draft,
         )
@@ -1205,13 +1205,13 @@ def _looks_like_general_explanation(message: str) -> bool:
 
 
 def _should_execute_front_router(rule_draft: Any) -> bool:
-    return bool(rule_draft.needs_front_llm or rule_draft.confidence < 0.9)
+    return bool(rule_draft.needs_front_llm or rule_draft.confidence < 0.75)
 
 
-def _route_with_front_llm(message: str, router_context: dict[str, Any], rule_draft: Any | None = None) -> Any:
+def _route_with_front_llm(message: str, front_llm_context: dict[str, Any], rule_draft: Any | None = None) -> Any:
     return route_with_front_llm_draft(
         user_message=message,
-        conversation_context=router_context,
+        conversation_context=front_llm_context,
         rule_route_draft=rule_draft,
     )
 
@@ -1272,22 +1272,11 @@ def _should_call_parser_model(message: str, rule_draft: Any, front_draft: Any) -
 def _standalone_query_from_front_or_rule(
     *,
     message: str,
-    previous_context: dict[str, Any],
     rule_draft: Any,
     front_draft: Any,
 ) -> str:
     if front_draft and front_draft.rewritten_query:
         return front_draft.rewritten_query
-
-    if rule_draft.route == "FOLLOW_UP_MODIFY_QUERY" and rule_draft.delta:
-        previous_query = (
-            previous_context.get("last_data_query")
-            or previous_context.get("last_validated_query")
-            or previous_context.get("last_parsed_query")
-            or {}
-        )
-        merged_query = merge_followup_query(previous_query, rule_draft.delta)
-        return _query_dict_to_standalone_text(merged_query) or message
 
     return message
 
